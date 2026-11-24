@@ -7,6 +7,9 @@
 
 let bgStars = [];
 let nebulaPoints = null;
+// Three-way text pick (EN/VI/ZH) for the few HUD strings drawn here; VI keeps
+// the original English, as the shipped VI version does.
+const _hudL3 = (en, vi, zh) => (typeof window._L3 === 'function' ? window._L3(en, vi, zh) : en);
 const _walpurgisIconImg = new Image();
 _walpurgisIconImg.src = 'assets/images/game/icons/walpurgis-icon.png';
 _walpurgisIconImg.decode().catch(() => {}); // force async decode now, not on first draw
@@ -3004,7 +3007,7 @@ function draw(deltaTime) {
             ctx.globalAlpha = _alpha;
             ctx.font = '11px monospace';
             ctx.fillStyle = _isClear ? '#336644' : '#445566';
-            ctx.fillText(_isClear ? 'WAVE CLEARED  :  NEXT IN' : 'NEXT WAVE IN', _wcx, _wcy - 6);
+            ctx.fillText(_isClear ? _hudL3('WAVE CLEARED  :  NEXT IN', 'WAVE CLEARED  :  NEXT IN', '本波已清空  :  下一波') : _hudL3('NEXT WAVE IN', 'NEXT WAVE IN', '下一波即将来袭'), _wcx, _wcy - 6);
             ctx.font = 'bold 20px monospace';
             ctx.fillStyle = _isClear ? '#55cc88' : '#88aacc';
             ctx.shadowBlur = 8; ctx.shadowColor = _isClear ? '#22aa55' : '#2244aa';
@@ -3072,7 +3075,7 @@ function draw(deltaTime) {
         ctx.font = _hMob ? 'bold 14px Arial' : 'bold 18px Arial';
         ctx.shadowBlur = 7; ctx.shadowColor = '#3366cc';
         ctx.fillStyle = '#b8d0ff';
-        ctx.fillText(`WAVE  ${_waveNumber}`, _hX + _hW - _hPad, _ry + (_hMob ? 13 : 17));
+        ctx.fillText(_hudL3(`WAVE  ${_waveNumber}`, `WAVE  ${_waveNumber}`, `第 ${_waveNumber} 波`), _hX + _hW - _hPad, _ry + (_hMob ? 13 : 17));
         ctx.shadowBlur = 0;
         _ry += _rH + 2;
 
@@ -3087,7 +3090,7 @@ function draw(deltaTime) {
         if (_wavePhase === 'rest') {
             const _restSec = Math.ceil(_waveRestTimer / 1000);
             ctx.fillStyle = '#667788';
-            _iconText('cycle', `${_restSec}s  ·  ${_aliveCount} alive`, _hX + _hW - _hPad, _ry + (_hMob ? 11 : 13), _hMob ? 10 : 12);
+            _iconText('cycle', _hudL3(`${_restSec}s  ·  ${_aliveCount} alive`, `${_restSec}s  ·  ${_aliveCount} alive`, `${_restSec}s  ·  ${_aliveCount} 存活`), _hX + _hW - _hPad, _ry + (_hMob ? 11 : 13), _hMob ? 10 : 12);
         } else {
             // _waveQueue is only populated for the old fixed-15s queue - waves
             // now always use the trickle spawner instead (_WAVE_TRICKLE_MIN
@@ -3097,7 +3100,7 @@ function draw(deltaTime) {
             const _total = _aliveCount + (_waveSpawnBudget ? _waveTrickleBudgetLeft() : _waveQueue.length);
             const _pulseCnt = 0.7 + 0.3 * Math.abs(Math.sin(performance.now() / 600));
             ctx.fillStyle = _total > 0 ? `rgba(255,160,80,${_pulseCnt})` : '#446644';
-            _iconText('target', _total > 0 ? `${_total} enemies` : 'clearing...', _hX + _hW - _hPad, _ry + (_hMob ? 11 : 13), _hMob ? 10 : 12);
+            _iconText('target', _total > 0 ? _hudL3(`${_total} enemies`, `${_total} enemies`, `${_total} 名敌人`) : _hudL3('clearing...', 'clearing...', '清理中…'), _hX + _hW - _hPad, _ry + (_hMob ? 11 : 13), _hMob ? 10 : 12);
         }
         _ry += (_hMob ? 16 : 20);
 

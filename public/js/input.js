@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pauseOverlay.style.display = "flex";
         if (pauseMainBtns) pauseMainBtns.style.display = "flex";
         progressContainer.style.display = "none";
-        pauseTitle.innerText = "SYSTEM TERMINATED";
+        pauseTitle.innerText = (window._t ? window._t('pause.title') : 'SYSTEM TERMINATED');
         pauseSubtitle.style.display = "block";
         const _pgb = document.getElementById("pause-guide-btns");
         if (_pgb) _pgb.style.display = "flex";
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!gamePaused || progressContainer.style.display === 'block') return;
         if (pauseMainBtns) pauseMainBtns.style.display = "none";
         pauseSubtitle.style.display = "none";
-        pauseTitle.innerText = "REBOOTING SYSTEMS...";
+        pauseTitle.innerText = (window._t ? window._t('pause.reboot') : 'REBOOTING SYSTEMS...');
         progressContainer.style.display = "block";
         progressBar.style.width = "0%";
         const _pgb = document.getElementById("pause-guide-btns");
