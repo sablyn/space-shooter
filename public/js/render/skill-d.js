@@ -99,7 +99,7 @@ function drawSkillDCharging() {
             ctx.font = 'italic 13px monospace';
             ctx.fillStyle = '#bb66ff';
             if (!_mobPerf) ctx.shadowBlur = 10;
-            ctx.fillText(window._lang === 'vi' ? '— Tinh Vương Long: Tử Long Tinh —' : '— Death Star —', cx, cy - 98);
+            ctx.fillText(window._L3('— Death Star —', '— Tinh Vương Long: Tử Long Tinh —', '— 星王龙：紫龙星 —'), cx, cy - 98);
             ctx.restore();
         }
     }

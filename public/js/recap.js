@@ -63,7 +63,10 @@ const I18N = {
     rcSaveHint: "Press and hold the image to save it",
     rcSaveViewHint: "Press and hold the image, then choose Save to Photos",
     rcBtnDone: "Done",
-    rcSaveFailed: "Could not create the image, please try again"
+    rcSaveFailed: "Could not create the image, please try again",
+    rcRank: "Rank",
+    rcWaveCard: "WAVE {w}",
+    rcWaveShort: "W{w}"
   },
   vi: {
     rcAstralSub: "Nhật Ký Chuyến Bay",
@@ -121,7 +124,71 @@ const I18N = {
     rcSaveHint: "Nhấn giữ ảnh để lưu vào máy",
     rcSaveViewHint: "Nhấn giữ ảnh rồi chọn Lưu vào Ảnh",
     rcBtnDone: "Xong",
-    rcSaveFailed: "Chưa tạo được ảnh, bạn thử lại nhé"
+    rcSaveFailed: "Chưa tạo được ảnh, bạn thử lại nhé",
+    rcRank: "Hạng",
+    rcWaveCard: "WAVE {w}",
+    rcWaveShort: "W{w}"
+  },
+  zh: {
+    rcAstralSub: "飞行日志",
+    rcTitle: "远航终点",
+    rcScore: "总分",
+    rcScoreSub: "整趟飞行中获得的分数",
+    rcWave: "到达波次",
+    rcWaveSub: "你到达的最远波次",
+    rcTime: "飞行时间",
+    rcTimeSub: "战斗中花费的时间",
+    rcEpitaphPrefix: "被击落于",
+    rcQuitLine: "中途离开了远航",
+    rcLivesLostBadge: "损失生命：{lost}",
+    rcSigilTitle: "已选印记",
+    rcSigilSub: "按你选择的顺序",
+    rcAtWave: "出发",
+    rcWaveNum: "第 {w} 波",
+    rcKillsTitle: "击败的敌人",
+    rcKillsSub: "击败最多的敌人",
+    rcKillsTotalLabel: "总击败数",
+    rcAnalysisTitle: "对局统计",
+    rcAnalysisSub: "按来源统计伤害与损失的生命",
+    rcTabAlly: "造成的伤害",
+    rcTabEnemy: "受到的伤害",
+    rcTabLives: "损失的生命",
+    rcUnitLives: "次",
+    rcDonutTotal: "总计",
+    rcNameLabel: "呼号",
+    rcEmptySigils: "本次远航未选择任何印记",
+    rcEmptyKills: "这次没有击败任何敌人",
+    rcEmptyStats: "这里还没有记录",
+    rcEmptyTimeline: "远航太短，无法绘制",
+    rcTimelineTitle: "战斗时间线",
+    rcTimelineSub: "每 5 秒，附 30 秒移动平均线",
+    rcLegOutput: "造成的伤害（5 秒）",
+    rcLegMa: "移动平均（30 秒）",
+    rcLegTaken: "受到的伤害",
+    rcLegWave: "波次与首领标记",
+    rcPeakTag: "峰值：{v}（{t}）",
+    rcDangerTag: "最危险：{v}（{t}）",
+    rcSumDps: "每秒伤害",
+    rcSumPeak: "峰值伤害（5 秒）",
+    rcSumMvp: "最大输出来源",
+    rcSumTop3: "前 3 来源占比",
+    rcBtnPlayAgain: "再玩一次",
+    rcBtnMainMenu: "主菜单",
+    rcBtnCreateImg: "生成图片",
+    rcModalTitle: "生成分享图片",
+    rcFmtPortrait: "竖版 1080x1350（动态、信息流）",
+    rcFmtLandscape: "横版 1200x630（链接、帖子）",
+    rcBtnDownload: "下载（PNG）",
+    rcBtnShare: "分享",
+    rcShareSaved: "图片已下载",
+    rcSaveStarted: "正在下载。如果没有出现，请长按图片保存",
+    rcSaveHint: "长按图片保存",
+    rcSaveViewHint: "长按图片，然后选择保存到相册",
+    rcBtnDone: "完成",
+    rcSaveFailed: "图片生成失败，请重试",
+    rcRank: "评级",
+    rcWaveCard: "第 {w} 波",
+    rcWaveShort: "{w}波"
   }
 };
 
@@ -195,13 +262,107 @@ const LABEL_VI = {
   "Other": "Khác"
 };
 
+// Chinese names for the same damage sources and enemy labels, mirroring
+// LABEL_VI. Boss names use the shared glossary (Goliath 歌利亚, etc.).
+// Entries LABEL_VI leaves in English as proper nouns stay in English here.
+const LABEL_ZH = {
+  "Umbral Serpent: Devour": "幽影毒蛇：吞噬",
+  "Umbral Serpent: Shards": "幽影毒蛇：碎片",
+  "Umbral Serpent: Array": "幽影毒蛇：法阵",
+  "Umbral Serpent: Serpents": "幽影毒蛇：蛇群",
+  "Umbral Serpent: Venom": "幽影毒蛇：剧毒",
+  "Player Auto-Fire": "自动射击",
+  "Player Charged Shot": "蓄力射击",
+  "Sentinel Auto-Fire": "哨兵：自动射击",
+  "Sentinel Special Shot": "哨兵：特殊射击",
+  "Overload Laser": "超载激光",
+  "Overload Laser: Mirror": "超载激光：镜像",
+  "Skill A: Thunder Orbs": "技能 A：雷霆宝珠",
+  "Skill A: Onslaught": "技能 A：雷霆宝珠",
+  "Skill A: Scattered Projectiles": "技能 A：散射弹",
+  "Skill A: Dimensional Rift": "技能 A：次元裂隙",
+  "Dimensional Rift": "次元裂隙",
+  "Skill D: Death Star": "技能 D：死星",
+  "Skill D: Mark & Annihilate": "技能 D：标记与歼灭",
+  "Skill D: Galactic Spaceships": "技能 D：银河飞船",
+  "Skill F: Annihilation Sweep": "技能 F：湮灭横扫",
+  "Blade Arc": "技能 S：弧形斩",
+  "Skill G: Tesla Coil": "技能 G：特斯拉矩阵",
+  "Chain Lightning": "连锁闪电",
+  "Skill S: Remembrance Spirit": "技能 S：追忆之灵",
+  "Skill S: Photokrystos": "技能 S：Phōtokrystos",
+  "Skill S: Spinner": "技能 S：回旋",
+  "Skill S: Danger Not Today": "技能 S：Danger Not Today",
+  "Skill S: Back to Motherland": "技能 S：Back to Motherland",
+  "Yog-Sothoth Domain": "犹格-索托斯领域",
+  "Soul Devourer": "Soul Devourer",
+  "Soul Reaver": "Soul Reaver",
+  "Vulnerability": "Vulnerability",
+  "Solar Flare": "狮子吼：灼烧",
+  "Boon & Bane": "Boon & Bane",
+  "Mountainfall": "泰山压顶",
+  "Divine Fate: Shatter": "神命：碎裂",
+  "Golden Needle": "绣花针",
+  "Golden Needle: Reflect": "绣花针：反射",
+  "Aries: Gate of Babylon": "白羊座：巴比伦之门",
+  "Aries: Enuma Elish": "Enuma Elish",
+  "Sigil: Yuusha Party": "勇者小队",
+  "Sigil: Mirror Laser": "镜面激光",
+  "Sigil: Blood Arrow": "血箭",
+  "Shadow Twin": "影双子",
+  "Virgo: Forest Guardian": "处女座：森林守护者",
+  "Pisces: Flow Fish": "双鱼座：轮回之鱼",
+  "Cancer: Riptide Surge": "巨蟹座：激流涌动",
+  "Cancer: Riptide Surge (DOT)": "巨蟹座：激流涌动（持续伤害）",
+  "Great Sage: Root Shockwave": "斗战胜佛：Root Shockwave",
+  "Great Sage: Phantom Strike": "斗战胜佛：Phantom Strike",
+  "Great Sage: Perseverance Sweep": "斗战胜佛：Perseverance Sweep",
+  "Great Sage: Null Slash": "斗战胜佛：Null Slash",
+  "Great Sage: Lumen Nova": "斗战胜佛：Lumen Nova",
+  "Great Sage: Arc Barrier": "斗战胜佛：Arc Barrier",
+  "Great Sage: Absolute Verdict": "斗战胜佛：Absolute Verdict",
+  "Enemy Bullet": "敌方子弹",
+  "Ammit": "阿米特",
+  "Ammit Bullet": "阿米特子弹",
+  "Enemy Chain Lightning": "敌方连锁闪电",
+  "Boss Attack": "首领攻击",
+  "Normal Enemy": "普通敌人",
+  "Debug Kill": "调试",
+  "Unknown": "未知",
+  "Other": "其他",
+  "Goliath": "歌利亚",
+  "Goliath Bullet": "歌利亚子弹",
+  "Leviathan": "利维坦",
+  "Leviathan Bullet": "利维坦子弹",
+  "Egregor": "埃格雷戈",
+  "Egregor Bullet": "埃格雷戈子弹",
+  "Dargruel": "达格鲁尔",
+  "Dargruel Bullet": "达格鲁尔子弹",
+  "Marchosias": "玛可西亚斯",
+  "Marchosias Bullet": "玛可西亚斯子弹",
+  "Veilshroud": "维尔舒德",
+  "Veilshroud Bullet": "维尔舒德子弹",
+  "Raphael": "拉斐尔",
+  "Raphael Bullet": "拉斐尔子弹",
+  "Thaelis": "泰利斯",
+  "Thaelis Bullet": "泰利斯子弹",
+  "Uriel": "乌列",
+  "Uriel Bullet": "乌列子弹",
+  "Apostle": "使徒",
+  "Apostle Bullet": "使徒子弹",
+  "Embryo": "胚体",
+  "Abyssal Chain": "深渊锁链"
+};
+
 function label(raw, lang) {
-  return (lang === "vi" && LABEL_VI[raw]) ? LABEL_VI[raw] : raw;
+  if (lang === "vi" && LABEL_VI[raw]) return LABEL_VI[raw];
+  if (lang === "zh" && LABEL_ZH[raw]) return LABEL_ZH[raw];
+  return raw;
 }
 
 function t(key, lang, vars) {
   const dict = I18N[lang] || I18N.en;
-  const ov = window._rcOverrides && window._rcOverrides[lang === "vi" ? "vi" : "en"];
+  const ov = window._rcOverrides && window._rcOverrides[lang === "vi" ? "vi" : lang === "zh" ? "zh" : "en"];
   let str = (ov && ov[key]) || dict[key] || I18N.en[key] || key;
   if (vars) for (const k in vars) str = str.replace("{" + k + "}", vars[k]);
   return str;
@@ -214,15 +375,20 @@ const RC_FONTS = {
   en: { title: "'Cinzel', Georgia, serif", ui: "'Orbitron', 'Segoe UI', sans-serif", italic: "'Playfair Display', Georgia, serif" },
   // The Vietnamese stacks fall back to Times New Roman, which draws stacked marks such as ố correctly; Georgia
   // detaches the accent when the web faces are offline or blocked
-  vi: { title: "'Playfair Display', 'Times New Roman', Times, serif", ui: "'Be Vietnam Pro', 'Segoe UI', sans-serif", italic: "'Cormorant Garamond', 'Times New Roman', Times, serif" }
+  vi: { title: "'Playfair Display', 'Times New Roman', Times, serif", ui: "'Be Vietnam Pro', 'Segoe UI', sans-serif", italic: "'Cormorant Garamond', 'Times New Roman', Times, serif" },
+  // Chinese stacks come from config.js (window._FONT_ZH_TITLE / _FONT_ZH_UI);
+  // the literals are the fallback if this file ever loads before config.js.
+  zh: { title: window._FONT_ZH_TITLE || "'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif", ui: window._FONT_ZH_UI || "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif", italic: window._FONT_ZH_TITLE || "'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif" }
 };
 const RC_FONT_URL = {
   en: "https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Playfair+Display:ital@1&display=swap",
-  vi: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
+  vi: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Be+Vietnam+Pro:wght@400;600;700&display=swap",
+  zh: "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@700;900&display=swap"
 };
 const RC_FONT_FACES = {
   en: ["700 16px Cinzel", "700 16px Orbitron", "italic 16px 'Playfair Display'"],
-  vi: ["700 16px 'Playfair Display'", "italic 400 16px 'Cormorant Garamond'", "italic 500 16px 'Cormorant Garamond'", "italic 600 16px 'Cormorant Garamond'", "600 16px 'Be Vietnam Pro'", "700 16px 'Be Vietnam Pro'"]
+  vi: ["700 16px 'Playfair Display'", "italic 400 16px 'Cormorant Garamond'", "italic 500 16px 'Cormorant Garamond'", "italic 600 16px 'Cormorant Garamond'", "600 16px 'Be Vietnam Pro'", "700 16px 'Be Vietnam Pro'"],
+  zh: ["700 16px 'Noto Serif SC'", "900 16px 'Noto Serif SC'", "400 16px 'Noto Sans SC'", "600 16px 'Noto Sans SC'", "700 16px 'Noto Sans SC'"]
 };
 let _rcF = RC_FONTS.en;
 const _rcFontPromise = {};
@@ -240,7 +406,8 @@ function _rcLoadFonts(lang) {
     if (!document.fonts || !document.fonts.load) return null;
     // The canvas picks a face by the weight it asks for, and a face only gets its Vietnamese glyphs once text that
     // needs them has been loaded for it, so every weight in use is loaded with stacked mark sample text
-    return Promise.all(RC_FONT_FACES[key].map(function(f) { return document.fonts.load(f, "ĐẾNỘ Ãi ốếềểỗợữứừ ĂÂÊÔƠƯ"); }));
+    const sample = key === "zh" ? "中文测试飞行员执照远航无尽" : "ĐẾNỘ Ãi ốếềểỗợữứừ ĂÂÊÔƠƯ";
+    return Promise.all(RC_FONT_FACES[key].map(function(f) { return document.fonts.load(f, sample); }));
   }).catch(function() {});
   return _rcFontPromise[key];
 }
@@ -265,6 +432,7 @@ function _rcSaveName(name) {
 // Cinzel has no Vietnamese marks, so any name beyond plain ASCII uses the
 // Vietnamese title face.
 function _rcNeedsViFont(text) { return /[^\x20-\x7E]/.test(text); }
+function _rcNeedsZhFont(text) { return /[\u4E00-\u9FFF\u3400-\u4DBF]/.test(text); }
 // Steps the size down from size to min until text fits in maxW.
 function _rcFitFont(ctx, text, weight, size, min, family, maxW) {
   let s = size;
@@ -827,7 +995,7 @@ function drawSigilConstellationCanvas(canvas, sigils, lang, progress, nowMs) {
     }
 
     // Sigil name & wave below node
-    const dispName = lang === "vi" ? (s.vi || s.name) : s.name;
+    const dispName = lang === "vi" ? (s.vi || s.name) : lang === "zh" ? (s.zh || s.name) : s.name;
     const waveTxt = s.atWave === 0 ? t("rcAtWave", lang) : t("rcWaveNum", lang, { w: s.atWave });
 
     ctx.font = "700 11px " + _rcF.title;
@@ -1155,7 +1323,7 @@ function drawShareCard(canvas, data, lang, format) {
   _rcUseLang(lang);
   const pilot = _recapState.pilotName || "";
   const cardTitle = (pilot || t("rcTitle", lang)).toUpperCase();
-  const cardTitleFace = pilot && _rcNeedsViFont(pilot) ? RC_FONTS.vi.title : _rcF.title;
+  const cardTitleFace = pilot && _rcNeedsViFont(pilot) ? (lang === "zh" ? RC_FONTS.zh.title : RC_FONTS.vi.title) : _rcF.title;
   if (!canvas || !data) return;
   ensureSpritesInitialized();
   const isLandscape = format === "landscape";
@@ -1253,7 +1421,7 @@ function drawShareCard(canvas, data, lang, format) {
     const cardY = 430, cardH = 148, gap = 22;
     const mItems = [
       { label: t("rcScore", lang), val: formatNumber(data.score || 0), col: "#00E5FF" },
-      { label: t("rcWave", lang), val: sdCard ? (data.wave || 0) + "/" + sdTotal : "WAVE " + (data.wave || 1), col: "#DCE8F5" },
+      { label: t("rcWave", lang), val: sdCard ? (data.wave || 0) + "/" + sdTotal : t("rcWaveCard", lang, { w: data.wave || 1 }), col: "#DCE8F5" },
       { label: t("rcTime", lang), val: formatTimeMs(data.timeMs || 0), col: "#DCE8F5" }
     ];
     if (cardRank) mItems.push({ label: t("rcRank", lang), val: cardRank, col: cardRankColor, rank: true });
@@ -1332,7 +1500,7 @@ function drawShareCard(canvas, data, lang, format) {
         const gSprite = getGlyphSprite(np.s.id);
         if (gSprite) ctx.drawImage(gSprite, np.x - 20, np.y - 20, 40, 40);
 
-        const sName = lang === "vi" ? (np.s.vi || np.s.name) : np.s.name;
+        const sName = lang === "vi" ? (np.s.vi || np.s.name) : lang === "zh" ? (np.s.zh || np.s.name) : np.s.name;
         ctx.fillStyle = "#DCE8F5";
         ctx.font = "700 16px " + _rcF.title;
         ctx.fillText(sName, np.x, np.y + 54);
@@ -1391,7 +1559,7 @@ function drawShareCard(canvas, data, lang, format) {
     const mH = 98, mGap = 14, mY = 148;
     const mList = [
       { label: t("rcScore", lang), val: formatNumber(data.score || 0), col: "#00E5FF" },
-      { label: t("rcWave", lang), val: sdCard ? (data.wave || 0) + "/" + sdTotal : "W" + (data.wave || 1), col: "#DCE8F5" },
+      { label: t("rcWave", lang), val: sdCard ? (data.wave || 0) + "/" + sdTotal : t("rcWaveShort", lang, { w: data.wave || 1 }), col: "#DCE8F5" },
       { label: t("rcTime", lang), val: formatTimeMs(data.timeMs || 0), col: "#DCE8F5" }
     ];
     if (cardRank) mList.push({ label: t("rcRank", lang), val: cardRank, col: cardRankColor, rank: true });
@@ -1471,7 +1639,7 @@ function drawShareCard(canvas, data, lang, format) {
         const gSprite = getGlyphSprite(np.s.id);
         if (gSprite) ctx.drawImage(gSprite, np.x - 16, np.y - 16, 32, 32);
 
-        const sName = lang === "vi" ? (np.s.vi || np.s.name) : np.s.name;
+        const sName = lang === "vi" ? (np.s.vi || np.s.name) : lang === "zh" ? (np.s.zh || np.s.name) : np.s.name;
         ctx.fillStyle = "#DCE8F5";
         ctx.font = "700 13px " + _rcF.title;
         ctx.fillText(sName, np.x, np.y + 44);
@@ -1726,7 +1894,7 @@ function openRecap(container, data, lang, onPlayAgain, onMainMenu) {
   let sigilPillsHtml = "";
   for (let i = 0; i < sigils.length; i++) {
     const s = sigils[i];
-    const sName = useLang === "vi" ? (s.vi || s.name) : s.name;
+    const sName = useLang === "vi" ? (s.vi || s.name) : useLang === "zh" ? (s.zh || s.name) : s.name;
     const wLabel = s.tag != null ? s.tag : (s.atWave === 0 ? t("rcAtWave", useLang) : t("rcWaveNum", useLang, { w: s.atWave }));
     sigilPillsHtml += (
       '<span class="rc-sigil-pill">' +
@@ -2098,7 +2266,7 @@ function openRecap(container, data, lang, onPlayAgain, onMainMenu) {
     btnCreateImg.addEventListener("click", function() {
       shareModal.classList.add("rc-open");
       drawCard();
-      Promise.all([_rcLoadFonts(useLang), _rcNeedsViFont(_recapState.pilotName) ? _rcLoadFonts("vi") : null]).then(function() {
+      Promise.all([_rcLoadFonts(useLang), _rcNeedsZhFont(_recapState.pilotName) ? _rcLoadFonts("zh") : _rcNeedsViFont(_recapState.pilotName) ? _rcLoadFonts("vi") : null]).then(function() {
         if (_recapState.active) drawCard();
       });
     });
@@ -2151,7 +2319,8 @@ function openRecap(container, data, lang, onPlayAgain, onMainMenu) {
     _recapState.pilotName = clean;
     _rcSaveName(clean);
     nameCount.textContent = Array.from(clean).length + "/" + RC_NAME_MAX;
-    if (_rcNeedsViFont(clean)) _rcLoadFonts("vi").then(queueRedraw);
+    if (_rcNeedsZhFont(clean)) _rcLoadFonts("zh").then(queueRedraw);
+    else if (_rcNeedsViFont(clean)) _rcLoadFonts("vi").then(queueRedraw);
     queueRedraw();
   };
   if (nameInput && nameCount && shareCanvas) {
@@ -2409,7 +2578,7 @@ function _openShowdownRecap(data, onPlayAgain, onMainMenu) {
     document.body.appendChild(_rcOverlay);
   }
   _rcOverlay.style.display = "block";
-  const lang = window._lang === "vi" ? "vi" : "en";
+  const lang = window._lang === "zh" ? "zh" : window._lang === "vi" ? "vi" : "en";
   openRecap(_rcOverlay, data, lang, function() {
     _closeVoyageRecap();
     if (typeof onPlayAgain === "function") onPlayAgain();
@@ -2436,10 +2605,11 @@ function closeRecap() {
 function _buildRecapData() {
   const ms = window._matchStats || {};
   const viNames = typeof SIGIL_I18N_VI !== "undefined" ? SIGIL_I18N_VI : {};
+  const zhNames = typeof SIGIL_I18N_ZH !== "undefined" ? SIGIL_I18N_ZH : {};
   const defs = typeof SIGIL_DEFS !== "undefined" ? SIGIL_DEFS : {};
   const sigils = (window._playerSigils || []).map(function(p) {
-    const d = defs[p.sigilId] || {}, v = viNames[p.sigilId] || {};
-    return { id: p.sigilId, name: d.name || p.sigilId, vi: v.name || d.name || p.sigilId, color: d.color || "#00E5FF", atWave: p.atWave || 0 };
+    const d = defs[p.sigilId] || {}, v = viNames[p.sigilId] || {}, z = zhNames[p.sigilId] || {};
+    return { id: p.sigilId, name: d.name || p.sigilId, vi: v.name || d.name || p.sigilId, zh: z.name || d.name || p.sigilId, color: d.color || "#00E5FF", atWave: p.atWave || 0 };
   });
   const lost = ms.livesLost || 0;
   return {
@@ -2466,7 +2636,7 @@ function _openVoyageRecap(data) {
     document.body.appendChild(_rcOverlay);
   }
   _rcOverlay.style.display = "block";
-  const lang = window._lang === "vi" ? "vi" : "en";
+  const lang = window._lang === "zh" ? "zh" : window._lang === "vi" ? "vi" : "en";
   openRecap(_rcOverlay, data || _buildRecapData(), lang, function() {
     _closeVoyageRecap();
     if (typeof startGame === "function") startGame();

@@ -2611,6 +2611,7 @@ function _requestGoliathKillFonts() {
     _goliathKillFontsRequested = true;
     document.fonts.load('700 64px ' + GOLIATH_KILL_FONT, GOLIATH_KILL_GLYPHS).catch(() => {});
     document.fonts.load('600 24px ' + GOLIATH_KILL_SUB_FONT, 'THIÊN KHÔNG SỤP ĐỔ HEAVENS').catch(() => {});
+    if (window._lang === 'zh') document.fonts.load('600 24px ' + window._FONT_ZH_TITLE, '苍穹崩塌').catch(() => {});
 }
 
 // A rough vertical brush stroke: a ragged dark body plus dry bristle streaks.
@@ -2638,9 +2639,9 @@ function _bakeGoliathInkStroke(w, h) {
     return c;
 }
 
-function _goliathKillBannerParts(fs, vi) {
+function _goliathKillBannerParts(fs, lang) {
     const fontsReady = !!(document.fonts && document.fonts.check && document.fonts.check('700 64px ' + GOLIATH_KILL_FONT, GOLIATH_KILL_GLYPHS));
-    const key = fs + '|' + vi + '|' + fontsReady;
+    const key = fs + '|' + lang + '|' + fontsReady;
     if (_goliathKillBannerCache && _goliathKillBannerCache.key === key) return _goliathKillBannerCache;
     const glyphPad = Math.ceil(fs * 0.3), gs = Math.ceil(fs * 1.2 + glyphPad * 2);
     const layers = [[fs * 0.34, 'rgba(255,214,170,0.06)'], [fs * 0.2, 'rgba(255,226,196,0.1)'], [fs * 0.09, 'rgba(255,240,224,0.22)']];
@@ -2660,16 +2661,17 @@ function _goliathKillBannerParts(fs, vi) {
         fg.fillStyle = '#ffffff'; fg.fillText(ch, gs / 2, gs / 2);
         flashes.push(f);
     }
-    const sub = vi ? 'THIÊN KHÔNG SỤP ĐỔ' : 'THE HEAVENS HAVE FALLEN';
+    const sub = lang === 'vi' ? 'THIÊN KHÔNG SỤP ĐỔ' : lang === 'zh' ? '苍穹崩塌' : 'THE HEAVENS HAVE FALLEN';
+    const subFont = lang === 'zh' ? window._FONT_ZH_TITLE : GOLIATH_KILL_SUB_FONT;
     const subSize = Math.max(11, Math.round(fs * 0.26)), gap = subSize * 0.42;
     const sc = document.createElement('canvas');
     const sg = sc.getContext('2d');
-    sg.font = '600 ' + subSize + 'px ' + GOLIATH_KILL_SUB_FONT;
+    sg.font = '600 ' + subSize + 'px ' + subFont;
     let subW = 0;
     for (const ch of sub) subW += sg.measureText(ch).width + gap;
     subW -= gap;
     sc.width = Math.ceil(subW + subSize); sc.height = Math.ceil(subSize * 1.8);
-    sg.font = '600 ' + subSize + 'px ' + GOLIATH_KILL_SUB_FONT; sg.textBaseline = 'middle'; sg.lineJoin = 'round';
+    sg.font = '600 ' + subSize + 'px ' + subFont; sg.textBaseline = 'middle'; sg.lineJoin = 'round';
     let x = subSize / 2;
     for (const ch of sub) {
         const w = sg.measureText(ch).width;
@@ -2706,7 +2708,7 @@ function _drawGoliathKillBanner() {
     }
     const hudScale = window._hudScale || 1;
     const fs = Math.round(Math.max(28, Math.min(canvas.height / hudScale * 0.105, canvas.width / hudScale * 0.15)));
-    const P = _goliathKillBannerParts(fs, window._lang === 'vi');
+    const P = _goliathKillBannerParts(fs, window._lang);
     const n = P.glyphs.length;
     const W = canvas.width, H = canvas.height;
     const cx = W / 2, colH = P.step * n, cy = H * 0.44;
@@ -3429,10 +3431,10 @@ function _drawGoliathBossBar(enemy) {
     ctx.textAlign = 'left';
     // Playfair Display, already loaded for the title logo - closer to
     // Elden Ring lettering than Cinzel (too blocky for a name plate)
-    ctx.font = "italic 700 17px 'Playfair Display', serif";
+    ctx.font = window._lang === 'zh' ? 'italic 700 17px ' + window._FONT_ZH_TITLE : "italic 700 17px 'Playfair Display', serif";
     ctx.fillStyle = _frozen ? 'rgba(210,232,245,0.95)' : 'rgba(214,196,150,0.95)';
     if (!_mobPerf) { ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 1; }
-    ctx.fillText(window._lang === 'vi' ? 'Á Thần Khởi Nguyên' : 'Demigod of Genesis', x, titleY + 12);
+    ctx.fillText(window._L3('Demigod of Genesis', 'Á Thần Khởi Nguyên', '创世亚神'), x, titleY + 12);
     ctx.restore();
 
     const hpPct = enemy.maxHp > 0 ? Math.max(0, Math.min(1, enemy.hp / enemy.maxHp)) : 0;
@@ -3509,7 +3511,7 @@ function _drawGoliathBossBar(enemy) {
 
     ctx.save();
     ctx.textAlign = 'left';
-    ctx.font = '700 9px Arial';
+    ctx.font = window._lang === 'zh' ? '700 9px ' + window._FONT_ZH_UI : '700 9px Arial';
     let lx = x;
     if (enemy.vulnStacks > 0 && enemy.vulnEndTime && now < enemy.vulnEndTime) {
         const chipW = 58;
@@ -3518,7 +3520,7 @@ function _drawGoliathBossBar(enemy) {
         ctx.strokeStyle = 'rgba(239,68,68,0.5)';
         ctx.strokeRect(lx, rowY, chipW, rowH);
         ctx.fillStyle = '#ff9999';
-        ctx.fillText('VULN x' + enemy.vulnStacks, lx + 4, rowY + rowH - 3);
+        ctx.fillText(window._L3('VULN x', 'VULN x', '易伤 x') + enemy.vulnStacks, lx + 4, rowY + rowH - 3);
         lx += chipW + 4;
     }
     if (enemy.soulReaver) {
@@ -3528,7 +3530,7 @@ function _drawGoliathBossBar(enemy) {
         ctx.strokeStyle = 'rgba(239,68,68,0.5)';
         ctx.strokeRect(lx, rowY, chipW, rowH);
         ctx.fillStyle = '#ff9999';
-        ctx.fillText('REAVER', lx + 4, rowY + rowH - 3);
+        ctx.fillText(window._L3('REAVER', 'REAVER', '收割者'), lx + 4, rowY + rowH - 3);
         lx += chipW + 4;
     }
     if (typeof _goliathWaningStacks === 'function' && _goliathWaningStacks(enemy) > 0) {
@@ -3538,7 +3540,7 @@ function _drawGoliathBossBar(enemy) {
         ctx.strokeStyle = 'rgba(239,68,68,0.5)';
         ctx.strokeRect(lx, rowY, chipW, rowH);
         ctx.fillStyle = '#ff9999';
-        ctx.fillText('WANE x' + _goliathWaningStacks(enemy), lx + 4, rowY + rowH - 3);
+        ctx.fillText(window._L3('WANE x', 'WANE x', '衰退 x') + _goliathWaningStacks(enemy), lx + 4, rowY + rowH - 3);
     }
     ctx.restore();
 
@@ -3551,9 +3553,9 @@ function _drawGoliathBossBar(enemy) {
         const _shieldShown = Math.min(shieldVal, _displayCap);
         ctx.save();
         ctx.textAlign = 'right';
-        ctx.font = '700 9px Arial';
+        ctx.font = window._lang === 'zh' ? '700 9px ' + window._FONT_ZH_UI : '700 9px Arial';
         ctx.fillStyle = '#7dd3fc';
-        ctx.fillText((window._lang === 'vi' ? 'KHIÊN ' : 'SHIELD ') + _shieldShown.toLocaleString() + (_shieldOverflow ? '+' : ''), x + w, rowY + rowH - 3);
+        ctx.fillText(window._L3('SHIELD ', 'KHIÊN ', '护盾 ') + _shieldShown.toLocaleString() + (_shieldOverflow ? '+' : ''), x + w, rowY + rowH - 3);
         ctx.restore();
     }
     _endScreenHud();

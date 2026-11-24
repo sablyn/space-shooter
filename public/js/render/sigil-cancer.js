@@ -544,22 +544,21 @@ function _drawKillerWhale(x, y, scale, facing, rot, jawOpen, flex) {
 }
 
 // Center-screen prompt while a Riptide Surge is banked and ready - same box
-// style as Great Sage's own release prompt (js/render/skill-f.js), EN/VI via
-// window._lang like every other bilingual HUD string in this codebase.
+// style as Great Sage's own release prompt (js/render/skill-f.js), EN/VI/ZH via
+// window._lang like every other trilingual HUD string in this codebase.
 function _drawTidalSurgeReadyPrompt() {
     if (!window._tidalSurgeReady) return;
     const now = performance.now();
     const pulse = 0.7 + 0.3 * Math.sin(now / 320);
     const cx = canvas.width / 2, cy = canvas.height * 0.5;
-    const vi = window._lang === 'vi';
-    const label = vi ? 'TRIỀU CƯỜNG SẴN SÀNG' : 'TIDE READY';
+    const label = window._L3('TIDE READY', 'TRIỀU CƯỜNG SẴN SÀNG', '激流涌动就绪');
     // Phones have no Space key; the CHARGE button releases it there.
     const key = window._platform === 'mobile' ? 'CHARGE' : 'Space';
-    const sub = key + (vi ? ': triệu hồi xoáy nước' : ': summon the whirlpool');
+    const sub = key + window._L3(': summon the whirlpool', ': triệu hồi xoáy nước', '：召唤漩涡');
 
     _beginScreenHud(cx, cy);
     ctx.save();
-    ctx.font = 'bold 13px "Courier New", Consolas, monospace';
+    ctx.font = window._lang === 'zh' ? 'bold 13px ' + window._FONT_ZH_UI : 'bold 13px "Courier New", Consolas, monospace';
     const labelW = ctx.measureText(label).width;
     const boxW = Math.max(labelW, 160) + 40, boxH = 40;
 
@@ -575,10 +574,10 @@ function _drawTidalSurgeReadyPrompt() {
     ctx.shadowBlur = 0;
 
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = 'bold 13px "Courier New", Consolas, monospace';
+    ctx.font = window._lang === 'zh' ? 'bold 13px ' + window._FONT_ZH_UI : 'bold 13px "Courier New", Consolas, monospace';
     ctx.fillStyle = `rgba(167,255,240,${0.75 + 0.25 * pulse})`;
     ctx.fillText(label, cx, cy - 8);
-    ctx.font = '11px "Courier New", Consolas, monospace';
+    ctx.font = window._lang === 'zh' ? '11px ' + window._FONT_ZH_UI : '11px "Courier New", Consolas, monospace';
     ctx.fillStyle = 'rgba(200,240,235,0.85)';
     ctx.fillText(sub, cx, cy + 10);
     ctx.restore();

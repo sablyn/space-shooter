@@ -39,7 +39,7 @@ function drawSkillA() {
             ctx.font = 'italic 13px monospace';
             ctx.fillStyle = '#88eeff';
             if (!_mobPerf) ctx.shadowBlur = 10;
-            ctx.fillText('— Tinh Vương: Thiên Lôi Bộc Tinh —', player.x, player.y - 98);
+            ctx.fillText(window._lang === 'zh' ? '— 星王：天雷爆星 —' : '— Tinh Vương: Thiên Lôi Bộc Tinh —', player.x, player.y - 98);
             ctx.restore();
         }
     }
@@ -441,21 +441,20 @@ function drawSolArrowLilies() {
 // Center-screen prompt while a Blood Arrow (Libra) charge is banked and
 // ready - same box style as Great Sage's own release prompt (js/render/
 // skill-f.js's _drawGreatSageReleasePrompt) and Cancer's Riptide Surge one
-// (js/render/sigil-cancer.js's _drawTidalSurgeReadyPrompt), EN/VI via
-// window._lang like every other bilingual HUD string in this codebase.
+// (js/render/sigil-cancer.js's _drawTidalSurgeReadyPrompt), EN/VI/ZH via
+// window._lang like every other trilingual HUD string in this codebase.
 function _drawBloodArrowReadyPrompt() {
     const stacks = window._bloodArrowStacks || 0;
     if (stacks === 0) return;
     const now = performance.now();
     const pulse = 0.7 + 0.3 * Math.sin(now / 320);
     const cx = canvas.width / 2, cy = canvas.height * 0.5;
-    const vi = window._lang === 'vi';
-    const label = vi ? `HUYẾT TIỄN SẴN SÀNG x${stacks}` : `BLOOD ARROW READY x${stacks}`;
-    const sub = vi ? 'A (cần mục tiêu): bắn' : 'A (needs a target): fire';
+    const label = window._L3(`BLOOD ARROW READY x${stacks}`, `HUYẾT TIỄN SẴN SÀNG x${stacks}`, `血箭就绪 x${stacks}`);
+    const sub = window._L3('A (needs a target): fire', 'A (cần mục tiêu): bắn', 'A（需要目标）：发射');
 
     _beginScreenHud(cx, cy);
     ctx.save();
-    ctx.font = 'bold 13px "Courier New", Consolas, monospace';
+    ctx.font = window._lang === 'zh' ? 'bold 13px ' + window._FONT_ZH_UI : 'bold 13px "Courier New", Consolas, monospace';
     const labelW = ctx.measureText(label).width;
     const boxW = Math.max(labelW, 160) + 40, boxH = 40;
 
@@ -473,7 +472,7 @@ function _drawBloodArrowReadyPrompt() {
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillStyle = `rgba(255,255,255,${0.75 + 0.25 * pulse})`;
     ctx.fillText(label, cx, cy - 8);
-    ctx.font = '10px "Courier New", Consolas, monospace';
+    ctx.font = window._lang === 'zh' ? '10px ' + window._FONT_ZH_UI : '10px "Courier New", Consolas, monospace';
     ctx.fillStyle = 'rgba(255,180,180,0.75)';
     ctx.fillText(sub, cx, cy + 10);
     ctx.restore();

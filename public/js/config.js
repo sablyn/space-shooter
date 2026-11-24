@@ -1,4 +1,35 @@
 // Pisces: Space Journey. Copyright (c) 2024 An Nguyen. Licensed under the PolyForm Noncommercial License 1.0.0.
+// --- Chinese (zh) localization helpers ---
+// Three-way language pick for inline text: _L3(english, vietnamese, chinese).
+// Falls back to English when the Chinese text is missing (zh arg undefined).
+window._L3 = function (en, vi, zh) {
+    const l = window._lang;
+    if (l === 'vi') return vi;
+    if (l === 'zh') return (zh !== undefined && zh !== null) ? zh : en;
+    return en;
+};
+// Map lookup for {en, vi, zh} dictionaries: current language's entry,
+// falling back to English.
+window._LM = function (map) {
+    if (!map) return '';
+    const v = map[window._lang];
+    return (v !== undefined && v !== null) ? v : (map.en || '');
+};
+// CJK-aware splitter for canvas text wrapping. Chinese/Japanese/Korean text
+// has no spaces, so plain text.split(' ') yields one unbreakable "word" and
+// a long Chinese string overflows its box instead of wrapping. Each CJK
+// character becomes its own wrap-able unit; Latin/digit/punctuation runs
+// stay together and keep their trailing space, so joining units with plain
+// concatenation reproduces the original text exactly.
+window._splitWrapWords = function (text) {
+    const m = String(text).match(/[^\s\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef]+ ?|[\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef]|\s+/g);
+    return m || [];
+};
+// Shared CJK font stacks for Chinese UI text. System fonts first so the UI
+// renders even offline; Noto webfonts are loaded on demand by the recap
+// module for machines without CJK system fonts.
+window._FONT_ZH_UI = "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif";
+window._FONT_ZH_TITLE = "'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif";
 const TD_FLOW_PLAYER_CD = 0.35;
 const TD_FLOW_ENEMY_BULLET = 1.25;
 const TD_FLOW_ENEMY_CD = 0.25;

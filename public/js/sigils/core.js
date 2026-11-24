@@ -1,8 +1,8 @@
 // Pisces: Space Journey. Copyright (c) 2024 An Nguyen. Licensed under the PolyForm Noncommercial License 1.0.0.
 // Zodiac Sigil engine: the generic picker/HUD/glyph machinery shared by every
-// sigil. Per-sigil EN+VI data (name/element/buff text) lives one file per sigil in
+// sigil. Per-sigil EN+VI+ZH data (name/element/buff text) lives one file per sigil in
 // this same folder (js/sigils/<id>.js), each assigning into the SIGIL_DEFS and
-// SIGIL_I18N_VI objects declared empty right below - this file must load BEFORE
+// SIGIL_I18N_VI / SIGIL_I18N_ZH objects declared empty right below - this file must load BEFORE
 // any of them (see index.html's script order). Split out of the old monolithic
 // js/sigils.js so each sigil's own data lives in its own small file.
 
@@ -26,8 +26,14 @@ const SIGIL_EXTRA = ['than', 'dau', 'ty'];
 // Vietnamese string.
 const SIGIL_I18N_VI = {};
 
+// Chinese display text, mirroring SIGIL_I18N_VI above (same shape: name /
+// element / buffs map by buff id). Picked by _localizedSigil() when
+// window._lang === 'zh'; missing entries fall back to the English def.
+const SIGIL_I18N_ZH = {};
+
 // Returns a display-only copy of SIGIL_DEFS[sigilId] with name/element/buff
-// name+desc swapped to Vietnamese when window._lang === 'vi' — used ONLY by
+// name+desc swapped to Vietnamese when window._lang === 'vi', or to Chinese
+// when window._lang === 'zh' — used ONLY by
 // the sigil-picker rendering path (_drawPickerCards and what it calls).
 // SIGIL_DEFS itself is never mutated, so every other reader (game logic,
 // drawSigilHUD, drawSigilShipUpgrades' element === 'Fire' checks, etc.)
@@ -35,15 +41,16 @@ const SIGIL_I18N_VI = {};
 function _localizedSigil(sigilId) {
     const def = SIGIL_DEFS[sigilId];
     if (!def) return def;
-    if (window._lang !== 'vi' || !SIGIL_I18N_VI[sigilId]) return def;
-    const vi = SIGIL_I18N_VI[sigilId];
+    const table = window._lang === 'vi' ? SIGIL_I18N_VI : window._lang === 'zh' ? SIGIL_I18N_ZH : null;
+    if (!table || !table[sigilId]) return def;
+    const loc = table[sigilId];
     return {
         ...def,
-        name: vi.name,
-        element: vi.element,
+        name: loc.name,
+        element: loc.element,
         buffs: def.buffs.map(b => {
-            const viBuff = vi.buffs[b.id];
-            return viBuff ? { ...b, name: viBuff.name, desc: viBuff.desc } : b;
+            const locBuff = loc.buffs[b.id];
+            return locBuff ? { ...b, name: locBuff.name, desc: locBuff.desc } : b;
         }),
     };
 }
@@ -251,10 +258,11 @@ function _drawDetailPanel(def, x, y, w, alpha) {
     // Measure height dynamically
     ctx.font = `9px sans-serif`;
     const _measH = (desc) => {
-        const words = desc.split(' ');
+        const words = window._splitWrapWords ? window._splitWrapWords(desc) : desc.split(' ');
         let line = '', lines = 0;
         for (const wd of words) {
-            const test = line ? line + ' ' + wd : wd;
+            if (!line && /^\s+$/.test(wd)) continue;
+            const test = line + wd;
             if (ctx.measureText(test).width > maxW - badgeW - 8 && line) { lines++; line = wd; } else { line = test; }
         }
         if (line) lines++;
@@ -920,10 +928,11 @@ function _drawMiniBuffRow(cx, topY, maxW, buff, maxLines) {
 }
 
 function _wrapText(text, x, y, maxW, lineH, maxLines) {
-    const words = text.split(' ');
+    const words = window._splitWrapWords ? window._splitWrapWords(text) : text.split(' ');
     let line = '', lines = [];
     for (const word of words) {
-        const test = line ? line + ' ' + word : word;
+        if (!line && /^\s+$/.test(word)) continue;
+        const test = line + word;
         if (ctx.measureText(test).width > maxW && line) {
             lines.push(line); line = word;
             if (lines.length >= maxLines) break;

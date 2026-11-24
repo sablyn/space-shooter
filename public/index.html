@@ -150,6 +150,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@700&text=%E5%A4%A9%E7%A9%BA%E5%B4%A9%E5%A1%8C&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=20261106a">
     <link rel="stylesheet" href="css/recap.css?v=20261106a">
 
@@ -372,6 +373,9 @@
         #modeBtn.gm-vi, #mode-panel.gm-vi { --gm-font: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif; }
         #modeBtn.gm-vi { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         #modeBtn.gm-vi .gm-name { letter-spacing: 1px; }
+        #modeBtn.gm-zh, #mode-panel.gm-zh { --gm-font: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif; }
+        #modeBtn.gm-zh { font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif; }
+        #modeBtn.gm-zh .gm-name { letter-spacing: 1px; }
         @media (hover: hover) and (pointer: fine) {
             #modeBtn:hover {
                 color: #e6fdff;
@@ -434,6 +438,7 @@
         }
         #modeOverlay.gm-open #mode-panel { transform: none; }
         #mode-panel.gm-vi { --gm-title: 'Playfair Display', Georgia, serif; }
+        #mode-panel.gm-zh { --gm-title: 'Noto Serif SC', 'Songti SC', 'STSong', serif; }
         #mode-panel::before {
             content: "";
             position: absolute;
@@ -515,9 +520,11 @@
             text-shadow: 0 0 10px rgba(0, 229, 255, 0.55), 0 2px 3px rgba(0, 0, 0, 0.9);
         }
         #mode-panel.gm-vi .gm-card .gm-title { font-family: var(--gm-font); letter-spacing: 1px; font-size: 15px; }
+        #mode-panel.gm-zh .gm-card .gm-title { font-family: var(--gm-font); letter-spacing: 1px; font-size: 15px; }
         .gm-desc { min-height: 2.8em; font-size: 11px; line-height: 1.4; color: #B9CBE0; text-shadow: 0 1px 2px #000; }
         .gm-tag { position: absolute; top: 10px; left: 10px; padding: 3px 7px; font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border-radius: 2px; white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis; }
         #mode-panel.gm-vi .gm-tag { font-family: var(--gm-font); letter-spacing: 0.5px; }
+        #mode-panel.gm-zh .gm-tag { font-family: var(--gm-font); letter-spacing: 0.5px; }
         .gm-tags { position: absolute; top: 10px; left: 10px; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; max-width: calc(100% - 20px); }
         .gm-tags .gm-tag { position: static; max-width: none; overflow: visible; text-overflow: clip; }
         .gm-tag-hard { color: #fff1f1; background: #b3263a; }
@@ -1247,7 +1254,7 @@
                 cursor:pointer; backdrop-filter:blur(8px);
                 box-shadow:0 0 20px rgba(0,229,255,0.15);
                 transition:all 0.25s;
-            "><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l8 4.6v9.2l-8 4.6-8-4.6V7.4z"/><path d="M12 8.6l3 1.7v3.4L12 15.4l-3-1.7v-3.4z" fill="currentColor" stroke="none"/></svg> Guide</button>
+            "><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l8 4.6v9.2l-8 4.6-8-4.6V7.4z"/><path d="M12 8.6l3 1.7v3.4L12 15.4l-3-1.7v-3.4z" fill="currentColor" stroke="none"/><span data-i18n="menu.guide">Guide</span></button>
             <button onclick="openSettings()" style="
                 padding:10px 24px;
                 font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700;
@@ -1257,10 +1264,10 @@
                 cursor:pointer; backdrop-filter:blur(8px);
                 box-shadow:0 0 20px rgba(0,229,255,0.15);
                 transition:all 0.25s;
-            "><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M5.4 18.6l1.8-1.8M16.8 7.2l1.8-1.8"/></svg> Settings</button>
+            "><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M5.4 18.6l1.8-1.8M16.8 7.2l1.8-1.8"/><span data-i18n="settings.title">Settings</span></button>
         </div>
         <div id="pause-main-btns" style="display:none; gap:16px; align-items:center; justify-content:center;">
-            <button id="resume-btn">RESUME</button>
+            <button id="resume-btn" data-i18n="menu.resume">RESUME</button>
             <button id="main-menu-btn">MAIN MENU</button>
         </div>
         <div id="resume-progress-container">
@@ -1353,7 +1360,7 @@
                         cursor:pointer; backdrop-filter:blur(8px);
                         box-shadow:0 0 20px rgba(0,229,255,0.15);
                         transition:all 0.25s;
-                    "><span class="menu-btn-ico"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l8 4.6v9.2l-8 4.6-8-4.6V7.4z"/><path d="M12 8.6l3 1.7v3.4L12 15.4l-3-1.7v-3.4z" fill="currentColor" stroke="none"/></svg></span> Guide</button>
+                    "><span class="menu-btn-ico"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l8 4.6v9.2l-8 4.6-8-4.6V7.4z"/><path d="M12 8.6l3 1.7v3.4L12 15.4l-3-1.7v-3.4z" fill="currentColor" stroke="none"/><span data-i18n="menu.guide">Guide</span></button>
                     <button id="settingsBtn" onclick="openSettings()" style="
                         flex:1; padding:12px 0;
                         font-family:'Orbitron',sans-serif; font-size:12px; font-weight:700;
@@ -1363,7 +1370,7 @@
                         cursor:pointer; backdrop-filter:blur(8px);
                         box-shadow:0 0 20px rgba(0,229,255,0.15);
                         transition:all 0.25s;
-                    "><span class="menu-btn-ico"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M5.4 18.6l1.8-1.8M16.8 7.2l1.8-1.8"/></svg></span> Settings</button>
+                    "><span class="menu-btn-ico"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M5.4 18.6l1.8-1.8M16.8 7.2l1.8-1.8"/><span data-i18n="settings.title">Settings</span></button>
                 </div>
 
                 <button id="modeBtn" type="button" aria-haspopup="dialog" aria-expanded="false" onclick="openModePicker()">
@@ -1373,7 +1380,7 @@
                     <svg class="gm-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
 
-                <button id="start-hyperjump-btn">Initiate Hyperjump</button>
+                <button id="start-hyperjump-btn" data-i18n="menu.hyperjump">Initiate Hyperjump</button>
             </div>
 
             <!-- Voyage picker overlay -->
@@ -1729,6 +1736,7 @@
                             <select id="lang-select" style="display:none;">
                                 <option value="en">English</option>
                                 <option value="vi">Tiếng Việt</option>
+                                <option value="zh">中文</option>
                             </select>
                             <div class="st-row">
                                 <span class="st-label" data-i18n="language.section">Language</span>
@@ -1835,6 +1843,10 @@
 
                 #settings-panel.st-vi {
                     --rc-font-title: 'Playfair Display', Georgia, serif;
+                }
+
+                #settings-panel.st-zh {
+                    --rc-font-title: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
                 }
 
                 #settings-panel::before {
@@ -2722,6 +2734,12 @@
                         'pause.subtitle': 'Press RESUME to continue',
                         'pause.viewPosition': 'View Position',
                         'pause.peekHint': 'Click/Tap anywhere or press Esc to return',
+                        'menu.hyperjump': 'Initiate Hyperjump',
+                        'menu.guide': 'Guide',
+                        'menu.resume': 'RESUME',
+                        'menu.clickStart': 'Click anywhere to start',
+                        'jump.footer': 'Wandering across the sea of thousands of stars',
+                        'loading.hyperdrive': 'Initiating hyperdrive jump...',
                         'confirmMenu.message': 'Abort the voyage? Your flight log will be sealed here.',
                         'whatsNew.title': "What's New",
                         'whatsNew.release': 'v7.1.5 · Showdown Voyage',
@@ -2821,6 +2839,12 @@
                         'pause.subtitle': 'Ấn RESUME để tiếp tục',
                         'pause.viewPosition': 'Xem Vị Trí',
                         'pause.peekHint': 'Click/Chạm vào bất kỳ đâu hoặc nhấn Esc để quay lại',
+                        'menu.hyperjump': 'Initiate Hyperjump',
+                        'menu.guide': 'Guide',
+                        'menu.resume': 'RESUME',
+                        'menu.clickStart': 'Click anywhere to start',
+                        'jump.footer': 'Wandering across the sea of thousands of stars',
+                        'loading.hyperdrive': 'Initiating hyperdrive jump...',
                         'confirmMenu.message': 'Dừng chuyến bay tại đây? Nhật ký chuyến bay sẽ khép lại.',
                         'whatsNew.title': 'Có Gì Mới',
                         'whatsNew.release': 'v7.1.5 · Showdown Voyage',
@@ -2849,6 +2873,111 @@
                         'mode.desktopOnly.desc': 'Quyết Chiến chưa khả dụng trên điện thoại và máy tính bảng. Hãy chơi trên máy tính nhé.',
                         'confirmMenu.no': 'KHÔNG',
                     },
+                    zh: {
+                        'settings.title': '设置',
+                        'settings.subtitlePre': '按',
+                        'settings.subtitlePost': '暂停 / 继续游戏',
+                        'graphics.section': '画面',
+                        'graphics.smartQuality': '智能画质',
+                        'graphics.smartQualityDesc': '自动调节画质以保持流畅。',
+                        'graphics.low': '低', 'graphics.medium': '中', 'graphics.high': '高', 'graphics.per': '性能',
+                        'graphics.qualityNote': '要指定画质，请先关闭智能画质。',
+                        'graphics.highFps': '高帧率',
+                        'graphics.highFpsDesc': '解除手机上约 45fps 的帧率上限。设备性能强时会更流畅，但更耗电。',
+                        'graphics.showFps': '显示帧率',
+                        'graphics.showFpsDesc': '在音效按钮旁显示帧率，方便选择适合设备的画质。',
+                        'fpsTip.body': '你的 Safari 似乎被限制在 60fps 附近。如需在 ProMotion 机型上尝试 120fps：关闭低电量模式，然后在“设置”中搜索 Safari 的“高级”>“功能标志”，关闭“优先以接近 60fps 更新页面渲染”。',
+                        'audio.section': '音频', 'audio.bgm': '音乐', 'audio.sfx': '音效', 'audio.global': '总音量',
+                        'audio.inGameMusic': '游戏内音乐', 'audio.random': '随机', 'audio.tracksSelected': '已选 {n} 首',
+                        'background.section': '背景', 'background.brightness': '亮度',
+                        'background.detail': '背景细节',
+                        'background.detailDesc': '战斗后方漂浮的星星、星云和小行星数量。调低可减轻弱设备的负担。',
+                        'background.low': '低', 'background.mid': '细节', 'background.full': '完整',
+                        'background.glow': '光斑',
+                        'gameplay.section': '玩法', 'gameplay.screenShake': '屏幕震动',
+                        'gameplay.on': '开', 'gameplay.off': '关',
+                        'gameplay.screenShakeWarn': '开启屏幕震动可能导致部分设备出现意外卡顿。',
+                        'gameplay.dangerWarn': '红色危险警告',
+                        'gameplay.dangerWarnDesc': '大型范围攻击前显示红色区域、收缩圆环和屏幕边缘脉冲。',
+                        'gameplay.tapFx': '点击特效',
+                        'gameplay.tapFxDesc': '点击或触摸处出现发光圆环；点在按钮上时圆环会包裹按钮。',
+                        'gameplay.vibrate': '振动',
+                        'gameplay.vibrateDesc': '命中、选择印记和按下技能按钮时短震。',
+                        'gameplay.skipKanade': '跳过 Kanade 动画',
+                        'gameplay.skipKanadeNote': '无论是否跳过，Boss 波次照常出现并施加时间线扭曲。',
+                        'offline.section': '离线游玩', 'offline.desc': '提前下载，无网络也能玩。',
+                        'offline.downloadLabel': '下载离线资源',
+                        'offline.pkgBasic': '基础版（约 66MB）', 'offline.pkgFull': '完整版（约 219MB）',
+                        'offline.downloadBtn': '下载', 'offline.downloadedBtn': '已下载',
+                        'offline.statusFormat': '{cached}/{total} 个文件（{pct}%）',
+                        'settings.apply': '应用',
+                        'settings.reset': '恢复默认设置',
+                        'settings.resetDesc': '将所有设置恢复为首次启动时的状态。语言保持不变。',
+                        'settings.resetBtn': '恢复',
+                        'settings.resetAsk': '将所有设置恢复为首次启动时的状态吗？语言保持不变。',
+                        'settings.resetDone': '已恢复',
+                        'graphics.advanced': '高级画面',
+                        'graphics.advancedSoon': '新功能',
+                        'graphics.advancedNote': '这些开关只是在当前画质的基础上再关闭部分特效。敌人攻击警告始终开启。',
+                        'graphics.fxSoon': '即将推出',
+                        'graphics.fxByLevel': '跟随画质等级',
+                        'graphics.fxAllOff': '全部关闭',
+                        'graphics.fxBrightness': '特效亮度',
+                        'graphics.flashIntensity': '闪光强度',
+                        'fx.explosions': '爆炸', 'fx.explosionsDesc': '敌人倒下和重击命中时的爆炸',
+                        'fx.particles': '碎片与火花', 'fx.particlesDesc': '命中和爆炸时飞溅的碎片',
+                        'fx.glow': '辉光', 'fx.glowDesc': '子弹、光束和技能周围的光晕',
+                        'fx.screenFlash': '屏幕闪光', 'fx.screenFlashDesc': '命中和释放大技能时的全屏闪光',
+                        'fx.sigilLight': '印记之光', 'fx.sigilLightDesc': '双鱼座的月光、摩羯座山峰落下时天空变暗',
+                        'fx.sigilBackdrop': '印记背景', 'fx.sigilBackdropDesc': '每个印记专属的战场背景',
+                        'fx.nebula': '移动星云', 'fx.nebulaDesc': '漂移的星云层；星空保持不变',
+                        'fx.trails': '拖尾', 'fx.trailsDesc': '飞行子弹身后的光带',
+                        'fx.jewelTwinkle': '珠宝闪光', 'fx.jewelTwinkleDesc': 'Kanade 首饰上的闪光',
+                        'system.section': '系统',
+                        'language.section': '语言',
+                        'sigilPicker.title': '星座印记',
+                        'sigilPicker.chooseSeal': '选择你的印记',
+                        'sigilPicker.confirm': '确认',
+                        'sigilPicker.reroll': '刷新',
+                        'sigilPicker.swipeHint': '滑动或点击箭头浏览',
+                        'pause.title': '系统已终止',
+                        'pause.subtitle': '按“继续”恢复游戏',
+                        'pause.viewPosition': '查看位置',
+                        'pause.peekHint': '点击任意处或按 Esc 返回',
+                        'menu.hyperjump': '启动超空间跳跃',
+                        'menu.guide': '指南',
+                        'menu.resume': '继续',
+                        'menu.clickStart': '点击任意处开始',
+                        'jump.footer': '在万千星辰之海上漫游',
+                        'loading.hyperdrive': '正在启动超光速引擎……',
+                        'confirmMenu.message': '要中止本次远航吗？飞行日志将就此封存。',
+                        'whatsNew.title': '更新内容',
+                        'whatsNew.release': 'v7.1.5 · 决战远航',
+                        'whatsNew.i1': '<b>决战远航：</b>与主脑埃格雷戈的 Boss 对决，拥有五件圣物和 18 种攻击。标注为高难度，需在电脑上游玩。',
+                        'whatsNew.i2': '<b>远航选择：</b>决战远航现在紧跟在无尽远航之后。在手机标签页上显示“即将推出”且处于锁定状态。',
+                        'whatsNew.i3': '<b>新音乐：</b>埃格雷戈战斗主题曲《Ruler of the Violet Domain》已加入音乐档案。',
+                        'whatsNew.i4': '<b>指南：</b>“基础”标签页新增“远航”卡片，介绍每种远航。',
+                        'whatsNew.i5': '<b>特效更流畅：</b>湮灭横扫和犹格-索托斯领域绘制开销更小。',
+                        'whatsNew.log': '完整更新日志',
+                        'whatsNew.ok': '知道了',
+                        'confirmMenu.yes': '是',
+                        'mode.label': '远航',
+                        'mode.pick': '选择远航',
+                        'mode.endless': '无尽远航',
+                        'mode.endless.desc': '在无尽的波次中求生。标准模式。',
+                        'mode.tutorial': '教程',
+                        'mode.tutorial.desc': '学习闪避和使用技能。',
+                        'mode.custom': '自定义远航',
+                        'mode.custom.desc': '带调试控制台的空白试验场。',
+                        'mode.showdown': '决战远航',
+                        'mode.showdown.desc': '与宇宙实体一对一决斗。每一颗子弹都至关重要。',
+                        'mode.soon': '即将推出',
+                        'mode.dev': '开发',
+                        'mode.hard': '高难度',
+                        'mode.comingSoon': '即将推出',
+                        'mode.desktopOnly.desc': '决战远航暂不支持手机和平板。请在电脑上游玩。',
+                        'confirmMenu.no': '否',
+                    },
                 };
                 function _t(key) {
                     const dict = I18N[window._lang] || I18N.en;
@@ -2858,12 +2987,14 @@
                 window._addI18n = function (dict) {
                     if (dict.en) Object.assign(I18N.en, dict.en);
                     if (dict.vi) Object.assign(I18N.vi, dict.vi);
+                    if (dict.zh) Object.assign(I18N.zh, dict.zh);
                 };
 
                 window._lang = 'en';
                 try {
                     const savedLang = localStorage.getItem('pisces_lang');
-                    if (savedLang === 'vi' || savedLang === 'en') window._lang = savedLang;
+                    if (savedLang === 'vi' || savedLang === 'en' || savedLang === 'zh') window._lang = savedLang;
+                    else if (!savedLang && (navigator.language || '').toLowerCase().indexOf('zh') === 0) window._lang = 'zh';
                 } catch (_) { }
 
                 function applyLanguage() {
@@ -2874,11 +3005,15 @@
                     if (langSel) langSel.value = window._lang;
                     const stPanel = document.getElementById('settings-panel');
                     if (stPanel) stPanel.classList.toggle('st-vi', window._lang === 'vi');
+                    if (stPanel) stPanel.classList.toggle('st-zh', window._lang === 'zh');
                     // Dynamic labels not covered by static data-i18n nodes:
                     if (typeof _updateMusicSelectLabel === 'function') _updateMusicSelectLabel();
                     if (typeof _updateLangSelectLabel === 'function') _updateLangSelectLabel();
                     if (typeof _updateOfflinePkgSelectLabel === 'function') _updateOfflinePkgSelectLabel();
                     if (typeof refreshOfflineUI === 'function') refreshOfflineUI();
+                    // Click-to-start prompt: touch devices say "Tap", others "Click" (same text in Chinese).
+                    const cts = document.getElementById('cts-prompt');
+                    if (cts) cts.textContent = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ? (window._lang === 'zh' ? '点击任意处开始' : 'Tap anywhere to start') : _t('menu.clickStart');
                     // Re-render guide.html content if the guide panel is open.
                     if (typeof window._refreshGuideLanguage === 'function') window._refreshGuideLanguage();
                     if (typeof window._refreshGameModeUI === 'function') window._refreshGameModeUI();
@@ -3083,7 +3218,7 @@
                 function _buildLangDropdown() {
                     const dd = document.getElementById('lang-dropdown');
                     if (!dd) return;
-                    const opts = [['en', 'English'], ['vi', 'Tiếng Việt']];
+                    const opts = [['en', 'English'], ['vi', 'Tiếng Việt'], ['zh', '中文']];
                     dd.innerHTML = opts.map(([val, label]) => {
                         const active = window._lang === val;
                         return '<div class="stg-music-row' + (active ? ' stg-music-row-active' : '') + '" onclick="onLangOptionClick(\'' + val + '\')">'
@@ -3104,7 +3239,7 @@
                 function _updateLangSelectLabel() {
                     const lbl = document.getElementById('lang-select-label');
                     if (!lbl) return;
-                    lbl.textContent = window._lang === 'vi' ? 'Tiếng Việt' : 'English';
+                    lbl.textContent = window._lang === 'vi' ? 'Tiếng Việt' : window._lang === 'zh' ? '中文' : 'English';
                 }
 
                 // Offline package dropdown — single-select, same pattern, driving
@@ -3413,14 +3548,14 @@
                     style="color: #fff; letter-spacing: 3px; text-shadow: 0 0 15px #fff; font-family: 'Playfair Display', serif;">
                     SYSTEM LOADING
                 </h1>
-                <p style="color: #fff; font-family: 'Roboto', sans-serif; margin-bottom: 0;">Initiating hyperdrive
+                <p style="color: #fff; font-family: 'Roboto', sans-serif; margin-bottom: 0;" data-i18n="loading.hyperdrive">Initiating hyperdrive
                     jump...</p>
                 <div class="progress-container">
                     <div id="progress-bar" class="progress-bar"></div>
                 </div>
             </div>
             <div id="jump-footer" aria-hidden="true">
-                <div id="jump-footer-text">Wandering across the sea of thousands of stars</div>
+                <div id="jump-footer-text" data-i18n="jump.footer">Wandering across the sea of thousands of stars</div>
                 <div id="jump-footer-track"><div id="jump-footer-bar"></div></div>
             </div>
         </div>
@@ -4771,16 +4906,17 @@
             function updateLock() {
                 const btn = $('start-hyperjump-btn');
                 if (!btn) return;
-                if (!btn.dataset.label) btn.dataset.label = btn.textContent;
                 const locked = !GAME_MODES[mode].ready;
                 btn.classList.toggle('gm-locked', locked);
                 btn.setAttribute('aria-disabled', locked ? 'true' : 'false');
-                btn.textContent = locked ? tr('mode.comingSoon') : btn.dataset.label;
+                btn.textContent = locked ? tr('mode.comingSoon') : tr('menu.hyperjump');
             }
             function updateUI() {
-                const vi = window._lang === 'vi', name = $('modeName'), soon = $('modeSoon'), bar = $('modeBtn'), panel = $('mode-panel');
+                const vi = window._lang === 'vi', zh = window._lang === 'zh', name = $('modeName'), soon = $('modeSoon'), bar = $('modeBtn'), panel = $('mode-panel');
                 if (bar) bar.classList.toggle('gm-vi', vi);
+                if (bar) bar.classList.toggle('gm-zh', zh);
                 if (panel) panel.classList.toggle('gm-vi', vi);
+                if (panel) panel.classList.toggle('gm-zh', zh);
                 if (name) { name.dataset.i18n = KEY[mode]; name.textContent = tr(KEY[mode]); }
                 if (soon) soon.hidden = GAME_MODES[mode].ready;
                 const soonTags = document.querySelectorAll('#modeGrid .gm-card .gm-tag-soon');
@@ -4870,7 +5006,7 @@
                 if (!ov || open) return;
                 const license = $('modeLicense');
                 license.hidden = !window._tutorialHasLicense?.();
-                license.textContent = window._lang === 'vi' ? 'Giấy Phép Phi Công' : 'Pilot licence';
+                license.textContent = window._L3('Pilot licence', 'Giấy Phép Phi Công', '飞行员执照');
                 open = true;
                 updateUI();
                 ov.style.display = 'flex';
@@ -6618,6 +6754,10 @@
             --rc-font-title: 'Playfair Display', Georgia, serif;
         }
 
+        .wn-panel.wn-zh {
+            --rc-font-title: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+        }
+
         .wn-panel::before {
             content: "";
             position: absolute;
@@ -6725,7 +6865,7 @@
                 ov.id = 'whatsNewOverlay';
                 let items = '';
                 for (let i = 1; i <= ITEMS; i++) items += '<li>' + _t('whatsNew.i' + i) + '</li>';
-                ov.innerHTML = '<div class="wn-panel' + (window._lang === 'vi' ? ' wn-vi' : '') + '" role="dialog" aria-modal="true">'
+                ov.innerHTML = '<div class="wn-panel' + (window._lang === 'vi' ? ' wn-vi' : window._lang === 'zh' ? ' wn-zh' : '') + '" role="dialog" aria-modal="true">'
                     + '<div class="wn-head"><div class="wn-title">' + _t('whatsNew.title') + '</div>'
                     + '<div class="wn-release">' + _t('whatsNew.release') + '</div></div>'
                     + '<ul class="wn-list">' + items + '</ul>'

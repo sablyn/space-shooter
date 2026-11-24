@@ -17,3 +17,8 @@ SIGIL_I18N_VI.scorpio = { name: 'Bọ Cạp', element: 'Thủy', buffs: {
         hoan_sinh: { name: 'Hoàn Sinh', desc: 'Nhận ngay 4 mạng (tối đa 12), và cứ mỗi 300,000 điểm được thêm 1 mạng thay vì 500,000.' },
         tu_huyet: { name: 'Tử Ấn', desc: 'Sát thương tăng khi kẻ địch mất máu, tới +65% khi còn 20% HP trở xuống. Kẻ địch còn 5% HP bị sét đánh chết. Lưỡi kiếm Skill F xuyên Iron Body.' },
 }};
+
+SIGIL_I18N_ZH.scorpio = { name: '天蝎座', element: '水', buffs: {
+        hoan_sinh: { name: '复活', desc: '立即获得4条命（上限12条），之后每300,000分获得一条额外生命，而非500,000分。' },
+        tu_huyet: { name: '死亡印记', desc: '敌人生命值越低，伤害越高，生命值20%及以下时最高+65%。生命值5%的敌人将被闪电劈死。技能F的刀刃弧线可穿透铁躯。' },
+}};

@@ -82,7 +82,9 @@ function _timelineDistortionColors(accent) {
 }
 
 function _timelineDistortionName(effect) {
-    return window._lang === 'vi' && effect.nameVi ? effect.nameVi : effect.name;
+    if (window._lang === 'vi' && effect.nameVi) return effect.nameVi;
+    if (window._lang === 'zh' && effect.nameZh) return effect.nameZh;
+    return effect.name;
 }
 
 const _tdBossCooldowns = ['_verdictCooldownEnd', '_meteorCooldownEnd', '_echoCooldownEnd', '_fractureStepCooldownEnd'];
@@ -171,23 +173,29 @@ function _adaptiveSkillMult(source, enemy) {
 const TIMELINE_DISTORTION_POOL = [
     {
         id: 'stack_overflow',
-        name: 'STACK OVERFLOW',
+        name: 'STACK OVERFLOW', nameZh: '堆叠溢出',
         playerHalf: 'Your stacks never cap.',
+        playerHalfZh: '你的层数永不上限。',
         enemyHalf: 'Neither do theirs.',
+        enemyHalfZh: '敌人的也是如此。',
         apply() { window._stackOverflowActive = true; },
         clear() { window._stackOverflowActive = false; },
     },
     {
-        id: 'spacetime_flow', name: 'SPACETIME FLOW', nameVi: 'DÒNG CHẢY THỜI KHÔNG',
+        id: 'spacetime_flow', name: 'SPACETIME FLOW', nameVi: 'DÒNG CHẢY THỜI KHÔNG', nameZh: '时空洪流',
         playerHalf: 'Your cooldowns run 35% faster.',
+        playerHalfZh: '你的冷却速度提升 35%。',
         enemyHalf: 'Enemy bullets and boss skills run faster too.',
+        enemyHalfZh: '敌方子弹和首领技能也会变得更快。',
         apply() { window._spacetimeFlowActive = true; },
         clear() { window._spacetimeFlowActive = false; },
     },
     {
-        id: 'administrators_favor', name: "ADMINISTRATOR'S FAVOR", nameVi: 'ÂN SỦNG QUẢN TRỊ VIÊN',
+        id: 'administrators_favor', name: "ADMINISTRATOR'S FAVOR", nameVi: 'ÂN SỦNG QUẢN TRỊ VIÊN', nameZh: '管理员的恩赐',
         playerHalf: 'Kanade shields you and your Sentinels.',
+        playerHalfZh: 'Kanade 会为你和你的哨兵提供护盾。',
         enemyHalf: 'Her blessing marks your enemies and hardens them.',
+        enemyHalfZh: '她的祝福会标记你的敌人并强化它们。',
         apply() {
             window._administratorsFavorActive = true;
             window._tdFavorSeenEnemies = new WeakSet(enemies);
@@ -210,9 +218,11 @@ const TIMELINE_DISTORTION_POOL = [
         },
     },
     {
-        id: 'adaptive_counter', name: 'ADAPTIVE COUNTER', nameVi: 'KẺ ĐỊCH HỌC HỎI',
+        id: 'adaptive_counter', name: 'ADAPTIVE COUNTER', nameVi: 'KẺ ĐỊCH HỌC HỎI', nameZh: '适应性反击',
         playerHalf: 'Switching skills makes the next one hit harder.',
+        playerHalfZh: '切换技能会让下一个技能打得更痛。',
         enemyHalf: 'The boss adapts to a skill you keep repeating.',
+        enemyHalfZh: '首领会适应你反复使用的技能。',
         apply() { window._adaptiveCounterState = { last: null, fresh: false, resistance: { A: 0, S: 0, D: 0, F: 0 } }; },
         clear() { window._adaptiveCounterState = null; },
     },

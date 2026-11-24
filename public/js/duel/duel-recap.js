@@ -88,6 +88,45 @@
             threatTempest: 'Sét Bão Tempest',
             threatNullSlash: 'Vết Chém Null Slash',
             threatRift: 'Vết Nứt Không Gian'
+        },
+        zh: {
+            titleVictory: '埃格雷戈·统御心智已被击败',
+            titleDefeat: '失败',
+            titleAbandoned: '决战中止',
+            subtitle: '决战日志',
+            opponentLabel: '对手：埃格雷戈·统御心智',
+            difficultyLabel: '难度：困难',
+            tabOverview: '总览',
+            tabHits: '受击',
+            tabTimeline: '时间线',
+            metricTime: '战斗时间',
+            metricScore: '总分',
+            metricRank: '评级',
+            metricClears: '已破解攻击',
+            metricLives: '剩余生命',
+            metricShield: '护盾抵挡',
+            metricGraze: '擦弹次数',
+            metricShifts: '领域使用次数',
+            metricSkillF: '技能 F 使用次数',
+            scoreBreakdownTitle: '分数明细',
+            scoreWinBonus: '胜利征服奖励',
+            scoreAttackBonus: '破解攻击奖励',
+            scoreTimeBonus: '速通奖励',
+            scoreCleanBonus: '无伤攻击奖励',
+            scoreLivesPenalty: '生命损失扣分',
+            scoreShieldPenalty: '护盾破损扣分',
+            scoreGrazeBonus: '擦弹专注奖励',
+            btnPlayAgain: '再战一次',
+            btnMainMenu: '主菜单',
+            practiceTitleVictory: '练习完成',
+            practiceTitleDefeat: '练习失败',
+            hitsByAttackTitle: '各招式受击统计',
+            hitsByCauseTitle: '按威胁类型统计受击',
+            threatBullet: '弹幕子弹',
+            threatLaser: '次元激光',
+            threatTempest: '风暴闪电',
+            threatNullSlash: '虚无斩击横扫',
+            threatRift: '时空裂缝'
         }
     };
 
@@ -161,20 +200,27 @@
     // Ending screen: the Voyage Recap presentation fed with the figures of the duel.
     const SD_PHASE_NAMES = {
         en: ['The Slumbering Elder', 'Descent of Ten Thoughts', 'Voidword of the Final End'],
-        vi: ['Thâm Miên Cổ Thần', 'Thập Niệm Giáng Thế', 'Chung Yên Hư Ngôn']
+        vi: ['Thâm Miên Cổ Thần', 'Thập Niệm Giáng Thế', 'Chung Yên Hư Ngôn'],
+        zh: ['沉眠古神', '十念降世', '终末虚言']
+    };
+    // Chinese attack names, matching the duel UI translations (duel.attack.N).
+    const SD_ATTACK_NAMES_ZH = {
+        1: '触手探查', 2: '锁定意念', 3: '眼线', 4: '次元涟漪', 5: '低语之雨', 6: '镜心',
+        7: '十声同鸣', 8: '集体心智', 9: '虚无前奏', 10: '虚无斩击', 11: '心灵链接脉冲', 12: '福祸相依',
+        13: '次元破裂', 14: '统御心智合唱', 15: '心灵风暴漩涡', 16: '十念回响', 17: '集体之怒', 18: '十心一言'
     };
     const SD_CAUSE_NAMES = {
-        bullet: { en: 'Enemy bullets', vi: 'Đạn kẻ địch' },
-        laser: { en: 'Eye beams', vi: 'Tia mắt' },
-        tempest: { en: 'Tempest', vi: 'Bão tâm linh' },
-        upheaval: { en: 'Earthen Tentacle Upheaval', vi: 'Địa Xúc Hất Thiên' },
-        null_slash: { en: 'Null Slash', vi: 'Null Slash' },
-        rift: { en: 'Dimensional Rift', vi: 'Vết rách không gian' },
-        gap_bar: { en: 'Void Horizon', vi: 'Hư Không Hoành Tuyến' },
-        crush: { en: 'Falling Monolith', vi: 'Cự Trụ Giáng Thế' },
-        tendril: { en: 'Tendril lash', vi: 'Xúc tu quất' },
-        cube: { en: 'Thought sphere', vi: 'Quả cầu tư niệm' },
-        sphere: { en: 'Thought sphere', vi: 'Quả cầu tư niệm' }
+        bullet: { en: 'Enemy bullets', vi: 'Đạn kẻ địch', zh: '敌方子弹' },
+        laser: { en: 'Eye beams', vi: 'Tia mắt', zh: '眼眸光束' },
+        tempest: { en: 'Tempest', vi: 'Bão tâm linh', zh: '心灵风暴' },
+        upheaval: { en: 'Earthen Tentacle Upheaval', vi: 'Địa Xúc Hất Thiên', zh: '地触翻天' },
+        null_slash: { en: 'Null Slash', vi: 'Null Slash', zh: '虚无斩击' },
+        rift: { en: 'Dimensional Rift', vi: 'Vết rách không gian', zh: '次元裂缝' },
+        gap_bar: { en: 'Void Horizon', vi: 'Hư Không Hoành Tuyến', zh: '虚空地平线' },
+        crush: { en: 'Falling Monolith', vi: 'Cự Trụ Giáng Thế', zh: '陨落巨柱' },
+        tendril: { en: 'Tendril lash', vi: 'Xúc tu quất', zh: '触手抽击' },
+        cube: { en: 'Thought sphere', vi: 'Quả cầu tư niệm', zh: '意念之球' },
+        sphere: { en: 'Thought sphere', vi: 'Quả cầu tư niệm', zh: '意念之球' }
     };
     const SD_LABELS = {
         en: {
@@ -250,6 +296,43 @@
             rcBtnPlayAgain: 'Đánh Lại',
             rcBtnMainMenu: 'Về Menu',
             rcLivesLostBadge: 'Mất {lost} trên {start} mạng'
+        },
+        zh: {
+            rcAstralSub: '决战日志',
+            rcScoreSub: '本场战斗总分',
+            rcRank: '评级',
+            rcQuitLine: '中途退出决战',
+            rcWave: '已破解攻击',
+            rcWaveSub: '共 18 个攻击',
+            rcTime: '战斗时间',
+            rcTimeSub: '战斗用时',
+            rcSigilTitle: '攻击星图',
+            rcSigilSub: '三形态共十八个攻击',
+            rcEmptySigils: '未破解任何攻击',
+            rcKillsTitle: '各形态攻击',
+            rcKillsSub: '你在各形态推进到了哪里',
+            rcKillsTotalLabel: '已破解攻击',
+            rcEmptyKills: '未破解任何攻击',
+            rcAnalysisTitle: '决战统计',
+            rcAnalysisSub: '造成的伤害、受到的攻击与失去的生命',
+            rcTabAlly: '造成的伤害',
+            rcTabEnemy: '受到的攻击',
+            rcTabLives: '失去的生命',
+            rcEmptyStats: '此处暂无记录',
+            rcEmptyTimeline: '战斗太短，无法绘制',
+            rcTimelineTitle: '战斗时间线',
+            rcTimelineSub: '每 5 秒记录，附 30 秒移动平均',
+            rcLegOutput: '造成的伤害（5 秒）',
+            rcLegMa: '移动平均（30 秒）',
+            rcLegTaken: '受到的攻击',
+            rcLegWave: '攻击与形态标记',
+            rcSumDps: '每秒伤害',
+            rcSumPeak: '峰值伤害（5 秒）',
+            rcSumMvp: '最强形态',
+            rcSumTop3: '最强形态占比',
+            rcBtnPlayAgain: '再战一次',
+            rcBtnMainMenu: '主菜单',
+            rcLivesLostBadge: '失去 {lost} / {start} 条生命'
         }
     };
 
@@ -293,44 +376,44 @@
         }
         const ha = stats.hitsByAttack || {};
         for (const k in ha) {
-            if (ha[k] > 0) { const def = defs[k]; lifeMap['A' + k + (def && lang !== 'vi' ? ' ' + def.name : '')] = ha[k]; }
+            if (ha[k] > 0) { const def = defs[k]; const atkName = lang === 'zh' ? (SD_ATTACK_NAMES_ZH[k] || (def && def.name)) : (lang !== 'vi' ? (def && def.name) : ''); lifeMap['A' + k + (def && atkName ? ' ' + atkName : '')] = ha[k]; }
         }
 
         const weaponId = (typeof data.weapon === 'object' && data.weapon) ? (data.weapon.id || data.weapon.name) : (data.weapon || 'sword');
         const weaponNames = {
-            sword: { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà' }, blade: { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà' },
-            spear: { en: 'Void Piercer', vi: 'Ngọn Giáo Hư Không' }, halberd: { en: 'Eclipse Cleaver', vi: 'Lưỡi Kích Nhật Thực' },
-            dagger_array: { en: 'Phantom Blades', vi: 'Bộ Phi Đao Bóng Ma' }, heavy_lance: { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần' },
-            lance: { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần' }
+            sword: { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà', zh: '天穹之刃' }, blade: { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà', zh: '天穹之刃' },
+            spear: { en: 'Void Piercer', vi: 'Ngọn Giáo Hư Không', zh: '虚空穿刺者' }, halberd: { en: 'Eclipse Cleaver', vi: 'Lưỡi Kích Nhật Thực', zh: '蚀月利刃' },
+            dagger_array: { en: 'Phantom Blades', vi: 'Bộ Phi Đao Bóng Ma', zh: '幻影刃阵' }, heavy_lance: { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần', zh: '泰坦巨枪' },
+            lance: { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần', zh: '泰坦巨枪' }
         };
         const wn = weaponNames[weaponId] || weaponNames.sword;
-        const oppName = lang === 'vi' ? 'Egregor: Thống Lĩnh Tâm Trí' : 'Egregor the Overmind';
+        const oppName = lang === 'zh' ? '埃格雷戈·统御心智' : lang === 'vi' ? 'Egregor: Thống Lĩnh Tâm Trí' : 'Egregor the Overmind';
         const pills = [
-            { name: wn.en, vi: wn.vi, color: '#00E5FF', tag: '' },
-            { name: oppName, vi: oppName, color: '#B68AFF', tag: '' },
-            { name: 'Hard', vi: 'Khó', color: '#FF8A5C', tag: '' },
-            { name: 'Rank ' + sc.rank, vi: 'Hạng ' + sc.rank, color: '#E8C46A', tag: '' }
+            { name: wn.en, vi: wn.vi, zh: wn.zh, color: '#00E5FF', tag: '' },
+            { name: oppName, vi: oppName, zh: oppName, color: '#B68AFF', tag: '' },
+            { name: 'Hard', vi: 'Khó', zh: '困难', color: '#FF8A5C', tag: '' },
+            { name: 'Rank ' + sc.rank, vi: 'Hạng ' + sc.rank, zh: '评级 ' + sc.rank, color: '#E8C46A', tag: '' }
         ];
 
         const causeKey = stats.lastCause;
         const causeNm = causeKey && SD_CAUSE_NAMES[causeKey] ? (SD_CAUSE_NAMES[causeKey][lang] || SD_CAUSE_NAMES[causeKey].en) : (causeKey || '');
         let epitaphHtml;
         if (isWin) {
-            epitaphHtml = '<span class="rc-epitaph-cause">' + oppName + '</span> ' + (lang === 'vi' ? 'đã gục ngã' : 'has fallen');
+            epitaphHtml = '<span class="rc-epitaph-cause">' + oppName + '</span> ' + (lang === 'zh' ? '已倒下' : lang === 'vi' ? 'đã gục ngã' : 'has fallen');
         } else if (data.quit) {
-            epitaphHtml = lang === 'vi' ? 'Rút khỏi trận quyết chiến giữa chừng' : 'Withdrew from the showdown mid fight';
+            epitaphHtml = lang === 'zh' ? '中途退出决战' : lang === 'vi' ? 'Rút khỏi trận quyết chiến giữa chừng' : 'Withdrew from the showdown mid fight';
         } else if (causeNm) {
-            epitaphHtml = (lang === 'vi' ? 'Gục trước ' : 'Felled by ') + '<span class="rc-epitaph-cause">' + causeNm + '</span>';
+            epitaphHtml = (lang === 'zh' ? '败于 ' : lang === 'vi' ? 'Gục trước ' : 'Felled by ') + '<span class="rc-epitaph-cause">' + causeNm + '</span>';
         } else {
-            epitaphHtml = lang === 'vi' ? 'Hành trình dừng lại giữa chừng' : 'The showdown ended early';
+            epitaphHtml = lang === 'zh' ? '决战提前结束' : lang === 'vi' ? 'Hành trình dừng lại giữa chừng' : 'The showdown ended early';
         }
 
-        const labels = { en: Object.assign({}, SD_LABELS.en), vi: Object.assign({}, SD_LABELS.vi) };
+        const labels = { en: Object.assign({}, SD_LABELS.en), vi: Object.assign({}, SD_LABELS.vi), zh: Object.assign({}, SD_LABELS.zh) };
         const title = isWin
-            ? { en: 'Egregor Has Fallen', vi: 'Egregor Đã Gục Ngã' }
-            : (data.isPractice ? { en: 'Practice Ended', vi: 'Buổi Luyện Tập Kết Thúc' } : { en: "Showdown's End", vi: 'Hồi Kết Quyết Chiến' });
-        labels.en.rcTitle = title.en; labels.vi.rcTitle = title.vi;
-        if (data.isPractice) { labels.en.rcAstralSub = 'Practice Log'; labels.vi.rcAstralSub = 'Nhật Ký Luyện Tập'; }
+            ? { en: 'Egregor Has Fallen', vi: 'Egregor Đã Gục Ngã', zh: '埃格雷戈已倒下' }
+            : (data.isPractice ? { en: 'Practice Ended', vi: 'Buổi Luyện Tập Kết Thúc', zh: '练习结束' } : { en: "Showdown's End", vi: 'Hồi Kết Quyết Chiến', zh: '决战落幕' });
+        labels.en.rcTitle = title.en; labels.vi.rcTitle = title.vi; labels.zh.rcTitle = title.zh;
+        if (data.isPractice) { labels.en.rcAstralSub = 'Practice Log'; labels.vi.rcAstralSub = 'Nhật Ký Luyện Tập'; labels.zh.rcAstralSub = '练习日志'; }
 
         return {
             variant: 'showdown',
@@ -365,7 +448,7 @@
 
         if (typeof window !== 'undefined' && typeof window._openShowdownRecap === 'function') {
             try {
-                const sdLang = (window._lang === 'vi') ? 'vi' : 'en';
+                const sdLang = (window._lang === 'zh') ? 'zh' : (window._lang === 'vi') ? 'vi' : 'en';
                 _showdownRecapOpen = true;
                 window._openShowdownRecap(buildShowdownRecapData(data, sdLang), onPlayAgain, onMainMenu);
                 return;
@@ -381,7 +464,7 @@
         _activeTab = 'overview';
         _animStartTime = performance.now();
 
-        const lang = (typeof window !== 'undefined' && window._lang === 'vi') ? 'vi' : 'en';
+        const lang = (typeof window !== 'undefined' && window._lang === 'zh') ? 'zh' : (typeof window !== 'undefined' && window._lang === 'vi') ? 'vi' : 'en';
         const scoreData = calculateScore(data);
 
         _overlayEl = document.createElement('div');
@@ -395,18 +478,18 @@
 
         const weaponId = (typeof data.weapon === 'object' && data.weapon) ? (data.weapon.id || data.weapon.name) : (data.weapon || 'lance');
         const weaponNames = {
-            'sword': { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà' },
-            'blade': { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà' },
-            'spear': { en: 'Void Piercer', vi: 'Ngọn Giáo Hư Không' },
-            'halberd': { en: 'Eclipse Cleaver', vi: 'Lưỡi Kích Nhật Thực' },
-            'dagger_array': { en: 'Phantom Blades', vi: 'Bộ Phi Đao Bóng Ma' },
-            'heavy_lance': { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần' },
-            'lance': { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần' }
+            'sword': { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà', zh: '天穹之刃' },
+            'blade': { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà', zh: '天穹之刃' },
+            'spear': { en: 'Void Piercer', vi: 'Ngọn Giáo Hư Không', zh: '虚空穿刺者' },
+            'halberd': { en: 'Eclipse Cleaver', vi: 'Lưỡi Kích Nhật Thực', zh: '蚀月利刃' },
+            'dagger_array': { en: 'Phantom Blades', vi: 'Bộ Phi Đao Bóng Ma', zh: '幻影刃阵' },
+            'heavy_lance': { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần', zh: '泰坦巨枪' },
+            'lance': { en: 'Titan Greatlance', vi: 'Chiến Thương Cự Thần', zh: '泰坦巨枪' }
         };
-        const wInfo = weaponNames[weaponId] || { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà' };
-        const weaponName = lang === 'vi' ? wInfo.vi : wInfo.en;
+        const wInfo = weaponNames[weaponId] || { en: 'Celestial Blade', vi: 'Thanh Kiếm Thiên Hà', zh: '天穹之刃' };
+        const weaponName = lang === 'zh' ? (wInfo.zh || wInfo.en) : lang === 'vi' ? wInfo.vi : wInfo.en;
         // Showdown mode is always Hard difficulty
-        const diffText = lang === 'vi' ? 'Độ Khó: Khó' : 'Difficulty: Hard';
+        const diffText = lang === 'zh' ? '难度：困难' : lang === 'vi' ? 'Độ Khó: Khó' : 'Difficulty: Hard';
 
         let contentHtml = '';
         contentHtml += '<div style="max-width:960px;width:100%;display:flex;flex-direction:column;align-items:center;position:relative;margin:auto 0;">';
@@ -414,7 +497,7 @@
         // Header Title
         contentHtml += '<div style="text-align:center;margin-bottom:18px;">';
         contentHtml += '<div style="font-size:12px;letter-spacing:4px;color:#8CA6C6;margin-bottom:6px;text-transform:uppercase;">' + t('subtitle', lang) + '</div>';
-        contentHtml += '<h1 style="font-family:' + (lang === 'vi' ? "'Playfair Display',Georgia,serif" : "'Cinzel','Playfair Display',Georgia,serif") + ';font-size:32px;color:' + titleColor + ';margin:0 0 8px 0;letter-spacing:2px;text-shadow:0 0 20px rgba(232,196,106,0.4);">' + titleText.toUpperCase() + '</h1>';
+        contentHtml += '<h1 style="font-family:' + (lang === 'zh' ? (window._FONT_ZH_TITLE || "'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif") : lang === 'vi' ? "'Playfair Display',Georgia,serif" : "'Cinzel','Playfair Display',Georgia,serif") + ';font-size:32px;color:' + titleColor + ';margin:0 0 8px 0;letter-spacing:2px;text-shadow:0 0 20px rgba(232,196,106,0.4);">' + titleText.toUpperCase() + '</h1>';
         contentHtml += '<div style="font-size:13px;color:#8CA6C6;letter-spacing:1.5px;">' + t('opponentLabel', lang) + ' &nbsp;|&nbsp; ' + weaponName + ' &nbsp;|&nbsp; ' + diffText + '</div>';
         contentHtml += '</div>';
 
@@ -512,8 +595,8 @@
             const attId = data.practiceAttackId || 1;
             let html = '';
             html += '<div style="background:rgba(8,20,40,0.85);border:1px solid ' + (isWin ? '#E8C46A' : '#FF4D6D') + ';border-radius:8px;padding:24px;text-align:center;margin-bottom:24px;">';
-            html += '<div style="font-size:12px;color:#8CA6C6;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">SPELL ' + attId + ' PRACTICE</div>';
-            html += '<div style="font-family:Cinzel,Playfair Display,Georgia,serif;font-size:36px;font-weight:700;color:' + (isWin ? '#F2D98B' : '#FF4D6D') + ';margin-bottom:12px;">' + (isWin ? (lang === 'vi' ? 'THÀNH CÔNG' : 'CLEARED') : (lang === 'vi' ? 'THẤT BẠI' : 'FAILED')) + '</div>';
+            html += '<div style="font-size:12px;color:#8CA6C6;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">' + (lang === 'zh' ? '招式 ' + attId + ' 练习' : 'SPELL ' + attId + ' PRACTICE') + '</div>';
+            html += '<div style="font-family:' + (lang === 'zh' ? (window._FONT_ZH_TITLE || "'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif") : 'Cinzel,Playfair Display,Georgia,serif') + ';font-size:36px;font-weight:700;color:' + (isWin ? '#F2D98B' : '#FF4D6D') + ';margin-bottom:12px;">' + (isWin ? (lang === 'zh' ? '已攻克' : lang === 'vi' ? 'THÀNH CÔNG' : 'CLEARED') : (lang === 'zh' ? '失败' : lang === 'vi' ? 'THẤT BẠI' : 'FAILED')) + '</div>';
             html += '<div style="font-size:14px;color:#DCE8F5;">' + t('metricTime', lang) + ': <strong style="color:#00E5FF;">' + (scoreData.timeSec).toFixed(1) + 's</strong></div>';
             html += '</div>';
 
@@ -640,7 +723,7 @@
             const pct = Math.round((h / maxHitsOnAnyAttack) * 100);
             const barCol = h > 0 ? (h === maxHitsOnAnyAttack ? '#FF4D6D' : '#F2D98B') : '#3A5070';
             html += '<div style="display:flex;align-items:center;gap:10px;font-size:11px;">';
-            html += '<span style="width:70px;color:#8CA6C6;">Attack ' + i + '</span>';
+            html += '<span style="width:70px;color:#8CA6C6;">' + (lang === 'zh' ? '招式 ' + i : 'Attack ' + i) + '</span>';
             html += '<div style="flex:1;height:12px;background:rgba(0,20,40,0.6);border-radius:3px;overflow:hidden;">';
             html += '<div style="height:100%;width:' + pct + '%;background:' + barCol + ';"></div>';
             html += '</div>';
@@ -661,7 +744,7 @@
         html += '<div style="font-size:14px;color:#E8C46A;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">' + t('tabTimeline', lang) + '</div>';
 
         if (timeline.length === 0) {
-            html += '<div style="color:#8CA6C6;font-size:13px;text-align:center;padding:24px;">No critical combat events recorded.</div>';
+            html += '<div style="color:#8CA6C6;font-size:13px;text-align:center;padding:24px;">' + (lang === 'zh' ? '未记录到关键战斗事件。' : 'No critical combat events recorded.') + '</div>';
         } else {
             html += '<div style="display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;padding-right:8px;">';
             for (let i = 0; i < timeline.length; i++) {
@@ -671,23 +754,23 @@
                 const timeStr = (timeMin < 10 ? '0' : '') + timeMin + ':' + (timeSec < 10 ? '0' : '') + timeSec;
 
                 let tagColor = '#00E5FF';
-                let tagText = 'EVENT';
+                let tagText = lang === 'zh' ? '事件' : 'EVENT';
                 if (ev.type === 'hit') {
                     tagColor = '#FF4D6D';
-                    tagText = 'LIFE LOST';
+                    tagText = lang === 'zh' ? '失去生命' : 'LIFE LOST';
                 } else if (ev.type === 'shield_break') {
                     tagColor = '#00E5FF';
-                    tagText = 'SHIELD BREAK';
+                    tagText = lang === 'zh' ? '护盾破损' : 'SHIELD BREAK';
                 } else if (ev.type === 'skill_f') {
                     tagColor = '#F2D98B';
-                    tagText = 'SKILL F SWEEP';
+                    tagText = lang === 'zh' ? '技能 F 横扫' : 'SKILL F SWEEP';
                 } else if (ev.type === 'shift') {
                     tagColor = '#9C7BFF';
-                    tagText = 'TIME DOMAIN';
+                    tagText = lang === 'zh' ? '时间领域' : 'TIME DOMAIN';
                 }
 
                 html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(0,25,50,0.5);border-radius:4px;border-left:3px solid ' + tagColor + ';">';
-                html += '<span style="color:#DCE8F5;font-size:12px;font-weight:600;">' + tagText + ' (Attack ' + (ev.attackId || '?') + ')</span>';
+                html += '<span style="color:#DCE8F5;font-size:12px;font-weight:600;">' + tagText + ' (' + (lang === 'zh' ? '招式 ' : 'Attack ') + (ev.attackId || '?') + ')</span>';
                 html += '<span style="color:#8CA6C6;font-size:11px;font-family:monospace;">' + timeStr + '</span>';
                 html += '</div>';
             }

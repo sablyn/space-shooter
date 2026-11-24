@@ -27,12 +27,16 @@
     // benefit — VI mode overrides every element to Sora anyway (see the
     // body.lang-vi rule below), so Orbitron/Rajdhani/Cinzel/Share Tech Mono
     // are dead weight for VI users, and Sora is dead weight for EN users.
-    // Only request the family set the current language actually uses.
+    // ZH mode is the same story: it overrides to the Noto Sans/Serif SC
+    // stacks (see the body.lang-zh rule below). Only request the family set
+    // the current language actually uses.
     (function () {
       var lang;
       try { lang = (window.parent && window.parent._lang) || 'en'; } catch (e) { lang = 'en'; }
       var href = lang === 'vi'
         ? 'https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap'
+        : lang === 'zh'
+        ? 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@700;900&display=swap'
         : 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Cinzel:wght@400;700;900&display=swap';
       var link = document.createElement('link');
       link.rel = 'stylesheet';
@@ -50,6 +54,17 @@
        spirit to Orbitron/Rajdhani than a heavier grotesk like Be Vietnam Pro. */
     body.lang-vi, body.lang-vi * {
       font-family: 'Sora', sans-serif !important;
+    }
+
+    /* Same override pattern as lang-vi, for Simplified Chinese: Noto Sans
+       SC for UI text, Noto Serif SC for display titles (boss names, card
+       headings). Without this, headings would fall back to a Latin-only
+       face while ZH is active. */
+    body.lang-zh, body.lang-zh * {
+      font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif !important;
+    }
+    body.lang-zh h1, body.lang-zh h2, body.lang-zh .dsname {
+      font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif !important;
     }
 
     :root {
@@ -3112,6 +3127,589 @@
 </ul></div>`,
     };
 
+    // TABS_ZH mirrors TABS_VI exactly (same keys, same HTML structure,
+    // ids and onclicks byte-identical), body text translated into
+    // Simplified Chinese. updatelog intentionally omitted (dev changelog,
+    // stays English via the TABS_EN fallback in _tabHtml below). Unlike
+    // TABS_VI, the Ammit card IS included here, so the JS injection below
+    // (which inserts a Vietnamese Ammit card when cvAmmit is missing)
+    // never fires in zh mode.
+    const TABS_ZH = {
+      skills: `
+<div class="card"><h2 style="color:#ff8800"><span class="key">Space</span> 蓄力射击与超载激光</h2>
+<div class="sub">按住空格蓄力 • 3 秒 = 超载，<span class="cd">激光冷却 9 秒</span></div>
+<div class="ab" style="height:230px"><canvas id="cvLaser" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayLaser" onclick="playWidget('laser', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li><b>蓄力射击：</b> 按住最多 1 秒后松开。伤害随蓄力提升，最高为 <span class="dmg">80% ATK + 6% 生命上限</span>（满蓄力，10 倍）。</li>
+<li><b>超载激光：</b> 按住 3 秒不松开 → 持续发射光束，持续 <span class="hi">12 秒</span>。</li>
+<li>激光每 155ms 造成 <span class="dmg">40.25% ATK</span> 的伤害（镜面激光印记：+20%）。会把附近的敌人拉向光束。</li>
+<li>激活期间，<span class="hi">4 个分身残影</span> 出现（每侧 2 个，共 5 艘战机），发射平行光束。</li></ul></div>
+
+<div class="card"><h2 style="color:var(--gold)"><span class="key">Shift</span> 犹格-索托斯领域</h2><div class="sub">时空操纵 <span class="cd">冷却 1.1 秒–9 秒</span> <span class="cd">最长 8 秒</span></div>
+<div class="ab" style="height:160px"><canvas id="cvShift" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayShift" onclick="playWidget('shift', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li>按住 Shift：世界速度降至 <span class="hp">15%</span>。你获得 <b>铁躯</b>。</li>
+<li><span class="det-full"><b>冷却时间随按住时长变化</b>（不使用传送时）：&lt;2 秒 → <span class="hgr">1.1秒</span> · 2–5 秒 → <span class="hg">4.4秒</span> · 5–7 秒 → 9.9 秒 · ≥7 秒 → <span class="hr">9秒</span>。<span class="hr">若使用了 ←/→ 传送 → 恒为完整 9 秒。</span></span><span class="det-short"><b>冷却时间</b> 随按住时长变化（1.1 秒–9 秒）。传送总会触发完整 9 秒冷却。</span></li>
+<li>所有敌方子弹 <span class="hr">被摧毁</span>。<span class="key">←→</span> 传送。</li>
+<li><span class="hg">精准格挡：</span> 在领域内受击 → 伤害 +25%，持续 4 秒，哨兵获得 <b>铁躯 1.25 秒</b>。</li></ul></div>
+
+<div class="card"><h2 style="color:var(--blue)"><span class="key">A</span> 雷霆宝珠</h2><div class="sub">天界雷霆爆发 <span class="cd">冷却 6 秒</span></div>
+<div class="ab" style="height:210px"><canvas id="cvSkillA" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlaySkillA" onclick="playWidget('skillA', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li>召唤 <span class="hi">20 枚追踪宝珠</span>（最多 80 枚）。每枚：<span class="dmg">23% ATK + 2% 生命上限</span>（分裂宝珠路线为 27.6% ATK + 2% 生命上限），外加 <span class="hr">11.5% ATK + 目标已损失生命的 15%</span>（分裂路线为 13.8% ATK + 已损失生命的 18%）作为真实伤害。</li>
+<li>命中 → <span class="dmg">16 枚散射碎片</span>（每枚 0.9% ATK）。</li>
+<li><span class="hg">黄色宝珠：</span> 3 枚可吸收来袭攻击。当一枚宝珠被 <b>献祭</b>时，攻击者（若可锁定）会受到 <span class="hr">噬魂 + 噬魂者持续伤害</span>（每 0.35 秒 6.9% ATK），并被 <span class="hr">减速 25%</span>，持续 <span class="cd">3秒</span>。</li>
+<li><span class="det-full"><b>次元裂隙</b>（命中造成伤害时）：50px 区域，持续 <span class="cd">3秒</span>。区域内的敌人：<span class="hr">速度 −35%</span>，<span class="hr">噬魂 + 持续伤害</span>（每 0.35 秒 6.9% ATK），<span class="hr">承受伤害 +25%</span>。敌方子弹会被吸入核心并摧毁。<span class="dmg">20%</span> 概率在每次持续伤害跳动时连锁闪电攻击 8 个目标，造成 3.45% ATK。</span><span class="det-short"><b>次元裂隙</b>：命中时生成持续 3 秒的减速区域——减速、施加持续伤害、提高承受伤害，并吸入摧毁附近子弹。</span></li></ul></div>
+
+<div class="card"><h2 style="color:#ff44aa"><span class="key">S</span> 追忆之灵</h2>
+<div class="sub"><span class="cd">冷却 12 秒</span> <span class="cd">35秒</span></div>
+<div style="display:flex;gap:6px;margin-bottom:8px;">
+  <button onclick="showSpiritTab(1)" id="sTabBtn1" style="flex:1;padding:5px;font-family:'Rajdhani', 'Be Vietnam Pro', sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;background:rgba(255,68,170,0.25);border:1.5px solid #ff44aa;border-radius:6px;color:#ff44aa;">① 普通灵体</button>
+  <button onclick="showSpiritTab(2)" id="sTabBtn2" style="flex:1;padding:5px;font-family:'Rajdhani', 'Be Vietnam Pro', sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;background:rgba(0,80,40,0.2);border:1.5px solid rgba(0,255,136,0.4);border-radius:6px;color:#00cc66;">② Phōtokrystos</button>
+</div>
+<div id="sSpiritPane1">
+  <div class="ab" style="height:210px"><canvas id="cvSkillS" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlaySkillS" onclick="playWidget('skillS', this)"><i class="ico ico-play"></i>播放</button></div>
+  <ul><li>环绕灵体每 <span class="hi">54ms</span>（<span class="dmg">13.8% ATK</span>）。</li>
+  <li><span class="det-full">每第 5 发：<b>刃弧</b>（<span class="dmg">20.7% ATK + 1.5% 生命上限</span>，有双刃印记时为 24.8% ATK + 1.5% 生命上限）。摧毁敌方子弹。</span><span class="det-short">每第 5 发会发射一道 <b>刃弧</b>，可摧毁子弹。</span></li>
+  <li><span class="det-full"><b>终幕 @35 秒：</b> 2.5 秒激光蓄力（<span class="dmg">1.15% ATK</span> 真实伤害/跳），随后发射一枚 <b>旋转飞轮</b>：<span class="hi">5秒</span>，存在期间会在每个屏幕边缘反弹（发射与每次反弹时获得加速），<span class="dmg">20% ATK + 1.8% 生命上限</span> 接触时造成真实伤害（短暂冷却后可再次命中同一敌人），每 <span class="hi">0.3秒</span> 靠近敌人时以十字形斩出 4 道迷你刃弧（<span class="dmg">43% ATK</span> 每道穿透伤害，装备双刃时为 50% ATK），且每存活一整秒会再投掷 4 道（<span class="dmg">41% ATK</span>，装备双刃时为 47%）。旋转飞轮的每次命中都会施加 <b>噬魂</b>，持续 <span class="hi">2秒</span>（刷新持续时间，不叠加）。</span><span class="det-short"><b>终幕 @35 秒：</b> 道激光，随后是一枚弹跳的 <b>旋转飞轮</b>（存在 5 秒），接触时造成大量真实伤害，并定期斩出 4 道迷你刃弧。</span></li>
+  <li><b>太初造物：</b> 灵体击杀可为法力条充能（每次击杀 +2%）。充至 100% 时，再按 S 即可变身。</li></ul>
+</div>
+<div id="sSpiritPane2" style="display:none;">
+  <div class="ab" style="height:160px;border-color:rgba(0,255,136,0.2)"><canvas id="cvPhotokrystos" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayPhoto" onclick="playPhotokrystosWidget(this)"><i class="ico ico-play"></i>播放</button></div>
+  <ul>
+  <li><span style="color:#00cc66;font-size:10px">PHŌTOKRYSTOS</span> <b>太初大灵</b>——持续 <span class="hg">40秒</span>。持续时间可刷新。结束后冷却 40 秒。</li>
+  <li><span style="color:#88ccff;font-size:10px">被动</span> <b>太初祝福</b>：哨兵射击后坐力生命消耗 -15%，盟友伤害 +15%，每 0.75 秒恢复 +1.5% 生命上限，每名哨兵每 3 秒获得 +4.6% ATK 的护盾（上限为该哨兵自身生命上限的 15%）。</li>
+  <li><span style="color:var(--gold);font-size:10px">普通攻击</span> <b>3 枚追踪子弹</b> @ <b>42ms</b>：每发 <span class="dmg">14.4% ATK</span>，全部追踪目标。摧毁敌方子弹。施加易伤（15%）。</li>
+  <li><span style="color:var(--cyan);font-size:10px">技能</span> <b>回旋镖</b>——<span class="det-full">每 6 轮齐射：2 支回旋镖贯穿所有敌人（<span class="dmg">57.5% ATK + 2% 生命上限真实伤害</span>）。接触即造成伤害（可重复命中/200ms）。无敌人时排队等待。最多 <b>10</b> 个在场；达到上限时收回最旧的（待命队列：5 个）。弹跳 2 次或存在时间结束后，回旋镖 <b>飞回</b> 灵体处（速度快 60%）。BTM 会全部收回。摧毁子弹。</span><span class="det-short">每 6 轮齐射：2 支穿透回旋镖贯穿所有敌人（真实伤害，随已损失生命提升）。弹跳 2 次后收回。</span></li>
+  <li><span style="color:var(--cyan);font-size:10px">被动</span> <b>Danger? Not Today!</b>——<span class="det-full">敌人进入 <b>玩家 170px 内</b> 或 <b>边界 170px 内</b> → 灵体瞄准 100ms（每帧重新锁定），随后发射一道 <b>持续 2 秒的太初激光</b>，横扫 <b>±20°</b>（路径上的敌人立即击杀，无视所有护盾）。<b>伤害 -20%，持续 3 秒</b>。冷却从光束结束时开始计算。（冷却 10 秒）</span><span class="det-short">当敌人过于靠近玩家或屏幕边缘时，自动发射秒杀激光。（冷却 10 秒）</span></li>
+  <li><span style="color:#4ade80;font-size:10px">伙伴</span> <b>藤蔓束缚</b>——<span class="det-full">与“Danger? Not Today!”的锁定同时触发：太初藤蔓凭空破土而出，束缚离边界最近的敌人<b>与</b> 离玩家最近的敌人（若同一敌人同时满足两项，则为同一目标）。藤蔓需要 <b>1秒</b> 才能长成，随后绿色光环标记 <b>减速 50%，持续 2 秒</b>——光环与减速同时结束。免疫控制的敌人不受影响。</span><span class="det-short">用藤蔓束缚离边界最近与离玩家最近的敌人，使其减速 50%，持续 2 秒。</span></li>
+  <li><span style="color:var(--red);font-size:10px">终幕 @37 秒</span> <b>Back to Motherland</b>：<span class="det-full">全屏闪电屏障，持续 3.5 秒（<span class="dmg">20+35% 生命上限真实伤害/100ms</span>，清除子弹）→ 冲击波（<span class="dmg">10+99% 生命上限</span>，穿透所有护盾 + 铁躯）。冷却：自召唤起 12 秒。</span><span class="det-short">全屏闪电屏障，随后是一道穿透所有护盾与铁躯的冲击波。</span></li>
+  </ul>
+</div>
+</div>
+
+<div class="card"><h2 style="color:#9333ea"><span class="key">D</span> 死星</h2><div class="sub" style="font-weight:400;font-size:11px;opacity:0.75">巨龙湮灭</div><div class="sub"><span class="cd">冷却 10 秒</span> <span class="cd">蓄力 2 秒</span></div>
+<div class="ab" style="height:210px"><canvas id="cvSkillD" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlaySkillD" onclick="playWidget('skillD', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li>将所有敌人与子弹以 5.25 的速度拉向中心。触碰即 = <span class="hr">999,999,999 伤害</span> 立即击杀，即使穿过绝对护盾。</li><li><span style="color:var(--cyan);font-size:10px">技能</span> <b>标记与歼灭</b>——<span class="det-full">死星存活期间每约 2 秒标记 3 个目标（优先免疫控制的敌人——它们完全无法被牵引；否则选择当前生命最高的 3 个有效目标）。经过 1.5 秒预警（青色准星环）后，发射一束 <span class="hi">穿透性真实伤害光束</span> 穿过每个被标记的目标直达屏幕边缘——<span class="dmg">100+15% 生命上限</span> 每束，命中光束穿过的所有敌人，而不仅是被标记者。被光束命中的每个敌人还会受到 <span class="hg">持续 2 秒的减益：闪避 -10%</span>（乌列免疫，如同免疫其他所有减益）——闪避永不低于 0%，因此超出目标当前闪避的减免部分会在同一持续时间内转化为额外承受伤害。</span><span class="det-short">每约 2 秒：标记 3 个目标，随后发射一束 <span class="hi">穿透性真实伤害光束</span>（<span class="dmg">100+15% 生命上限</span>），在 1.5 秒预警后穿过每个目标。每次命中还会使闪避 -10%，持续 2 秒（溢出部分转化为额外承受伤害）。</span></li>
+<li><span style="color:#4ade80;font-size:10px">被动</span> <b>银河战舰</b>——<span class="det-full">死星击杀的每个敌人（中心秒杀、标记与歼灭光束，或免疫控制的敌人因累积伤害最终死亡）都会返还 <span class="hg">-0.25秒</span> 技能 D 自身的冷却。另：任何敌人因任何原因死亡——被盟友、玩家或死星本身击杀——只要处于 <span class="hi">死星半径 + 180px 范围内</span>，都会生成一艘友方战舰（<span class="hi">1 级，青色</span>）。每艘战舰以 <span class="hg">1.6 倍</span>随从速度飞向当前生命最高的敌人，并发射 <span class="dmg">固定 100 点真实伤害</span> 的弹丸，每 250ms 一发，但仅在目标进入 <span class="hi">220px</span> 范围内时；命中时造成 <span class="dmg">100+8% 生命上限真实伤害</span>，并施加 <span class="hi">1 层易伤</span>。<span class="hi">560 HP</span>——可在抵达目标前被敌方火力击落。<b>融合：</b> 50px 内的 2 艘同级战舰会在中点合成为 1 艘更高级的战舰——2 艘 1 级 → 1 艘 <span class="hi">2 级（紫色）</span>，全部属性 ×1.5；2 艘 2 级 → 1 艘 <span class="hi">3 级（红色）</span>，2 级全部属性 ×2（最高品阶）。</span><span class="det-short">死星击杀：<span class="hg">冷却 -0.25 秒</span>。死星附近的任何死亡（任何来源）：生成一艘快速战舰，飞向生命最高的敌人，进入 220px 后发射真实伤害弹丸，随后撞击造成额外伤害 + 易伤。560 生命，可被击落。50px 内的同级战舰会融合成更强的品阶（1 级青色 → 2 级紫色 ×1.5 → 3 级红色 ×2）。</span></li></ul></div>
+
+<div class="card"><h2 style="color:var(--red)"><span class="key">F</span> 湮灭横扫</h2><div class="sub">天意斩 <span class="cd">冷却 7 秒</span> <span class="cd">蓄力 1.5 秒 + 横扫 1 秒</span></div>
+<div class="ab" style="height:160px"><canvas id="cvSkillF" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlaySkillF" onclick="playWidget('skillF', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li><b>蓄力：</b> 半面青色辉光，所有敌人头上出现“目标锁定”准星，玩家处延伸出虚线。</li>
+<li><b>横扫：</b> 旋转利刃，默认自左向右。<span class="hr">999,999,999 伤害</span> 立即击杀。</li>
+<li><b>方向：</b> 在 1.5 秒蓄力期间按下 <span class="hi">→</span> 自左向右横扫，或按下 <span class="hi">←</span> 自右向左横扫。最后一次按键生效，并在横扫开始时锁定。屏幕顶部的小药丸会显示所选方向，随斩击发出而消失。装备流动循环（无需蓄力）时，按下 F 时按住的方向键决定方向。</li>
+<li>横扫过的区域会充满 <span class="hgr">矩阵数字雨</span> 与六边形网格覆盖层。</li><li>技能 F 的横扫（所有变体）、其发射的回旋镖与刃弧，以及大圣的夺宝攻击，都会斩碎命中的 <b>无尽回响</b> 幽灵，无论幽灵是正从 Kanade 掌心飞出、等待中还是奔逃中。被斩碎的幽灵不给分数、不充能印记、不触发击杀效果，且乌列的庇护屏障仍可格挡斩击。</li>
+</ul></div>
+
+<div class="card"><h2 style="color:#06b6d4"><span class="key">G</span> 特斯拉矩阵</h2><div class="sub"><span class="cd">通过击杀充能</span> <span class="cd">30秒</span></div>
+<div class="ab"><canvas id="cvSkillG" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlaySkillG" onclick="playWidget('skillG', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li>生成能量宝珠 → 配对成链接（减速 8% + <span class="dmg">8% ATK</span>/250ms）。</li>
+<li>链接在 5 秒时合并 → <b>特斯拉线圈</b>（最多 4 座）。光环内的敌人会被减速，并失去 <span class="hr">5% 减伤与 100 点固定减伤</span>（目标减伤不足时，差额转化为额外伤害）。每约 0.42 秒（射速 +20% 时为 0.5 秒），每座线圈在光环内选取最多 <b>5 名不同的敌人</b>，蓄力约 0.08 秒，然后依次向每个目标发射追踪电弧，间隔约 0.08 秒，造成 <span class="dmg">20% ATK 穿透伤害</span>（每轮每名敌人仅受 1 发）。命中的电弧还会使目标减速 <span class="hr">32%，持续 1.5 秒</span>（刷新持续时间，不叠加）。线圈没有生命值：每发射一发电弧，为连击叠加 <b>层</b>（最多 5 层），连击共用一个 1.5 秒计时器，每发新电弧都会刷新它，因此持续开火可以不断叠加，而不会让最旧的一层悄然过期。每层 <span class="hg">射速 +5%</span>与 <span class="hg">+2% ATK</span>，每次电弧命中生效。叠满 5 层后，下一发电弧会 <b>获得强化：</b>：<span class="dmg">+10% ATK、目标已损失生命的 +5% 与目标生命上限的 +1%</span>，并定身 <span class="hr">0.5秒</span>，随后层数重置为 1。每颗进入光环的敌方子弹有 <span class="hr">25% 概率消失</span>（每颗子弹仅判定一次）。重叠线圈的减速叠加但效果递减：第一个全效，之后每座线圈的效果 <span class="hr">降低 40%</span>。发射 500 发电弧的线圈会自行引爆。</li>
+<li>引爆（技能 G 结束时）：<span class="dmg">2.3% ATK</span> 的范围伤害，作用于每个剩余的宝珠/线圈。</li></ul></div>`,
+      rules: `
+<div class="card"><h2 style="color:var(--cyan)">波次系统</h2><div class="sub">15 秒生成窗口 · 休息 4 秒 · 无限提升</div>
+<ul>
+<li><b>生成（15 秒）：</b> 所有敌人保证在窗口内出现。使徒混合单体生成与 2–4 个的爆发。更高品阶按比例分散。</li>
+<li><b>清空：</b> 队列为空 + 全部死亡 → <span class="hgr">WAVE CLEARED</span>（3 秒）。队列为空 + 仍有存活 → 12 秒后强制结束。</li>
+<li><b>休息（5 秒）：</b> 下一波次倒计时。</li>
+</ul>
+<table class="controls-table" style="margin-top:4px">
+<tr><th>波次</th><th>使徒</th><th>异常</th><th>精英</th><th>主宰</th><th style="color:#eab308">歌利亚</th></tr>
+<tr><td>1</td><td>32</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>2</td><td>38</td><td>6</td><td>4</td><td>—</td><td>—</td></tr>
+<tr><td>3</td><td>40</td><td>7</td><td>6</td><td>2</td><td>—</td></tr>
+<tr><td>4</td><td>44</td><td>8</td><td>7</td><td>3</td><td>—</td></tr>
+<tr><td>5秒</td><td>48</td><td>9</td><td>8</td><td>4</td><td style="color:#f59e0b">1</td></tr>
+<tr><td>6</td><td>52</td><td>11</td><td>9</td><td>5秒</td><td>—</td></tr>
+<tr><td>7</td><td>56</td><td>12</td><td>10</td><td>6</td><td>—</td></tr>
+<tr><td>8</td><td>60</td><td>13</td><td>11</td><td>7</td><td>—</td></tr>
+<tr><td>9</td><td>64</td><td>14</td><td>12</td><td>8</td><td>—</td></tr>
+<tr><td style="color:var(--dim)">10+</td><td style="color:var(--dim)">+5/波</td><td style="color:var(--dim)">+1/波</td><td style="color:var(--dim)">+1/波</td><td style="color:var(--dim)">+1/波</td><td style="color:var(--dim)">1 / 5 波</td></tr>
+</table><p style="color:var(--dim);font-size:11px;margin-top:6px">歌利亚只生成一次，独立于其他所有品阶，在任意能被 5 整除的波次（5、10、15、20……）出现。</p></div>
+<div class="card"><h2 class="dsname" style="color:#ff3344"><img src="assets/images/game/icons/walpurgis-icon.png" alt="Walpurgis" style="height:0.85em;vertical-align:-0.05em;margin-right:5px;">WALPURGIS <span class="dsclass" style="font-size:9px;color:#ff3344">血夜</span></h2>
+<div class="sub">每 5 波 · 永久、可叠加、所有敌人</div>
+<ul>
+<li>每 5 波，所有敌人永久获得 1 层（第 5 波 = 1 层，第 10 波 = 2 层，无上限）。已在屏幕上的敌人会立即重新计算属性，不只适用于之后生成的敌人。</li>
+<li>每层：<b>生命上限 +20%</b>，<b>+5% 闪避</b>（上限 <b>+40%</b>（仅来自 Walpurgis），<b>固定减伤 +25</b>（独立于百分比减伤的属性，在百分比减伤之后减去，下限为 0，永不直接阻止击杀），以及 <b>所有受到的治疗/护盾效果 +5%</b>。</li>
+<li>一旦至少有 1 层生效，每个敌人周围都会出现红色光晕，每层都会变得更强烈。</li>
+</ul></div>
+<div class="card"><h2 style="color:var(--cyan)">伤害减免（DR）</h2><p>被抵消的来袭伤害百分比。加法叠加，上限 <span class="hi">85%</span>，适用于敌人的持续防御（<span class="hi">65%</span>，适用于友方召唤物）。两个限时例外仍保持 <span class="hi">99%</span>：维尔舒德自身的 3 秒幻影（及其歌利亚小丑复制品），以及利维坦破盾后 1 秒的宽限期。</p></div>
+<div class="card"><h2 style="color:#38bdf8">固定减伤</h2><p>直接从一次命中的伤害中减去的固定数值，在百分比减伤之后应用（而非之前）。独立属性，不计入减伤上限。下限为 0，因此只能将一次命中削弱为擦伤，永不直接阻止击杀。用于 Walpurgis（每层 +25，上限 100）与利维坦的命中注定（+150）。</p></div>
+<div class="card"><h2 style="color:#4488cc">护盾</h2><p>本体之前的生命缓冲。可叠加。摧毁护盾 ≠ 降低生命上限。</p></div>
+<div class="card"><h2 style="color:#ff8844">百分比伤害</h2><p>按 <b>仅生命上限</b> 计算，绝不按当前护盾计算——大护盾不再使百分比命中打得更痛。护盾仍会先吸收原始伤害。</p></div>
+<div class="card"><h2 style="color:var(--red)">真实伤害</h2><p>绕过所有护盾。直接作用于生命。</p></div>
+<div class="card"><h2 style="color:var(--gold)">铁躯</h2><p>完全免疫 <b>所有伤害</b>——百分比伤害、真实伤害、死星、技能 F。绝对免疫。</p></div>
+<div class="card"><h2 style="color:var(--purple)">免疫控制</h2><p>无法被任何控制效果拉扯/减速——死星拉扯、特斯拉减速、次元裂隙减速、宝珠减速。不会阻挡伤害，也不会覆盖主宰标记的力量（见主宰卡片）。<b>埃格雷戈</b>，<b>达格鲁尔</b>，<b>利维坦</b>，且 <b>Goliath</b>（真身，通过命中注定）拥有永久免疫控制。</p></div>
+<div class="card"><h2 style="color:#22ccaa">主宰</h2><p>与普通控制分开的一类。免疫控制可以阻挡被控制拉扯/减速/定身/沉默，但 <b>不能</b> 阻挡主宰效果，且没有任何手段可以清除它。<b>巨蟹座的激流涌动</b> 漩涡属于主宰：即使是免疫控制的敌人仍会被拖向其中心。<b>狮子座的神圣命运</b> 石化属于主宰：所有敌人都会化为石头，包括免疫控制的敌人，且坚定意志无法清除它。</p></div>
+<div class="card"><h2 style="color:#cc55ff">定身与沉默</h2>
+<p><b>定身 + 沉默同时生效：</b> 达格鲁尔的 <b>深渊锁链</b>。持续 <span class="hr">1 秒</span>，每次命中都会重新施加，即使已在生效中。</p>
+<p><b>仅沉默（无定身）：</b> 歌利亚真身命中玩家的每次攻击——绝对裁决（<span class="hr">1.25秒</span>）、腐化陨石与每个小丑复制品（<span class="hr">0.75秒</span> 每次）。</p>
+<ul><li><b>定身：</b> 完全无法移动。</li>
+<li><b>沉默：</b> 无法使用 <b>任何技能</b>——Shift、A、S、D、F、G 全部被锁定。自动射击 <span class="hr">完全停止</span>，且空格键（Charge Shot / Overload Laser）也被封锁——无论是开始新的蓄力还是释放已蓄满的。</li>
+<li>技能 A 的宝珠会回到轨道（停止锁定目标）。</li>
+<li>飞船上会出现一个减益图标——达格鲁尔定身+沉默效果为锁链虚空之口，歌利亚仅沉默命中为封印虚空裂隙——以及一个 <span class="hr">红色 X</span>，覆盖在所有技能按钮上。</li></ul></div>
+<div class="card"><h2 style="color:var(--green)">倍率</h2><ul>
+<li><span class="hgr">荣耀：</span> ×1.55 | <span class="hg">格挡：</span> ×1.25 | 合计：<span class="dmg">×1.9375</span></li></ul></div>`,
+      sigils: `
+<div class="card visible"><h2 style="color:var(--gold)">星座印记系统</h2><div class="sub">第 5 波 · 第 10 波——选择 1 枚印记 · 两项祝福全部获得</div>
+<p>第 1、5、10 波结束时，会出现印记选择界面。系统提供 4 枚随机印记——选择其中一枚，即可永久获得它的两项祝福。点击任意卡片可阅读其传说。</p>
+<p style="margin-top:6px;font-size:12px;color:var(--dim)">元素：<span style="color:#EF9F27;font-weight:600">火</span> · <span style="color:#4D9B2A;font-weight:600">土</span> · <span style="color:#378ADD;font-weight:600">风</span> · <span style="color:#7F77DD;font-weight:600">水</span> · <span style="color:#FFD23F;font-weight:600">金</span> &nbsp;|&nbsp; 类型：<span style="color:#f87171;font-weight:600">ATK</span> · <span style="color:#60a5fa;font-weight:600">防御</span> · <span style="color:#4ade80;font-weight:600">治疗</span> · <span style="color:#fbbf24;font-weight:600">特殊</span></p>
+</div>
+<div class="sigil-deck">
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#EF9F27;--scl:rgba(239,159,39,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="aries"></canvas><div class="sfc-name">白羊座</div><div class="sfc-el">火</div><div class="sfc-atk"><span>ATK <b>+8%</b></span></div><div class="sfc-theme">先锋突击</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>巴比伦之门</b> <span class="sbd">任何友方命中（技能 D/F 除外）都可在玩家周围开启传送门，以扇形发射 14 把利刃，每把利刃穿透路径上的所有敌人：每命中一名敌人造成 7.5% ATK 真实伤害（冷却 1.5 秒）。</span></div>
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>Enuma Elish</b> <span class="sbd">每命中 30 次友方攻击，就会召唤一个玩家的幻影分身，向优先级最高的敌人方向掷出一支巨矛，贯穿整条直线：每个被贯穿的敌人受到 18 倍 ATK + 自身生命上限 5% 的真实伤害，无上限（冷却 0.5 秒）。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="aries"></canvas>
+<div class="sfc-story">在第一颗星被点亮之前，只有虚空，无边无际，没有名字。随后白羊在黑暗中睁开双眼，它的怒火化作第一团火焰。它向前冲去，羊角撞碎虚无之处，火花向四面八方飞溅，每一粒火花都是一颗太阳。它并非有意创造，只是向前冲锋。而万物，便自这次冲锋中诞生。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#4D9B2A;--scl:rgba(77,155,42,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="taurus"></canvas><div class="sfc-name">金牛座</div><div class="sfc-el">土</div><div class="sfc-atk"><span>ATK <b>+5%</b></span></div><div class="sfc-theme">小队阵型</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>勇者小队</b> <span class="sbd">召唤一支由 4 名哨兵组成的小队，在玩家上方列阵跟随，各司其职（坦克 300 生命，辅助/射手/法师各 200 生命）。每名队员都有自己的生命条与专属武器，倒下后 5 秒复活（同一职责），并共享真实哨兵获得的所有增益（祝福、盖亚庇护/屏障、月轮庇护、最后一搏、正义荣耀）。敌方子弹飞近小队时可能击中队员：坦克会吸引其中约 75%。本应让玩家失去一条命的穿透攻击会同时击中所有存活的队员，每人承受相当于该攻击对真实哨兵造成伤害的 1.5 倍（非穿透攻击不受影响）。每 1 秒，若场上已无真实哨兵，会重新生成 2 名（冷却 2 秒）。</span></div>
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>小队协同</b> <span class="sbd">坦克：吸收计量条通过小队承受的伤害以及从真实哨兵每次受击中分担的部分（30%）积攒；蓄满时释放穿透性哨兵刃横扫（每名敌人 6% ATK 真实伤害 + 当前太初能量 4%），并为自身恢复最多 3% ATK（上限为自身生命上限的 8%）。辅助：为小队与真实哨兵中生命百分比最低的 2 个目标各恢复最多 7.5% ATK（上限为目标自身生命上限的 20%，绝不治疗玩家）。射手：每 0.3 秒自动发射一支穿透箭（11.2% ATK + 当前太初能量 5%）。法师：环绕水晶约每 1 秒飞向最近的敌人并引爆一片奥术范围区域（持续 3 秒，每跳 7.5% ATK + 当前太初能量 4%）。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="taurus"></canvas>
+<div class="sfc-story">白羊掷入黑暗的火花四散开来，还没来得及成为星辰就已冷却熄灭。随后金牛缓缓而来，步伐沉稳而坚定。它用宽厚的手掌聚拢每一粒余烬，将它们压合在一起，如磐石般耐心，在漫长的寂静岁月里向它们呵气。它的蹄下，第一片大地开始坚硬凝固。它从不匆忙，也从未匆忙过。大地长存，因为它长存。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#378ADD;--scl:rgba(55,138,221,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="gemini"></canvas><div class="sfc-name">双子座</div><div class="sfc-el">风</div><div class="sfc-atk"><span>ATK <b>+9%</b></span></div><div class="sfc-theme">镜像战术</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>影之双子</b> <span class="sbd">任意友方来源（哨兵除外）每命中第 10 次，蓄力 0.5 秒，随后一个幻影双子战机出现在随机屏幕边缘，向随机敌人发射 3 轮穿透等离子宝珠，横贯整个屏幕：每轮为 1 枚大宝珠配 2 枚小宝珠。小宝珠：11.2% ATK。大宝珠：27% ATK + 2.5% 生命上限。命中施加 1 层易伤 + 噬魂。再次触发前有 0.5 秒冷却。</span></div>
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>镜面激光</b> <span class="sbd">超载会召唤 2 个镜像体（左上与右下），沿垂直方向移动（速度 +25%），发射伤害为原光束 60% 的水平光束。原光束伤害 +20%。每次施放技能或自动射击还有 5% 概率（每次未触发 +0.3%）发射一道穿透性绿紫激光柱：每 125ms 造成 52.5% ATK + 2.5% 生命上限，持续 3 秒，无牵引，可与超载激光叠加（3 秒灼烧结束后冷却 6 秒）。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="gemini"></canvas>
+<div class="sfc-story">当世间只有一片大地与一片天空时，双子望着它，心生困惑。他们说，一个没有分隔的世界，是一个无法思考的世界。于是他们伸出四只手，将它劈开：光明与阴影分离，物质与梦境分离，自我与他者分离。对立面之间的裂缝，成了众生栖居的空间。从那以后，双子一直在为此争论不休。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#7F77DD;--scl:rgba(127,119,221,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="cancer"></canvas><div class="sfc-name">巨蟹座</div><div class="sfc-el">水</div><div class="sfc-atk"><span>ATK <b>+4%</b></span></div><div class="sfc-theme">月潮</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt def">防御</span><b>月轮庇护</b> <span class="sbd">盖亚庇护无需正义荣耀即可激活；盖亚屏障吸收量 +30%；哨兵闪避 +15%。海洋猎手：生命不高于 8% 的敌人会被一头虎鲸扑入瞬间处决。</span></div>
+<div class="sfc-row"><span class="sbt heal">治疗</span><b>潮汐流转</b> <span class="sbd">哨兵每秒恢复 3% 生命上限（随品阶提升）；治疗效果 +30%。每名哨兵获得 1 层铁躯；8 秒冷却仅在其被消耗后才开始。若场上已无哨兵，每 1 秒检查一次，重新召唤 2 名（冷却 2 秒）。激流涌动：被吸收的攻击会充入共用的潮汐计量条，另有随存活哨兵数量变化的被动充能（1/2/3 名以上存活时分别为每秒 50/60/75）；溢出部分最多可储存 +30% 作为下次的先手充能。蓄满后，按空格可在屏幕上的每个敌人处（最多 10 个，由近及远）引爆漩涡，将附近的一切拉向中心（这是“主宰”级牵引，并非普通控制——免疫控制的敌人与子弹也会被拖入，见“主宰”术语卡片）——被卷入者每在其中停留 100ms 就受到 7.5% ATK 真实伤害，每次激活每名受害者仅计算一次——随后在鲸鱼咬合时爆发出 97% ATK + 3.5% 生命上限的真实伤害。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="cancer"></canvas>
+<div class="sfc-story">巨蟹看见了双子劈开的那道巨大裂缝，为如今彼此分隔的万物落泪。她的泪水落入裂缝，填满了它，化作第一片海洋。她本无意创造大海，只是悲伤而已。但她用柔软的螯捧起海水，向它呵气，于是有什么东西在深邃温暖的黑暗中苏醒。从那以后，她一直在守护着它。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#EF9F27;--scl:rgba(239,159,39,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="leo"></canvas><div class="sfc-name">狮子座</div><div class="sfc-el">火</div><div class="sfc-atk"><span>ATK <b>+6%</b></span></div><div class="sfc-theme">太阳之火</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>狮吼</b> <span class="sbd">正义荣耀激活期间，攻击会附加灼烧：每层每 500ms 造成 30% ATK，持续 3 秒（新的命中会刷新持续时间并叠加一层，最多 3 层）。灼烧无视敌人 50% 的减伤。每次命中还会造成相当于目标已损失生命 1% 的额外伤害。野火：带着灼烧死亡的敌人会把灼烧层数传递给 150px 内的最多 6 名敌人。</span></div>
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>神圣命运</b> <span class="sbd">波次开始时：所有敌人被石化 5 秒（新生成的敌人也是），全部伤害 +60%。石化属于主宰效果；歌利亚的专属技能（无尽回响与小丑）仍会发动。装备狮吼后，命运计量条开始充能：灼烧击杀可充能（使徒 5%，异常与精英 20%，主宰 35%），每次对异常及以上级别敌人造成灼烧跳动 +1.5%，每次命中数字化敌人 +0.1%。每 1% 提供 +0.15% ATK（最多 +15%）。蓄满后，按空格（移动端按 CHARGE）可石化所有敌人 3 秒，同样获得 +60% 伤害。任意石化结束时，所有仍处于石化的敌人会碎裂，受到 100% ATK 的伤害。随后计量条清空，石化结束后 8 秒才可重新充能。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="leo"></canvas>
+<div class="sfc-story">狮子从巨蟹海洋的边缘崛起。它甩掉鬃毛上的水，张开大口，发出一声震天咆哮，世界之上的苍穹随之裂开。阳光第一次透过那道裂缝洒落。所有沉睡的生灵在突如其来的光芒下同时苏醒。狮子并未创造太阳，只是咆哮而已。但它的咆哮足够响亮，让阳光得以穿透进来。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#4D9B2A;--scl:rgba(77,155,42,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="virgo"></canvas><div class="sfc-name">处女座</div><div class="sfc-el">土</div><div class="sfc-atk"><span>ATK <b>+6%</b></span></div><div class="sfc-theme">精准打击</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>森林守护者</b> <span class="sbd">每第 6 轮自动齐射：3 倍伤害，施加易伤、定身与沉默 1 秒。子弹泛起金光。屏幕上有 5 名以上敌人时，每 4 秒会有一根缠绕藤蔓的木桩横扫屏幕（宽度为屏幕的 60%），对每个目标造成 150% ATK + 目标已损失生命 10% 的伤害。</span></div>
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>电路工程师</b> <span class="sbd">特斯拉持续伤害、线圈伤害与线圈光环伤害 +30%。摧毁一座线圈：技能 G 充能 +10 点。携带任意减益（减速、持续伤害、易伤、噬魂等）的敌人受到的所有来源伤害 +25%。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="virgo"></canvas>
+<div class="sfc-story">狮子的光芒之后，处女座赤足走过温暖的灰烬。火焰燃尽之处，她跪下来，用手指将种子一粒一粒按进土里，整整一万年。她不知道是否会有东西生长出来，但她依然播种。第一万年，第一株绿芽穿透黑色的泥土，向着光明探出头来。从那以后，她再也没有停止播种。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#378ADD;--scl:rgba(55,138,221,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="libra"></canvas><div class="sfc-name">天秤座</div><div class="sfc-el">血之巫术</div><div class="sfc-atk"><span>ATK <b>+10%</b></span></div><div class="sfc-theme">绯红清算</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>血箭</b> <span class="sbd">装备天秤座时，技能 A 冷却 -2 秒。技能 A 每次按下可储存 1 层；再次按下且有目标时触发充能并释放全部已储存层数，每层发射 5 支穿透箭（1 支大箭标记生命上限最高的敌人，4 支小箭攻击其他敌人，优先密集的敌群）。大箭：45% ATK 穿透伤害，爆炸造成 60% ATK + 3.5% 生命上限的真实伤害（再根据目标减伤最多 +60%）。小箭：27% ATK 穿透伤害，爆炸造成 27% ATK + 2.5% 生命上限加目标已损失生命 3% 的穿透伤害（护盾仍可格挡），飞行速度快 20%。爆炸施加 2 层易伤；重复命中同一敌人时伤害降低 30%。</span></div>
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>星体贯穿</b> <span class="sbd">技能 A 的宝珠命中时会直接穿透目标，继续飞向屏幕边缘，伤害沿途遇到的每个敌人。宝珠体积 +30%，伤害 +20%。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="libra"></canvas>
+<div class="sfc-story">当处女座的花园疯长到窒息时，天秤座降临了。她手持两盘锃亮的铜秤，将它们置于万物中心，开始称量。生命与死亡，丰饶与饥饿，生长与毁灭。她每削减一样东西，都会回馈另一样。世界没有感谢她。平衡从不被感谢。但它维系着一切，永远如此。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#7F77DD;--scl:rgba(127,119,221,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="scorpio"></canvas><div class="sfc-name">天蝎座</div><div class="sfc-el">水</div><div class="sfc-atk"><span>ATK <b>+6%</b></span></div><div class="sfc-theme">死亡印记</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt heal">治疗</span><b>复活</b> <span class="sbd">选择时：立即获得 +4 条命（最多 12 条）。生命奖励速率：每 300,000 分 +1 条命。</span></div>
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>死亡标记</b> <span class="sbd">伤害加成随生命降低线性提升：满血时为 0%，21% 生命时为 +50%，20% 及以下生命时固定 +65%。技能 F 的刃弧可穿透铁躯。生命 ≤5% 的敌人会被一道闪电与血花爆裂瞬间处决。生命低于 50% 的敌人会显示青色警告环。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="scorpio"></canvas>
+<div class="sfc-story">天蝎座潜入树根之下、岩石之下，深入白羊在太初时逃离的那片古老虚空。它还活着，依然饥饿。天蝎没有摧毁它，而是将尾刺刺入黑暗，把它撑开，如同一扇门。死亡第一次通过这扇门进入世界，而它的降临，也让每一个生灵都有了活着的理由。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#EF9F27;--scl:rgba(239,159,39,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="sagittarius"></canvas><div class="sfc-name">射手座</div><div class="sfc-el">火</div><div class="sfc-atk"><span>ATK <b>+10%</b></span></div><div class="sfc-theme">灵魂之刃</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>双刃</b> <span class="sbd">灵体的刃弧斩击发射 2 把利刃（每把 +20%，间隔 15ms），另有 25% 概率发射第 3 把。每次回旋镖触发都有两次独立的 30% 概率，各额外增加 2 支回旋镖。技能 F 的横扫现在改为从玩家处投掷 2 支回旋镖，而非刃弧。额外利刃的半径 +20%。每次自动射击有 15% 概率发射一道刃弧（34.5% ATK），与灵体的相同。还会强化旋转飞轮（技能 S 的终幕）：每次触发时迷你刃弧齐射翻倍（4→8，每把伤害 +20%，第二波在 15ms 后发射，半径 +20%），并获得 <b>弹射猎手</b>——旋转飞轮每次撞墙反弹时，轨迹会部分转向附近的敌人（60° 锥形范围内），并为下次身体接触命中叠加 +15% 伤害（最多 3 层，+45%），命中后立即重置。</span></div>
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>极寒</b> <span class="sbd">回旋镖与刃弧斩击：75% 概率使目标减速 30%，持续 2 秒，并拉向玩家。免疫控制的敌人永远不会被拉动，但仍会被减速。追忆之灵与 Phōtokrystos 的射速 +20%。同样适用于旋转飞轮：其身体接触命中获得同样的 75% 概率减速+牵引，其刃弧斩击节奏加快 20%。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="sagittarius"></canvas>
+<div class="sfc-story">射手座站在已知世界的尽头，望向群星之外的黑暗。他拉开长弓，整整三个时代纹丝不动，直到瞄准达到绝对完美。然后他松手。箭矢飞越所有的太阳与彼此之间的黑暗，至今尚未落地。那支箭就是所有灵魂必须走过的道路。他称之为命运。从那以后，他一直微笑着。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#4D9B2A;--scl:rgba(77,155,42,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="capricorn"></canvas><div class="sfc-name">摩羯座</div><div class="sfc-el">土</div><div class="sfc-atk"><span>ATK <b>+5%</b></span></div><div class="sfc-theme">复利增长</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>复利</b> <span class="sbd">每次击杀在常规的 1.25 点之外，再为技能 S 充能 +0.8 点太初能量。每充能 5 点：全部盟友射速 +1.5%（最多 +40%，召唤后保留）。大灵存活期间，主要盟友命中造成 +22.5% ATK 真实伤害（每名目标每 250ms 仅触发一次，对歌利亚无效）。每次击杀，以及通过其他方式充能的每点太初能量（命中巨型敌人），都会获得 1 层：每层 +0.5% 伤害，最多 80 层（+40%）。6 秒内没有获得新层数时，全部层数消失；从第 4 秒起，战机周围的墨圈会开裂以示警告。</span></div>
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>山崩</b> <span class="sbd">每层复利为地脉计量条充能 2.5%（40 层即可蓄满）。蓄满后，按空格或 CHARGE：一座大山砸向战机上方至少 200px 处敌人最密集的区域，对 170px 内的所有敌人造成 12 倍 ATK + 4% 生命上限的伤害，并将其掩埋 1.5 秒（主宰效果，对免疫控制的敌人同样有效）。层数保留。大山在落点处碎裂成三面沿山脚弧形排列的岩墙，持续 4 秒。岩墙可阻挡敌方子弹、穿透射击、发射型技能（玛可西亚斯之刃、乌列之剑、拉斐尔宝珠、达格鲁尔锁链）以及来自墙后敌人的任何光束或攻击，敌人的身体也无法穿过。友方射击可以穿过。歌利亚有自己的规则：他的陨石与裁决宝珠接触岩墙时会将其击碎，而他的身体与普通射击可以穿过岩墙。若巨蟹座或狮子座也已就绪，按空格时先释放巨蟹座，再是狮子座，最后才是山崩。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="capricorn"></canvas>
+<div class="sfc-story">摩羯座明白，没有度量，时间便没有形态：一片无处不在因而无处可寻的海洋。它从深海攀登到世界最高的山峰，在那里用蹄子将第一部历法刻进石头。季节，时代，终结。完成后，它俯视着脚下循环往复的万物，说道：现在你知道自己身在何处了。现在你知道何时该停下了。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#378ADD;--scl:rgba(55,138,221,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="aquarius"></canvas><div class="sfc-name">水瓶座</div><div class="sfc-el">风</div><div class="sfc-atk"><span>ATK <b>+9%</b></span></div><div class="sfc-theme">电力风暴</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>连锁闪电</b> <span class="sbd">特斯拉持续伤害：50% 概率传导至 150px 内最近的敌人。技能 G 充能速度 +35%。技能 G 激活期间，每个过期且未配对成特斯拉线圈的能量宝珠都会提供可叠加的 +8% 盟友伤害增益（最多 6 层，共 +48%，每层 5 秒），若有空位，还会转化为一枚额外的技能 A 宝珠。</span></div>
+<div class="sfc-row"><span class="sbt def">防御</span><b>磁场</b> <span class="sbd">技能 G 激活或完全充能时：300px 内的敌人减速 30%，并每 100ms 受到 6.5% ATK 的持续伤害（每秒 65% ATK）。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="aquarius"></canvas>
+<div class="sfc-story">水瓶座从摩羯座的山峰走下，手捧一瓮从未触及阳光的水。他将水倾倒在沉睡的大地上，水流所及之处，有新的东西生长出来：不是植物，不是生灵，而是语言。名字如泡沫般从水中升起。十二位神明都有了名字。所有造物都有了名字。记忆诞生了。伴随着记忆，世界终于明白了自己是什么。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#7F77DD;--scl:rgba(127,119,221,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="pisces"></canvas><div class="sfc-name">双鱼座</div><div class="sfc-el">水</div><div class="sfc-atk"><span>ATK <b>+20%</b></span></div><div class="sfc-theme">流动与闪避</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>梦境</b> <span class="sbd">Shift：2.5 秒内抵消所有伤害，并标记屏幕上的所有敌人（每名敌人立即获得 1 层易伤）。1.65 秒后，被标记的敌人爆发，造成标记期间累积伤害的 50% 加已损失生命的 15%，上限为目标自身生命上限的 25%。与自身共享 6 秒最短再次触发间隔，因此反复短按 Shift 无法连成近乎持续的无敌。</span></div>
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>流动循环</b> <span class="sbd">击杀使徒可使 A/S/超载激光冷却减少 0.75 秒（D/F：1 秒）。击杀符合条件的异常/精英减少 1 秒（D/F：1.5 秒），击杀主宰减少 1.5 秒（D/F：2 秒），击杀埃格雷戈减少 2 秒（D/F：3 秒）。A/S/激光的击杀与移动返还共享预算：每真实秒最多 2 秒；D/F/Shift 无上限。每移动一整个屏幕宽度，所有冷却减少 0.5 秒。这些技能实际返还的每 1 秒都会增加 1 点流动值，包括零头秒数。达到 12 点时，气泡聚成一条鱼，游向最近的敌人。它直线穿过敌人，对每个目标造成一次 65% ATK 穿透伤害并眩晕 1 秒（主宰效果）。可储存 12 点溢出，最多同时存在 2 条鱼，召唤间隔至少 2 秒。战机周围的水流会随着流动值积攒而增强。技能 G 充能加快 35%（Phōtokrystos 仍为加快 50%）。D、F 与超载激光瞬时发射；Shift 不受影响。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="pisces"></canvas>
+<div class="sfc-story">最后，来自深渊的双鱼游过水瓶座的水域。两条鱼尾尾相连，向相反的方向环游：一条游向过去，一条游向尚未到来之物。它们共同梦见一切曾经存在与一切仍将存在之物。它们仍在做梦。世界就是它们的梦。只有当它们醒来，梦才会结束。因此智者自古祈祷：愿双鱼继续做梦。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#D62839;--scl:rgba(214,40,57,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="than"></canvas><div class="sfc-name">大圣</div><div class="sfc-el">土</div><div class="sfc-atk"><span>ATK <b>+8%</b></span></div><div class="sfc-theme">窃取之力</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>洗劫宝库</b> <span class="sbd">湮灭横扫变为如意金箍棒，每次横扫中击杀的敌人都会使其变宽（最多 4.5 倍），且每次真实横扫都会让玩家与哨兵进入 1 秒无法锁定状态。击杀精英及以上级别的敌人可窃取该敌人的宝珠（最多持有 3 颗，每种 1 颗）——击杀歌利亚则一次性窃取它持有的全部 3 颗宝珠，因为它本身就是由另外 3 名首领被窃取的力量构成。随时按下 F 且持有宝珠时，即可释放该敌人招牌攻击的真实复制品，无需冷却。</span></div>
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>七十二变</b> <span class="sbd">每次按下 F 仍只消耗 1 颗宝珠——但同时持有 3 颗不同宝珠时，正在消耗的那颗宝珠伤害提升 1.65 倍。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="than"></canvas>
+<div class="sfc-story">在那个名字还不值得畏惧之前，石猴游到东海之底，要求一件配得上自己的武器。龙王只想打发走他，接连献上刀剑，却都被嫌太轻而弃之一旁。唯有支撑海底本身的那根黑色铁柱合他心意：如意金箍棒，重逾群山，只听从一个愿望。他把宝贝别在耳后，走出大海，留下一位少了一件宝物的龙王。一座大山、一场诅咒、一次取经之后，曾经大闹天宫与地府的同一只猴子跪了下来，化作全新的存在：不再是齐天大圣，而是斗战胜佛。金箍棒从未停止听令，变的只是握住它的那只手。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#FFD23F;--scl:rgba(255,210,63,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="dau"></canvas><div class="sfc-name">黎明使者</div><div class="sfc-el">金</div><div class="sfc-atk"><span>ATK <b>+5%</b></span></div><div class="sfc-theme">第一缕光</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>破晓长鸣</b> <span class="sbd">每 10 秒，一道光环会清除敌方子弹，将敌人向上推 36px（耗时 220ms，主宰效果），揭示伪装中的乌列，并为敌人标记破晓，进入全局 4 秒窗口。破晓使敌人受到的伤害 +20%，并禁用身体闪避。歌利亚失去 30 个百分点的闪避。每击杀一名带破晓的敌人，下一次啼鸣提前 0.3 秒，每次啼鸣最多提前 5 秒。乌列每次受击仍失去 5 个百分点的闪避，最低至 30%，累计 10 次命中仍会触发伪装。减益免疫与独立屏障保留各自的规则。主宰位移同样会移动免疫控制的敌人，但伪装、加冕、茧与死亡序列除外。没有足够空间完成整段上推的敌人（顶部边缘下方空间不足），以及真身歌利亚，会被抬起相同距离，并在 0.7 秒内落回原位，即使在坚定意志免疫期间也是如此。光芒在 10 秒周期内不断汇聚，随后化作火焰雄鸡、初升的太阳与厚重的火焰光环。时钟会在暂停、印记选择与 Kanade 剧情时暂停。</span></div>
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>星落针</b> <span class="sbd">每颗被清除的子弹都会在原位置化作一枚追踪金针，每次啼鸣最多 16 枚，造成 60% ATK 真实伤害。目标死亡后由最近的存活敌人替代。七枚星针在 350ms 预警后攻击生命上限最高的七名敌人，造成 200% ATK 真实伤害并钉住 1.5 秒。敌人越少，星针越少。免疫控制可格挡钉住效果。光环触及的敌方技能弹道会被反弹回施放者。被反弹的技能无法闪避，不过歌利亚对此仅失去 30 个百分点的闪避，且它可穿透普通铁躯层与乌列赋予的铁躯层。每次啼鸣最多反弹 9 个技能，超过 9 个的技能不受影响继续飞行。金色复制体会返回施放者，若施放者已消失，则返回最近的有效敌人。真实伤害：玛可西亚斯之剑，150% ATK + 1% 生命上限；乌列审判，250% ATK + 2% 生命上限；拉斐尔智慧宝珠，250% ATK + 2% 生命上限；达格鲁尔深渊锁链，200% ATK + 1.5% 生命上限；泰利斯尤利西斯归来，200% ATK + 1.5% 生命上限；歌利亚腐化陨石，300% ATK + 2% 生命上限；歌利亚绝对裁决，600% ATK + 3% 生命上限。被反弹的原技能不留持续伤害、定身或溅射。普通子弹仍会转化为金针。无法反弹流明新星、坚毅、利维坦死亡激光、魔王霸气、心灵风暴、虚空斩、虚空打击、无尽回响以及所有小丑复制品。延迟利刃与聚能宝珠会被跳过。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back">
+<canvas class="sfc-glyph-sm-cv" data-sigil="dau"></canvas>
+<div class="sfc-story">当黑夜似乎无穷无尽时，黎明使者抬起了头。他的啼鸣剥去了蝎子的伪装，他的金针击碎了蜈蚣的金光。黎明不需要王座，也不需要军队，只需要一个清晰的声音。</div>
+<div class="sfc-hint">点击返回</div>
+</div></div></div>
+
+<div class="sfc" onclick="this.classList.toggle('flipped')" style="--sc:#9B5CFF;--scl:rgba(155,92,255,0.12)">
+<div class="sfc-inner"><div class="sfc-front">
+<canvas class="sfc-glyph-cv" data-sigil="ty"></canvas><div class="sfc-name">影蛇</div><div class="sfc-el">毒蛇术</div><div class="sfc-atk"><span>ATK <b>+5%</b></span></div><div class="sfc-theme">影火封印</div>
+<div class="sfc-buffs">
+<div class="sfc-row"><span class="sbt atk">ATK</span><b>影火吞噬</b> <span class="sbd">10 秒充能。击杀可使充能加快 0.3 秒。战机的下一发子弹命中可锁定目标时即触发吞噬，即使触手、护甲、屏障或免疫格挡了子弹。造成 4 次撕咬（每次 60% ATK + 0.4% 生命上限），随后是 4 枚穿透碎片（45% ATK + 0.3% 生命上限，重复命中造成 25%）。获得 50% 移速，持续 1 秒，并返还 D 与 S 各 1 秒冷却。</span></div>
+<div class="sfc-row"><span class="sbt spec">特殊</span><b>蛇阵</b> <span class="sbd">技能 S 开启一个 190px 的法阵（冷却 10 秒，灵体在场时也可开启），将敌人拉入（主宰效果），每 0.25 秒造成 20% ATK + 0.1% 生命上限，持续 1.25 秒，随后造成 300% ATK + 2% 生命上限并主宰击飞 1.25 秒。法阵攻击无法闪避。召唤 10 条蛇，持续 8 秒（每 0.45 秒造成 60% ATK + 0.2% 生命上限，每名目标最多 3 条蛇，51% 概率连续撕咬 3 次，击杀可延长 2 秒，最多 12 秒，撕咬可充能 3%）。获得一层抵挡一次攻击的护盾，在撕咬 12 次后恢复，并使附近敌人减速 50%，持续 2 秒。蛇群每次撕咬都会为玩家方提供 +1% 伤害，最多 40%，并为蛇咬增加 0.5% ATK，最多 20%。2 秒内没有撕咬命中时，层数会在 1 秒内衰减至零。每连续撕咬 5 次（按獠牙层数计算），被咬的敌人获得 1 层剧毒，并施加噬魂与噬魂者。剧毒每秒造成 35% ATK，持续 3 秒，第 3 秒造成 65%，第一层之后的每层额外增加 15% ATK，最多 5 层。获得新层数时会刷新全部层数；3 秒后，层数会在 1 秒内消退。蛇穿过普通敌方子弹时会将其消除，并获得 5% 移速与 5% 撕咬伤害，持续 3 秒。该效果不叠加，仅作用于该条蛇。</span></div>
+</div><div class="sfc-hint">点击阅读传说</div>
+</div><div class="sfc-back"><canvas class="sfc-glyph-sm-cv" data-sigil="ty"></canvas>
+<div class="sfc-story">在熄灭的群星之间，影蛇于虚空中刻下一道封印。十条蛇自它的眼中现身，拦截逼近的敌人。每一次撕咬，都会为整个阵型注入力量。</div>
+<div class="sfc-hint">点击返回</div></div></div></div>
+
+</div>`,
+      enemies: `
+<div class="card"><h2 class="dsname">敌人品阶</h2><table class="controls-table">
+<tr><th>品阶</th><th>示例</th><th>屏幕上限</th></tr>
+<tr><td style="color:#aaaaaa">下级</td><td>使徒</td><td>生命 22–330，随时间提升</td></tr>
+<tr><td style="color:#22cc55">异常</td><td>Thaelis, Veilshroud, Uriel</td><td>3 / 2 / 1</td></tr>
+<tr><td style="color:#ff8844">精英</td><td>Marchosias, Raphael, Egregor, Ammit</td><td>2 / 2 / 1</td></tr>
+<tr><td style="color:#cc55ff">主宰</td><td>Dargruel, Leviathan</td><td>2 / 1</td></tr>
+<tr><td style="color:#eab308">数字化</td><td>Goliath</td><td>1 名，第 5/10/15/20 波……</td></tr>
+<tr><td style="color:#ff2244">管理员</td><td>Kanade</td><td>—</td></tr>
+</table><p style="color:var(--dim);font-size:11px;margin-top:6px">所有敌人都有隐藏的 +5% 生命加成。上限 = 屏幕上同时存在的最大数量。各品阶之间没有总上限。歌利亚是未来管理员品阶的试验首领——每逢波次编号能被 5 整除时出现一次，独立于使徒/异常/精英/主宰的常规轮换。</p></div>
+
+<div class="card"><h2 class="dsname" style="color:#aaaaaa">使徒 <span class="dsclass" style="font-size:9px;color:#aaaaaa">下级</span></h2><div class="sub">生命 22–330 • 每秒发射 1 颗子弹 • 闪避 1→2% • 速度约 1.2 单位/秒</div>
+<div class="ab" style="height:140px"><canvas id="cvNormal" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:var(--gold);font-size:10px">普通攻击</span> 每秒发射 1 颗子弹。子弹生命 = 发射瞬间敌人的生命。</li>
+<li>生命随时间从 9 提升至 96。低生命时眼睛颜色由橙变红。</li>
+<li><span style="color:#ffd700;font-size:10px">被动</span> <b>加冕</b>——<span class="det-full">在场时，每名使徒每秒判定一次：基础概率 <span class="hi">0.67%</span>（屏幕中线上方），<span class="hi">1%</span>（下方）。每名使徒死亡增加 <span class="hi">+0.67%</span>（上方）或 <span class="hi">+1%</span>（下方），可累积——触发后重置。最多 <span class="hi">3</span> 次触发/5 秒（全局）。在约 <span class="hi">~2.2 秒</span> 的变身动画期间，使徒处于 <b>冻结</b>（<span class="hr">减速 45%</span>），<b>不死</b>，且 <b>。完成后，它会被消耗并替换为更高品阶的敌人——必定是玛可西亚斯、泰利斯或达格鲁尔；若上限允许，也可能是维尔舒德、埃格雷戈或利维坦。无波次限制。生成的敌人以满生命登场，并带有 </b>。完成后，它会被消耗并替换为一名更高品阶的敌人——始终是玛可西亚斯、泰利斯或达格鲁尔；若上限允许，也可能是维尔舒德、埃格雷戈或利维坦。不受波次限制。生成的敌人以满生命开始，并获得 <span class="hg">1 次铁躯</span>。不计击杀分数。</span><span class="det-short">可将一名使徒转变为更高品阶的敌人——变身期间约 2.2 秒处于冻结与不死状态。</span></li>
+</ul></div>
+
+
+<div class="card"><h2 class="dsname" style="color:#22cc55">泰利斯 <span class="dsclass" style="font-size:10px;color:#22cc55">异常</span></h2><div class="sub">第 2 波 • 生命 1,520–3,170 • 闪避 3→5% • 上限 2 • 速度 1.3 单位/秒</div>
+<div class="ab" style="height:110px"><canvas id="cvThaelis" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>转生：</b> <span class="det-full">生命归零时，泰利斯坍缩成一个无法锁定的 <b>茧</b>（免疫控制，铁躯），由 <span class="hi">4 名守卫</span> 守护（每名 500–1,000 生命，与泰利斯相同的闪避，免疫所有持续伤害，40%+20 点固定减伤）。每击杀一名守卫可储存 <span class="hg">250 点固定护盾</span>（转移时上限为泰利斯复活后生命上限的 50%，复活时还会免费额外获得 20%），并计入随机的 <span class="dmg">12–16 次击杀指标</span>（实时显示在茧的身体上）；守卫死亡后 1.05 秒复活。在 <span class="hi">7.5秒</span> 内达成指标可永久摧毁茧。未能达成时，泰利斯会以 <span class="hg">原始生命上限的 40%</span> 爬出，并获得已储存的护盾与 1 秒无敌，永久获得三项转生增益：<span class="hg">+100% 生命上限</span>（实际相当于 <span class="hi">80%</span> 原始生命上限），<span class="hg">减伤 +10%</span>，且 <span class="hg">+150 点固定减伤</span>，外加其常规坚韧加成。爬出时还带有 <span class="hg">5 层铁躯</span>，每层可抵挡一整次攻击，以铜板形式显示在身体旁。层数按每 <span class="hi">0.2秒</span> 计算一层，因此一次爆发只消耗一层，持续伤害跳动永不消耗层数（但仍会造成伤害）。</span><span class="det-short">生命归零时变为无法锁定的茧，由 4 名守卫守护（500–1,000 生命，1.05 秒后复活）。在 7.5 秒内击杀随机的 12–16 名守卫即可永久摧毁茧，否则泰利斯会以 40% 生命上限复活（增益 +100% 后为 80%），并获得已储存的护盾（上限为复活后生命上限的 50%，另免费获得 20%）与永久 +10%/+150 点固定减伤，以及 5 层铁躯（每 0.2 秒一层）。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>佩涅洛佩的裹尸布：</b> <span class="det-full">护盾吸收的伤害会为泰利斯恢复 <span class="hg">38%</span>。无护盾时，它还会每秒恢复 <span class="hg">1.5% 生命上限</span>。它的治疗与护盾效果为 <span class="hg">+35%</span>（无护盾时），<span class="hg">+10%</span>（有护盾时），适用于坚韧护盾以及从拉斐尔处获得的治疗与护盾。噬魂可使其治疗降低 40%。超出生命上限的治疗不会浪费：<span class="hg">55%</span> 的溢出治疗会转化为护盾。<b>斧刃格挡：</b> 每次命中都有 <span class="hg">15%</span> 概率（<span class="hg">8%</span> 有护盾时）会被泰利斯的斧头凌空斩落，完整格挡该次命中且不消耗铁躯层数。源自 <span class="hi">190px</span> 内的命中增加 20 个百分点：<span class="hg">35%</span>（无护盾时），<span class="hg">28%</span>（有护盾时）。落在快速挥舞内的每次命中（齐射的其余部分、后续命中）都会被同一横扫斩落，且不消耗铁躯层数。斧头每次格挡之间需要 <span class="hi">1.2秒</span> 间隔，无法格挡持续伤害或灵体激光，在尤利西斯归来蓄力时可以格挡，但挥砍时不能。</span><span class="det-short">护盾吸收的伤害可恢复 38%。无护盾时每秒恢复 1.5% 生命上限。治疗与护盾效果：无护盾 +35%，有护盾 +10%。55% 的溢出治疗转化为护盾。15% 概率（有护盾时 8%）挥斧格挡一次命中并完整抵挡，每 1.2 秒最多一次。190px 内：无护盾 35%，有护盾 28%。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>尤利西斯归来增益：</b> 命中的波浪或近身斩击会强化存活的泰利斯，持续 <span class="hi">1.25秒</span>，强化幅度取决于该次攻击命中的目标数量（哨兵与战机）：<span class="hi">1 / 3 / 4+</span> 个目标可获得治疗与护盾效果 <span class="hg">+10% / +15% / +20%</span>、立即恢复 <span class="hg">10% / 15% / 17% 生命上限</span>，以及闪避 <span class="hg">+10% / +12% / +14%</span>。达到更高档位时会刷新 1.25 秒，且仅补足治疗量的差额。增益持续期间，它的火焰光环会膨胀、变亮并扩散出一圈光环。</li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>尤利西斯归来：</b> <span class="det-full">当最近的目标在开始时处于 <span class="hr">190px</span> 内时，泰利斯会改为锁定一个 <span class="hr">2.0 弧度、范围 240px 的扇区</span>，并在 <span class="hi">1.14秒</span> 后挥砍。每名哨兵受到一次 <span class="hr">45% ATK 的 1.6 倍</span> 伤害，战机则透过常规防御失去 1 条命，命中时还会斩落友方子弹。不会生成波浪、集中加成或减速带，减速点数保持储存。施法者死亡后，斩击依然存在。茧始终发射波浪。泰利斯没有普通攻击。每当它受到相当于 <span class="dmg">4%</span> 生命上限的伤害（包括护盾，<span class="dmg">3%</span> 生命低于 40% 时为 3%）即为 <span class="hi">1 点试炼</span>，每次命中最多 2 点，每 6 秒自动获得 1 点。<span class="hi">3 点</span> 可排入一波浪，最多储存 <span class="hi">2 波浪</span>。波浪在 <span class="hi">0.9秒</span> 蓄势后射向最近的哨兵或战机，两次施放间隔 4 秒（永不低于 2.5 秒）。它是一条 <span class="hr">200px 宽的通道</span>，无法被摧毁或偏转，会斩落路径上的友方子弹。命中战机一次，造成 <span class="hr">1 条命</span>，每名哨兵受到一次 <span class="hr">45%、38% 然后 35%</span> 的 ATK。若波浪离去时其通道内站立的目标少于 <span class="hi">3 个目标</span>（哨兵与战机），波浪会变为集中波浪：命中 <span class="dmg">+50%</span>，并拖曳黑色闪电。在已储存 2 波浪时获得的每点 <span class="hg">可使冷却减少 0.5 秒</span>与 <span class="dmg">伤害 +4%</span> 至下一波浪（最多 +20%）；集满 4 点后，该波浪还会留下一条 <span class="hi">使战机减速 25%，持续 1.5 秒</span>。泰利斯死亡后，已发射的波浪会继续前进；复活期间茧仍可发射已储存的波浪，但不再获得点数。</span><span class="det-short">施放开始时 190px 内：锁定 2.0 弧度、240px 的近身斩击，1.14 秒后挥出，每名哨兵受到 45% ATK 的 1.6 倍伤害，战机失去 1 条命。命中时斩落子弹，不生成波浪或减速带，保留减速点数。从受到的伤害中积攒试炼点数（3 点排入一波浪，最多储存 2 波）。经过 0.9 秒蓄势后发射一道无法摧毁的 200px 能量波浪，斩落友方子弹。通道内目标少于 3 个时：伤害 +50%。超出满队列的点数可缩短冷却、增加伤害并留下一条减速带。化作茧时可发射已储存的波浪，但不再获得点数。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>坚韧</b>——<span class="det-full">每损失 1% 生命：<span class="dmg">减伤 +1%</span>（上限 <span class="dmg">65%</span>）。每损失 0.5% 生命：<span class="hi">波浪速度 +3.5%</span>（上限 <span class="hi">+25%</span>），其试炼计时器最多加快 <span class="hi">10%</span>。每次命中伤害上限为 <span class="dmg">max(35%, 90%−5%×已损失生命%) × 生命上限</span>。泰利斯每损失 <span class="dmg">30% 生命</span>，生成 <b>护盾</b>，数值为 <span class="hg">35% 生命上限 + 10% 已损失生命 + 100</span>，以身体周围脉动的金环显示。必须将其完全摧毁，任何伤害（普通或穿透）才能触及泰利斯的身体。例外：<span class="hi">灵体激光可绕过</span>。泰利斯还自带 <span class="hg">60 点固定减伤</span>。</span><span class="det-short">生命降低时获得减伤（上限 65%）与波浪速度；每损失 30% 生命生成一面金色护盾，可格挡所有伤害直至被摧毁。灵体激光可绕过它。</span></li>
+</ul></div>
+
+<div class="card"><h2 class="dsname" style="color:#22cc55">维尔舒德 <span class="dsclass" style="font-size:10px;color:#22cc55">异常</span></h2><div class="sub">第 2 波 • 生命 1,320–3,300 • 上限 2 • 速度 2.0 单位/秒 • 基础减伤 45% + 30 点固定减伤 • 闪避 5→7%</div>
+<div class="ab" style="height:120px"><canvas id="cvVeil" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>虚空回响</b>——<span class="det-full">死亡时留下一个 <b>无法锁定的幻影传送门</b>，位于死亡地点，免疫所有伤害与控制。<span class="hi">0&ndash;3 秒</span>：传送门会生出 <b>真正的使徒</b>，每 600ms 生出 2 名（共约 10 名），每名在成形前会有暗色斑块预警 450ms。使徒生命 = <span class="hg">max(60, 该维尔舒德一生中处于幻影状态时吸收的总伤害的 30%)</span>；它们的移动速度比波次使徒 <span class="hr">10%</span>。在第 <span class="hi">5秒</span> 传送门 <span class="hr">坍塌</span>：白光闪烁、屏幕震动、<span class="dmg">消除所有友方弹道</span>（包括刃弧），范围 <span class="hr">345px</span>，且在该瞬间处于 345px 内的玩家失去 <span class="dmg">1 条命</span>（梦境 / 大圣 / 犹格-索托斯 / 技能 A 宝珠 / 最终防线仍可优先抵挡）。随后留下一个 <span class="hi">2秒</span> 区域（345px，每 500ms 跳动一次，共 4 跳）：<span class="dmg">哨兵每跳 6% 生命上限</span>；玩家不会因该区域失去生命，只会因坍塌失去生命。<span style="color:var(--dim)">传送门开启的瞬间，波次系统即判定维尔舒德已死亡。</span></span><span class="det-short">死亡时开启一个无法锁定、免疫伤害的幻影传送门，在 3 秒内生出约 10 名真正的使徒（生命随幻影期间吸收的伤害提升）。第 5 秒时传送门坍塌：清除 345px 内的友方弹道，若玩家在范围内则失去 1 条命，随后一个持续 2 秒的区域每跳对哨兵造成 6% 生命上限的伤害（玩家不会失去生命）。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>回响披风</b>：处于幻影传送门 <span class="hi">345px</span> 半径内的每个敌人（传送门存续期间），以及处于其坍塌后留下的区域内的敌人，受到的伤害 <span class="hi">2秒</span>降低 <span class="hg">10%</span>。一道紫色虚线环会标记每个此类敌人。</li>
+<li><span style="color:var(--gold);font-size:10px">普通攻击</span> 每 450ms 向最近的目标发射一轮 2 颗子弹，弹速 5.3。每第三轮会有一颗子弹沿瞄准线直飞。在幻影/倒计时期间禁用。</li>
+<li><span style="color:var(--cyan);font-size:10px">技能：变异</span> <b>幻影循环与虚空打击</b>：<span class="det-full">幻影（1.5 秒，<span class="dmg">99% 减伤</span>，停止移动与攻击），恰好在上一次结束后 <span class="hi">3.5秒</span> 后开始（第一次在生成后 2.5 秒），且需等任意闪电倒计时结束。它从不随机触发，受击也不会触发；开始前 0.5 秒会有一圈光环向身体收拢。处于幻影期间：<span class="dmg">单次命中无法超过 15% 生命上限</span>（绝对上限）；受到的治疗与护盾降低 <span class="dmg">25%</span>。脱离幻影时：标记战机与一名哨兵（若无哨兵，则为战机侧方一根 <span class="hi">200 至 280px</span> 的立柱）；1.5 秒后，两道 <span class="hr">闪电</span> 落下。玩家：<span class="hr">1 条命</span>。100px 内的哨兵：<span class="dmg">18% 生命上限</span>。普通状态下：受到的治疗还会提供等量护盾；受到的护盾提升 <span class="hi">+20%</span>。普通状态下受到治疗可获得 <span class="hg">减伤 +10%，持续 3 秒</span>。</span><span class="det-short">按固定 3.5 秒时钟进入幻影（99% 减伤），从不随机触发或因受击触发。脱离时标记战机与一名哨兵，1.5 秒后落下两道闪电：玩家失去 1 条命，100px 内的哨兵受到 18% 生命上限的伤害。普通状态下受到治疗可获得 +10% 减伤（3 秒）。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>静电帷幕</b>：在每次幻影结束后 <span class="hi">3秒</span>（第一次幻影前不会出现），一个半径 <span class="hi">170px</span> 的力场会跟随维尔舒德，并干扰友方弹道。每颗弹道首次进入力场时判定一次：<span class="dmg">50%</span> 的战机、哨兵与灵体射击会被消除，<span class="dmg">15%</span> 的其他友方弹道（如刃弧）会被消除。光束、激光与范围攻击不受影响。紫色虚线边缘会标记该力场。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>帷幕阈值</b>：生命首次跌破 <span class="hi">75%</span>，<span class="hi">50%</span>与 <span class="hi">25%</span> 时，维尔舒德会在没有闪电倒计时进行时强制进入一次额外的幻影。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>相位净化</b>：处于幻影期间，维尔舒德会清除所有 <span class="hr">易伤</span> 层数及其真实伤害窗口，并拒绝获得新层数。它的幻影护盾永远不会被易伤削减，并以一道紫色光环显示，随着消耗逐渐展开。</li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>虚空爆裂</b>：脱离幻影时，暗色斑块会预警 <span class="hi">0.4秒</span>，随后 <span class="dmg">10 颗子弹</span> 以均匀角度散开，速度 <span class="hi">固定 2.88（原速度 4.8 的 60%）</span>，伤害、生命与体积与普通子弹相同。死亡、移除或重新进入幻影会取消它。犹格-索托斯可清除这些子弹。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>帷幕守卫</b>：一道淡淡的紫色边缘表示脱离幻影后 <span class="hg">70% 基础减伤，持续 0.75 秒</span>，随后恢复为 45%。可与其他减伤叠加，最高为现有 85% 上限。算上治疗加成的普通减伤为 55%。两项脱离增益仅属于真正的维尔舒德。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>能量积攒</b>——<span class="det-full">处于幻影期间，维尔舒德会记录吸收的所有伤害。脱离幻影时，将累积吸收量转化为护盾：<span class="hg">min(1500, ⌈(50% × 吸收量 + 280) × 1.15⌉)</span>。基础值 280 可保证最低护盾为 <span class="hg">322</span>，即使未受到任何伤害。</span><span class="det-short">将幻影期间吸收的伤害在脱离时转化为护盾（基础 322，上限 1500）。</span></li>
+</ul></div>
+
+<div class="card"><h2 class="dsname" style="color:#22cc55">乌列 <span class="dsclass" style="font-size:10px;color:#22cc55">异常</span></h2><div class="sub">生命 1,725–4,140 • 上限 1 • 基础减伤 40% • 每次命中上限 30% 生命上限 • 闪避 99%→30%（受击衰减）</div>
+<div class="ab" style="height:150px"><canvas id="cvUriel" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>契约之王</b>——<span class="det-full">每 2 秒刷新自身的一次铁躯。每 1 秒扫描并为其他所有存活敌人提供 <b>无限控制免疫</b>，以及一层 <b>乌列铁躯</b>（每名敌人消耗后每 5 秒重新授予）。消耗其中一层可完全抵消该次命中，并计入共享计数器：每次消耗都会尝试触发 <b>伪装</b>；每第 3 次消耗还会尝试发射 <b>圣剑</b>（审判）。乌列自身免疫所有持续伤害来源与所有减益（易伤、噬魂、减速、定身、沉默）。</span><span class="det-short">为其他所有敌人提供无限控制免疫与一层可重新授予的铁躯。消耗一层会尝试触发伪装；每第 3 次还会尝试审判。乌列自身免疫持续伤害与所有减益。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>对抗混沌</b>——<span class="det-full">初始为 <span class="hi">99% 闪避</span>。每次实际命中都会使其永久降低 <span class="dmg">5%</span>，最低为 <span class="hi">30%</span>（永不恢复）。每次成功闪避还会叠加 1 秒的 <span class="hg">移速 +5%</span>（总上限 +40%）。</span><span class="det-short">初始闪避 99%，每次命中永久 -5%，最低 30%。每次闪避还会叠加 1 秒的移速 +5%（上限 +40%）。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>庇护</b>——<span class="det-full">死亡时，在死亡地点留下一道静止的 <b>屏障</b>，持续 4 秒（宽度为自身身体直径的 1.2 倍）。可格挡普通子弹、穿透弹道、技能 F、技能 D 的核心（核心会等待屏障消失而非穿过，且不会被消耗）与超载激光，且无法被穿透。永远不是友方的有效目标。4 秒后消失。</span><span class="det-short">死亡时，一道持续 4 秒的静止屏障会直接格挡所有玩家方攻击（技能 D 的核心只需等待），随后消失。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>审判（圣剑）</b>——<span class="det-full">仅在可见时才能发射——伪装期间的触发会被储存，并在恢复可见的瞬间自动释放。蓄力 0.5 秒（能量汇聚、羽翼张开），随后以约 806px/s 的速度直线射向玩家 100ms 前的位置，可穿透。命中玩家：正常失去生命 + <b>被审判</b>（3 秒：此后的任意命中会额外消耗 1 条命，净 -2 条）。命中哨兵：<span class="hr">30% 生命上限真实伤害</span>，且不会使利刃停下。</span><span class="det-short">仅在可见时发射（否则排队等待）。蓄力 0.5 秒，随后以约 806px/s 的速度向玩家 100ms 前的位置发射一柄穿透之剑。玩家：命中 + 被审判（3 秒内的下次命中消耗 2 条命）。哨兵：30% 生命上限真实伤害。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>伪装</b>——<span class="det-full">每次消耗一层乌列铁躯时触发，或在 <span class="hi">10 次命中</span> 直接命中乌列自身后触发（冷却 3 秒，自上次隐身结束时起算）。完全隐形 1.75 秒，无法锁定，绝对铁躯，全程恢复 <span class="hg">1.5% 生命上限/秒</span>。随后在竞技场上半区的全新随机位置重新出现，并获得 <span class="hg">15% 生命上限护盾</span> + <span class="hg">200 点固定减伤，持续 2 秒</span>。</span><span class="det-short">无法锁定的隐身 1.75 秒（冷却 3 秒，乌列受到 10 次命中后也会触发），隐身期间每秒恢复 1.5% 生命上限，随后在竞技场上半区的新位置重新出现，并获得 15% 生命上限护盾 + 200 点固定减伤，持续 2 秒。</span></li>
+</ul></div>
+
+<div class="card"><h2 class="dsname" style="color:#ff8844">拉斐尔 <span class="dsclass" style="font-size:10px;color:#ff8844">精英</span></h2><div class="sub">第 2 波 • 生命 2,500–4,500 • 永久减伤 50% • 闪避 5→10% • 速度 1.65 单位/秒</div>
+<div class="ab" style="height:110px"><canvas id="cvRaphael" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>永恒守护</b>——<span class="det-full"><span class="hg">20 次命中</span> 会被完全抵消（铁躯，每次伴随白色闪光，限制为每约 175ms 最多计 1 次命中，因此一波爆发攻击无法一次性击穿整个护盾池）。第 20 次命中后破裂。<span class="hg">永恒守护生效期间免疫控制</span>——免疫死星牵引、特斯拉减速、次元裂隙减速与宝珠减速，且在生效期间完全不受任何持续伤害跳动的影响（特斯拉线圈、次元裂隙的噬魂者、太阳耀斑、犹格-索托斯的跳动、噬魂），只会闪烁一小簇青色火花，而不计入 20 次。铁躯过期后，辅助光环获得 <span class="hg">治疗效率 +35%</span>。永恒守护破裂时，拉斐尔获得一个 <span class="hg">一次性护盾</span>，数值取决于当时光环内的盟友数量：<span class="hg">0 名盟友 → +8% 生命上限</span> · <span class="hg">1 名盟友 → +10% 生命上限</span> · <span class="hg">2 名盟友 → +15% 生命上限</span> · <span class="hg">3 名盟友 → +20% 生命上限</span> · <span class="hg">4 名以上盟友 → +25% 生命上限</span>。在生命之前吸收所有非真实伤害；真实伤害可穿透它。</span><span class="det-short">前 20 次命中被抵消（铁躯，可限制爆发，完全免疫所有持续伤害跳动）。生效期间免疫控制。过期后：辅助光环治疗 +35%，破裂时拉斐尔获得一次性护盾（0 名盟友 → 8% 生命上限；1–4 名以上盟友 → 10–25% 生命上限）。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>辅助光环</b>——<span class="det-full">为盟友恢复 <span class="hgr">4% 生命上限/秒</span>，上限为 <span class="hgr">接受者生命上限的 3%/秒</span>（永恒守护过期后 ×1.35；拉斐尔自身效率为 55%）。提供 <span class="hg">min(施法者生命上限的 20%，接受者生命上限的 25%) 的护盾</span>（每名盟友一次）+ <span class="hg">min(2%/秒，接受者生命上限的 2%/秒）的跳动护盾</span>（可叠加）。护盾生效时 → <span class="hg">减伤 +12%</span>。溢出治疗 → 25% 护盾。使光环内所有敌人加速 5%。</span><span class="det-short">为盟友恢复 4% 生命上限/秒（上限为接受者生命上限的 3%/秒，永恒守护过期后 ×1.35），一次性护盾 min(施法者 20%，接受者 25%) + 跳动护盾 min(2%/秒，接受者 2%/秒），有护盾时减伤 +12%。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>流明新星</b>——每 5 秒：标记玩家 + 3 名哨兵，1 秒预警后发射激光。玩家：<span class="hr">1 条命</span>。哨兵：<span class="hr">20% 生命上限</span> 每束激光。</li>
+</ul></div>
+
+<div class="card"><h2 class="dsname" style="color:#ff8844">玛可西亚斯 <span class="dsclass" style="font-size:10px;color:#ff8844">精英</span></h2><div class="sub">第 2 波 • 生命 2,794–5,413 • 身体减伤 45% • 闪避 5→10% • 速度约 1.6 单位/秒</div>
+<div class="ab" style="height:120px"><canvas id="cvMarcho" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>弧形屏障</b>——<span class="det-full">90° 旋转屏障，<span class="dmg">60% 减伤</span>，单次命中不超过 <span class="dmg">屏障生命的 35%</span>，免疫增益。独立生命池 = <span class="hi">玛可西亚斯自身生命上限的 186%</span>。<span class="hg">连锁闪电会被屏障吸收</span>，如同普通命中。<span class="hg">最后庇护：</span> 低于 <span class="hi">30% 生命</span> 时，屏障会吸收所有本应命中身体的攻击，包括真实伤害与持续伤害。<span class="hg">屏障存活期间免疫控制</span>——免疫死星牵引、特斯拉减速、次元裂隙减速与宝珠减速。生效期间，玛可西亚斯与屏障额外获得 <span class="hg">闪避 +10%</span>（闪避同时适用于身体命中与屏障命中；被屏障闪避的命中在任何位置都不会造成伤害，包括身体）。穿透攻击（灵体刃弧、回旋镖、超载激光）命中屏障时：屏障承受 <span class="dmg">70%</span>，身体仅承受减少后的 <span class="hg">20%</span>（仍受自身减伤影响）——除非正是这次命中击碎了屏障，此时已无物可吸收剩余伤害，身体将承受 <span class="hr">全部剩余伤害</span>。每次命中屏障：屏障自我恢复 <span class="hgr">实际吸收伤害的 3%</span>（限速为每滚动 1 秒身体生命上限的 2%），玛可西亚斯身体恢复 <span class="hgr">实际吸收伤害的 5%</span>（同样限速，溢出部分 → <span class="hg">25% 转化为护盾</span>）。屏障破裂期间，身体减伤在常规 45% 之外明确获得 <span class="hg">+10%</span>（此前为结算器从未实际读取的无效字段）。屏障被摧毁时：玛可西亚斯获得 <span class="hr">5 层铁躯</span>（<span class="hr">7</span>（生命低于 30% 时，最多 7 层；每 <span class="hi">0.25秒</span> 计算一层，如同拉斐尔的永恒守护，因此一次爆发只消耗一层，持续伤害无法触及它们；任意层数存续期间免疫控制），恢复 <span class="hgr">15% 生命上限</span>（溢出部分 → <span class="hg">25% 护盾</span>），并获得 <span class="hg">护盾 = 15% 生命上限 + 10% 已损失生命</span>。<b>屏障复活时，+10% 减伤会被移除。</b> 破裂后的复活时间取决于剑的循环：若屏障破裂前 4 把剑已全部使用 → 爆裂爆炸动画，固定 <span class="hi">3秒</span> 复活；否则 <span class="hi">4–5 秒</span>（3 分钟时缩短至 4 秒）。追踪速度最高提升至 <span class="hi">×1.67</span>（游玩 3 分钟时）。玛可西亚斯下方有两个罗马数字计数器：<span style="color:#00ff88">绿色</span> = 激活的剑队列，<span style="color:#ffaa00">金色</span>（I→IV）= 本循环已使用的剑——在 IV 时发出明亮的金光，表示下次破裂时复活时间为 3 秒。</span><span class="det-short">90° 旋转的免疫控制屏障（身体生命上限的 155%），闪避 +10%。穿透命中：屏障承受 70%，身体承受 20%（若该次命中击碎屏障，则为 100%）。每次命中：屏障与身体按实际损失自我恢复（限速）。屏障破裂 → 身体减伤 +10%。破裂时：5 层铁躯（生命低于 30% 时为 7 层，每 0.25 秒一层，免疫持续伤害）+ 恢复 15% 生命 + 护盾（15% 生命上限 + 10% 已损失生命）（复活时移除减伤）。使用 4 把剑 → 3 秒复活（爆裂动画）；否则为 4–5 秒。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>同化</b>——<span class="det-full">死亡 → 3 台仆从机器人（25–35% 生命上限 <b>仆从机器人</b>（25–35% 生命上限 <span class="hg">+30%</span>，<span class="dmg">75% 减伤</span>，单次命中不超过 <span class="dmg">50% 生命上限</span>，<span class="hi">速度 ×2.10</span>），外加 <span class="hr">第 4 台仆从</span>（25% 生命上限），若死亡时弧形屏障仍在。每台仆从都携带一个 <span class="hg">守卫结界</span>，数值为 <span class="hi">玛可西亚斯屏障的 20%</span>，以一小段面向你的弧线显示；它相当于一层护盾，上限为仆从生命的 50%。在 <span class="hi">170px</span> 范围内扫描，以附着为寄生护盾或追捕玩家。仆从们 <b>寄生护盾</b> 或追捕玩家。仆从们 <span class="hg">分布在范围内的宿主身上</span>，优先选择仆从最少的宿主，守卫结界最多可为寄生护盾增加 <span class="hi">宿主生命上限的 5%</span>（15% + 5%）。追捕中的仆从跑得 <span class="hg">越快（生命越少越快）</span>（+已损失生命比例的 75%，上限为 <span class="hi">速度 +50%</span>）。仆从会闪烁一道发光圆环以示存在。</span><span class="det-short">死亡时生成 3 台快速仆从（75% 减伤），若屏障仍在则为 4 台，每台都带有一个小型守卫结界，生命越低速度越快。它们会分布在附近的敌人身上作为护盾，或追捕玩家。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>压力时钟</b>——<span class="det-full">若 <span class="hi">8秒</span> 内没有剑在排队，玛可西亚斯会自行施放一把：<span class="hi">6秒</span>（生命低于 50% 时），<span class="hi">4.5秒</span>（生命低于 30% 时）。这些免费的剑不计入每屏障循环 4 把的上限，因此永远不会缩短复活时间。</span><span class="det-short">若 8 秒内没有剑在排队（生命低于 50% 时为 6 秒，低于 30% 时为 4.5 秒），它会自行施放一把。免费的剑不计入循环上限。</span></li>
+<li><span style="color:var(--gold);font-size:10px">普通攻击</span> 每 1 秒向最近的目标发射 2 颗子弹。子弹生命 = ⌈当前生命的 1.25%⌉。</li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>剑</b>——<span class="det-full"><span class="hi">25% 概率</span>（每次屏障受击或每次闪避命中时，屏障破裂时必定触发）；排入一把剑（每次触发之间有 0.5 秒冷却）。每次屏障破裂还会发出一道 <span class="hg">冲击波</span>：处于 <span class="hi">420px</span> 内的战机会被减速 <span class="hr">25%</span>，持续 <span class="hi">1秒</span>。<b>每屏障循环最多 4 把剑</b>——触发第 4 把剑时，屏障会立即 <b>自爆</b>（3 秒复活，获得与破裂时相同的增益）。屏障复活时重置。在 <span class="hi">1% 生命</span> 时，所有排队的剑会同时发射。<span class="hr">无法摧毁。</span> 哨兵：<span class="hr">27% 生命上限</span>（第 1 次命中）/ <span class="hr">23%</span>（第 2 次）/ <span class="hr">21%</span>（第 3 次及以上）。玩家：<span class="hr">1 条命</span>。</span><span class="det-short">每次屏障受击/闪避命中时有 25% 概率排入一把无法摧毁的剑；每循环最多 4 把——第 4 把剑会触发屏障自爆（3 秒复活）。哨兵：27/23/21% 生命上限。玩家：1 条命。</span></li>
+</ul></div>
+
+<div class="card"><h2 class="dsname" style="color:#ff8844">埃格雷戈 <span class="dsclass" style="font-size:10px;color:#ff8844">精英</span></h2><div class="sub">第 2 波 • 生命 2,530–5,463 • 身体减伤 40% • 闪避 5→10% • 上限 1 • 速度 1.5 单位/秒 • 免疫控制</div>
+<div class="ab" style="height:320px"><canvas id="cvEgregor" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayEgregor" onclick="playWidget('egregor', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>集体意识：</b> <span class="det-full"><span class="hi">10 条触手</span>，每条初始拥有 <span class="hi">身体生命上限的 80%</span>。普通命中被偏转的概率为 <span class="hi">存活触手数 ÷ 10 × 60%</span>。否则一条存活触手会承受 <span class="dmg">来袭伤害的 35% × 75%</span>，随后应用狂怒减伤。狂怒为零时，该值为 <span class="dmg">26.25%（取整前）</span>。每失去一条触手，身体恢复 <span class="hgr">4% 生命上限</span>，随后使身体生命上限提升 <span class="hg">当前触手生命上限的 20%</span>。每次失去触手增加 <span class="hg">3% 身体减伤</span>，最多不超过 <span class="hg">15%</span>。失去至少 <span class="hi">4 条触手</span> 后，普通命中还会对身体造成 <span class="dmg">12% 伤害</span>，上限为 <span class="hi">身体生命上限的 12%</span>。穿透命中会擦过触手并对身体造成 <span class="hi">30% 伤害</span>，上限为 <span class="hi">20% 生命上限</span>，外加 <span class="hi">5% 拒绝概率</span>；虚空斩蓄势期间，该身体伤害会乘以 <span class="hi">0.70</span>。只要还有触手存活，穿透身体伤害还会受到共用的 <span class="hi">每 700ms 20% 生命上限的限制</span>。失去全部触手后，普通命中造成 <span class="dmg">50% 伤害</span>，上限为 <span class="hi">20% 生命上限</span>。身体命中的单次上限为 <span class="hi">max(25%, 90% 减去每失去一条触手 10%)</span>，且永不超过 <span class="hi">15% 生命上限</span>，祸福反噬除外。天然闪避从 <span class="hi">5% 提升至 10%</span>，持续 <span class="hi">3 分钟</span>。埃格雷戈不会与维尔舒德同时出现。</span><span class="det-short">10 条触手，每条拥有 80% 生命上限。普通命中偏转概率为存活触手数 ÷ 10 × 60%；否则触手会在狂怒减伤与取整前承受 26.25% 伤害。每次失去触手都会治疗并强化身体。失去 4 条触手后，12% 普通伤害可穿透；失去全部触手后，身体完全暴露。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>心灵链接：</b> <span class="det-full">一名敌人死亡时，若其处于 <span class="hi">600px</span> 范围内（埃格雷戈与敌方子弹除外），且未达到 <span class="hg">5 层上限</span>，即可获得一层狂怒。每层持续 <span class="hi">8秒</span>，增加 <span class="hg">18% 移速</span>与 <span class="hg">15% 生命上限</span>，恢复 <span class="hg">新身体生命上限的 12%</span>，并为存活触手恢复 <span class="hg">其当前生命上限的 10%</span>。触手减伤获得 <span class="hg">每层 5%</span>，通常上限为 <span class="hg">25%</span>。附近的死亡可让风暴在下一次更新时开始（若已就绪）。灵魂会飞入身体；安静的范围饰品在附近有存活敌人或收到灵魂时会变亮。任意狂怒都会使风暴预警与冷却缩短 <span class="hi">15%</span>；它不提供独立的攻速加成。</span><span class="det-short">附近的死亡最多可提供 5 层狂怒，每层持续 8 秒：移速 +18%、生命上限 +15%、按新生命上限恢复 12%，并为存活触手恢复 10%。任意狂怒都会使风暴预警与冷却缩短 15%。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>祸福相依：</b> <span class="det-full">虚空斩蓄势开始时获得 <span class="hg">250 点容器</span>。符合条件的身体命中会增加 <span class="hg">其结算伤害的 75%</span> 至容器及其累积计数器。容器会吸收普通身体伤害；<span class="dmg">真实伤害可穿透</span>。在 <span class="hi">950ms 斩击动画</span> 结束时，反噬会造成 <span class="hr">累积增量的 50%</span> 作为真实伤害反噬埃格雷戈，无视其普通命中上限，上限为 <span class="hr">40% 生命上限</span>。初始的 250 点不计入累积增量。两个计数器在斩击后重置。</span><span class="det-short">蓄势时获得 250 点容器。符合条件的身体命中增加 75% 结算伤害。斩击结束时，埃格雷戈会受到累积增量 50% 的真实反噬伤害，上限为 40% 生命上限。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>心灵风暴</b> <span class="cd">冷却 4 秒，有狂怒时为 3.4 秒</span>：<span class="det-full">锁定最多 <span class="hi">3 个随机目标</span> 的位置（玩家与哨兵）。埃格雷戈会将触手插入地面，并向紫色传送门延伸根系。每个目标都会保留一个清晰的 <span class="hi">100px 危险圈</span> 与倒计时。预警持续 <span class="hi">1200ms</span>，或 <span class="hi">有狂怒时为 1020ms</span>。巨型触手在伤害事件发生时破土而出，并在 <span class="hi">700ms 斩击</span> 期间收回。次要肢体仅为视觉效果。命中玩家会失去 <span class="hr">1 条命</span>（受防御影响）。每名哨兵受到的伤害为 <span class="hr">1.5% × min(埃格雷戈生命上限, 8000)</span>（防御前），每次施放最多一次。岩墙可格挡斩击且不会产生命中闪光。若埃格雷戈在预警期间死亡，传送门会立即发动攻击，并独立于身体完成。</span><span class="det-short">最多 3 个锁定的传送门在 1200ms 后爆发，有狂怒时为 1020ms。命中半径 100px。玩家：1 条命。哨兵：埃格雷戈有上限生命上限基数的 1.5%。斩击 700ms；冷却 4 秒，有狂怒时为 3.4 秒。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>虚空斩</b> <span class="cd">冷却 3.5 秒</span>：<span class="det-full">蓄势时间为 <span class="hi">max(1 秒，基础时间减去每层狂怒 0.35 秒）</span>，基础时间为 <span class="hi">3秒</span>（零狂怒时），<span class="hi">2.5秒</span>（有狂怒时）。埃格雷戈会追踪玩家，移动速度为 <span class="hi">10% 速度</span>，并获得 <span class="hg">25% 身体减伤</span>。释放时锁定目标并开始 <span class="hi">180° 横扫</span>。动画持续 <span class="hi">950ms</span>，命中发生在 <span class="hi">460ms</span>。玩家会被 <span class="hr">减速 50%，持续 1.5 秒</span>，且当埃格雷戈拥有超过 <span class="hi">3 层狂怒</span> 时，还会失去 <span class="hr">1 条命</span>（在所有防御生效之后）。横扫范围内的哨兵受到的真实伤害等于 <span class="hr">1.50 / 1.75 / 2.00 × 埃格雷戈 ATK</span>，对应 <span class="hi">一 / 两 / 至少三名哨兵目标</span>，再乘以 <span class="hi">0.80 加 0.40 乘以埃格雷戈已损失生命比例</span>。ATK 在生成时按基础值 <span class="hi">60</span> 与波次倍率快照确定。每层狂怒没有直接伤害加成。在 <span class="hi">720ms</span>，一道宇宙裂缝会留在弧线上：减速区域持续 <span class="hi">1000ms</span>，覆盖 <span class="hi">每侧 45px</span>，并使玩家减速 <span class="hr">20%</span>1800ms<span class="hi">。分层紫色裂口会持续可见 </span>，随狂怒增加更多星系与深空天体，随后从两端合拢。</span><span class="det-short">180° 弧形斩击，蓄势 1–3 秒后挥出。玩家减速 50%，持续 1.5 秒，狂怒超过 3 层时额外失去 1 条命。哨兵受到 1.50 / 1.75 / 2.00 倍 ATK 伤害，再乘以已损失生命系数。减速区域持续 1 秒，宇宙裂缝可见 1.8 秒。</span></li>
+</ul></div>
+<div class="card" id="cardAmmit"><h2 class="dsname" style="color:#f2b72e">阿米特 <span class="dsclass" style="font-size:10px;color:#ff8844">精英</span></h2><div class="sub">生命 3,680 至 7,590 • 体型 150 • 在心脏加成前漂移速度最高 66px/s • Duat 吞心者</div>
+<div class="ab" style="height:320px"><canvas id="cvAmmit" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayAmmit" onclick="playWidget('ammit', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>Duat 之门：</b> <span class="det-full">一个持续 <span class="hi">3秒</span> 的入口撕开一道通往金字塔沙漠的窗口。阿米特<span class="hg">无敌</span>，在入口期间无法被锁定。初始冷却在入口结束后开始计算。</span><span class="det-short">3 秒入口，通往金字塔沙漠窗口。阿米特在此期间无敌且无法锁定，直至入口结束。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>心脏囤积：</b> <span class="det-full">每当附近的哨兵或敌人死亡，阿米特会吞下它的心脏，存入一个最多由 <span class="hg">5 个金色 ib 心脏容器</span> 组成的环，环绕于 <span class="hi">8 点圆环（每颗持续 </span>，持续 <span class="hi">10秒</span>）。一道发光的心脏流将每颗被吞下的心脏送入鳄鱼巨口。集齐 <span class="hg">5 颗心脏</span>时，双眼会燃起金红色的光芒。每颗心脏提供 <span class="hi">+6% 伤害</span>，<span class="hi">+5% 冷却速度</span>与 <span class="hi">+2% 减伤</span>。死亡时，整圈心脏会爆发并化作明亮的尘埃。</span><span class="det-short">吞下附近阵亡者的心脏，最多 5 层（每颗 10 秒），环绕于 8 点圆环上。集齐 5 颗心脏时，阿米特的双眼会燃起金红色的光辉。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>裹尸布：</b> <span class="det-full"><span class="hg">3 层</span> 仪式木乃伊裹尸布缠绕在河马后躯上。每层可吸收相当于阿米特生命上限 8% 的伤害，随后化作金色尘埃爆开，并在 <span class="hi">6 秒不受击后重新生长</span>。剩余层数由布带的粗细与数量直接显示。</span><span class="det-short">3 层仪式裹尸布环绕后躯。每层可吸收 8% 生命上限的伤害，化作尘埃散开，并在 6 秒不受击后重新生长。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>真理之羽：</b> <span class="det-full">白金色的玛特之羽漂浮在阿米特额头上方。损失至少 <span class="hi">12% 生命上限</span>，在 <span class="hi">4秒</span> 内，会使羽毛如落叶般飘落，让阿米特进入 <span class="hr">暴露</span> 状态，持续 <span class="hi">3秒</span>（金色裂纹遍布全身，鬃毛与光环黯淡，所有裹尸布全部剥落）。羽毛会在 <span class="hi">12秒</span>。</span><span class="det-short">4 秒内损失 12% 生命上限会使玛特之羽掉落，阿米特暴露 3 秒（裹尸布全部剥落、躯体开裂、光环黯淡）。羽毛 12 秒后恢复。</span></li><li><span style="color:#a855f7;font-size:10px">被动</span> <b>玛特之衡：</b> <span class="det-full">阿米特一次最多损失 <span class="hi">其生命上限的 22%</span>，之后可再承受 <span class="hi">22%</span>，每 <span class="hi">2.5秒</span>，因此没有任何一波真实伤害爆发能在它出手前将其清空。施法期间，阿米特还会获得 <span class="hg">减伤 +10%</span>。</span><span class="det-short">一次最多损失 22% 生命上限，之后每 2.5 秒可再承受 22%。施法期间减伤 +10%。</span></li><li><span style="color:#a855f7;font-size:10px">被动</span> <b>最终审判：</b> <span class="det-full">生命低于 <span class="hi">30%</span> 时，阿米特进入狂怒：冷却速度提升 <span class="hi">35%</span>，攻击伤害提升 <span class="hi">15%</span>，获得 <span class="hg">+8% 减伤</span>，阿米特之颚会在飞船所在位置再次撕咬，并伴随一批新的圣甲虫。</span><span class="det-short">生命低于 30%：冷却加快 35%，伤害 +15%，减伤 +8%，阿米特之颚撕咬两次。</span></li><li><span style="color:#a855f7;font-size:10px">被动</span> <b>重型防御：</b> <span class="det-full">基础减伤为 <span class="hi">52%</span>，另有 <span class="hg">每颗心脏 +2%</span>，施法期间 +10%，狂怒期间 +8%，上限为 <span class="hi">80%</span>（来自本套技能）。固定减伤为 <span class="hi">340</span>，上限为 <span class="hi">60%</span> 的减伤后伤害。暴露或眩晕时，减伤降至 <span class="hr">15%</span>，固定减伤降至 <span class="hr">40</span>。每次命中上限为 <span class="hi">18% 生命上限</span>。持续伤害可绕过裹尸布。</span><span class="det-short">基础减伤 52%（每颗心脏 +2%，本套技能上限 80%），固定减伤 340，每次命中上限 18% 生命上限。暴露或眩晕时：减伤 15%，固定减伤 40。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>阿米特之颚</b> <span class="cd">冷却 5 秒</span>：<span class="det-full">锁定玩家或一名哨兵的位置。在 <span class="hi">1.3 秒预警</span>（<span class="hi">110px</span> 红色危险圈（中等强度 <span class="hi">0.6</span>）期间，沙与光构成的巨大上下鳄鱼颚向锁定点合拢，直至獠牙在完成时交错咬合。撕咬会释放金色闪光与环形冲击波，牙齿碎裂成沙，并留下一个 <span class="hr">Duat 沙坑</span>，持续 <span class="hi">3秒</span>，其中旋转着象形文字碎片。三个 <span class="hr">沙圣甲虫</span> 会在坑沿孵化并爬向飞船。飞船子弹可击碎一只，它们会在 <span class="hi">7秒</span> 后消失。技能 A、哨兵与 Ty 不会锁定圣甲虫。超载激光也能击碎它们，犹格-索托斯可减速它们，精准格挡可消灭它们。哨兵受到 <span class="hr">1.9 ATK</span>（在防御与心脏或狂怒加成计算前），命中玩家则使玩家失去 <span class="hr">1 条命</span>（在防御计算后）。</span><span class="det-short">预警 1.3 秒（半径 110px），巨大的沙颚在锁定点合拢撕咬，伴随冲击波，并留下一个持续 3 秒的 Duat 沙坑，孵化出 3 只沙圣甲虫。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>心脏称量</b> <span class="cd">冷却 12 秒</span>：<span class="det-full">在竞技场上半区召唤一座巨大的金色天平，两端秤盘分别位于 <span class="hi">25%</span>与 <span class="hi">75%</span> 宽度处，悬挂在飞船高度（<span class="hi">170px</span> 危险圈，重盘强度 <span class="hi">0.9</span>，轻盘强度 <span class="hi">0.4</span>）。在 <span class="hi">2秒</span> 内，横梁会向拥有更多玩家单位（飞船与哨兵）的一侧倾斜，玛特之羽悬停在较轻的秤盘上方。裁决时，重盘会伴随冲击波与象形文字地面裂纹猛然砸下。若双方相等，横梁保持水平，羽毛碎裂成光，阿米特会 <span class="hg">眩晕 2 秒</span>，八芒星环绕其头部。数量在裁决前 <span class="hi">400ms</span> 锁定，裁决于 <span class="hi">2.6秒</span>，正好位于中心的单位不计入任何一方。天平会在裁决后 <span class="hi">450ms</span> 内收回。重盘对哨兵造成 <span class="hr">2.3 ATK</span>（在防御与心脏或狂怒加成计算前），命中玩家则使玩家失去 <span class="hr">1 条命</span>（在防御计算后）。</span><span class="det-short">召唤两个 170px 秤盘，位于 25% 与 75% 宽度处，持续 2 秒。裁决时重盘砸下；若双方单位数量相等，阿米特眩晕 2 秒。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>狮爪</b> <span class="cd">冷却 5 秒</span>：<span class="det-full">当飞船位于阿米特横向 <span class="hi">340px</span> 范围内时使用。两只狮前爪抬起并凝聚金光，持续 <span class="hi">1.4秒</span> 预警，显示为一道红色扇形，向下延伸超过飞船所在行，宽约 <span class="hi">34 度</span>，并在最初 <span class="hi">0.5秒</span> 内跟随飞船，随后锁定。三道抓痕会以细金弧线的形式提前显示，直至命中时逐渐变亮。双爪向下挥出三道金色斩击，命中扇形内的所有目标。哨兵受到 <span class="hr">1.7 ATK</span>（在防御与心脏或狂怒加成计算前），命中玩家则使玩家失去 <span class="hr">1 条命</span>（在防御计算后）。</span><span class="det-short">当飞船横向距离在 340px 内时使用：红色扇形向下延伸超过飞船，双爪凝聚光芒，0.5 秒后锁定，随后三道金色抓痕命中扇形内的所有目标。</span></li><li><span style="color:var(--cyan);font-size:10px">技能</span> <b>河马践踏</b> <span class="cd">冷却 9 秒</span>：<span class="det-full">河马后躯扬起，持续 <span class="hi">1秒</span>，红色通道填满竞技场，位于一个 <span class="hi">260px</span> 安全间隙的两侧，间隙设在飞船一侧，迫使飞船移动。践踏会发出一道冲击波向下扫过竞技场，命中间隙外的每个单位一次。哨兵受到 <span class="hr">1.8 ATK</span>（在防御与心脏或狂怒加成计算前），命中玩家则使玩家失去 <span class="hr">1 条命</span>（在防御计算后）。安全间隙以一条平滑的青色通道标记，带有安卡箭头与方尖碑，而危险通道则显示倒计时刻度与预览波前，危险会在真实波浪后退去。间隙会在窄屏幕上缩小，其位置会给减速中的飞船留出逃脱时间。</span><span class="det-short">预警 1 秒，随后冲击波扫过竞技场。只有设在飞船旁边的 260px 安全间隙可以幸免。</span></li>
+</ul></div>
+<div class="card"><h2 class="dsname" style="color:#cc55ff">达格鲁尔 <span class="dsclass" style="font-size:10px;color:#cc55ff">主宰</span></h2><div class="sub">第 3 波 • 生命 6,200–16,000 • 闪避 10→15% • 上限 1 • 速度约 1.6 单位/秒 • 免疫控制</div>
+<div class="ab" style="height:130px"><canvas id="cvDargruel" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>命中注定</b>——命中伤害 &gt;25% 生命上限 → <span class="dmg">3.5 秒窗口：伤害上限为 11% 生命上限</span>（冷却 2 秒）。此外，每损失 <span class="hi">6% 生命上限</span>，达格鲁尔获得 <span class="hg">闪避 +5%</span>（上限 <span class="hg">+30%</span>（来自该机制）。生命低于 <span class="hi">60%</span> 时，还会获得最多 <span class="dmg">减伤 +30%</span>（超过该阈值后，每损失 1 个百分点的生命获得 0.75%）。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>Maître Suprême</b>——<span class="dmg">45% 基础减伤</span>。<span class="dmg">每名哨兵减伤 +1%</span>（上限 <span class="dmg">55%</span>）。<span class="hi">每名哨兵攻速 +5%</span>（上限 <span class="hi">+20%</span>）。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>恶魔馈赠</b> 在 90/70/50/30/1% 生命时：为所有敌人恢复 <span class="dmg">min(达格鲁尔生命上限的 15%，接受者生命上限的 20%)</span>（溢出部分 → <span class="hg">20% 护盾</span>）。受影响的敌人会散发 <span style="color:#aa00ff">紫色火焰光环</span>，持续 4 秒。所有单位减伤 +10%，持续 4 秒（最多 <span class="dmg">+20%</span>，2 层时）。达格鲁尔获得 <span class="hg">+3 次铁躯</span>（每次触发）。</li>
+<li><span style="color:var(--gold);font-size:10px">普通攻击</span> 每约 255ms 向最近的玩家或哨兵发射 1 颗子弹。</li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>深渊锁链</b>——每 2.1 秒发射 4 条穿透锁链 → 普通：<span class="hr">定身与沉默 1 秒</span>（玩家），<span class="hr">15% 生命上限真实伤害</span>（哨兵）。<b>暗黑锁链</b>（每轮基础概率 18%，每轮未命中 +2%）：玩家 <span class="hr">1 条命</span>，哨兵 <span class="hr">20% 生命上限</span>。无法摧毁。</li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>Maou Haki</b> 在 50% 生命时：全屏冲击波，摧毁所有友方弹道（禁弹区域持续 <span class="hi">0.5秒</span>，冲击波扫过后）。哨兵 −<span class="hr">38% 生命上限</span>。</li>
+</ul></div>
+
+<div class="card"><h2 class="dsname" style="color:#cc55ff">利维坦 <span class="dsclass" style="font-size:10px;color:#cc55ff">主宰</span></h2><div class="sub">第 3 波 • 生命 8,820–15,435 • 闪避 10→15% • 上限 1 • 速度约 1.5 单位/秒</div>
+<div class="ab" style="height:130px"><canvas id="cvLeviat" style="width:100%;height:100%"></canvas></div>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>命中注定</b>——<span class="det-full"><span class="dmg">55% 基础减伤</span>（AFO 护盾破裂后）。命中伤害 &gt;20% 生命上限 → <span class="dmg">3 秒窗口：伤害上限为 10% 生命上限</span>（窗口结束后冷却 2 秒）。利维坦生命首次跌破 <span class="hg">50%</span> 时也会强制触发，无论命中伤害大小或冷却。它的子弹接触时会摧毁玩家自动子弹、哨兵子弹与两名灵体的子弹——即使是通常可穿透的子弹。</span><span class="det-short">减伤 55%；命中伤害 &gt;20% 生命上限或生命跌破 50% 时触发 3 秒伤害上限窗口。它的子弹接触时会击碎玩家/哨兵/灵体的子弹。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>壁垒屏障</b>——<span class="det-full">每 1.5 秒获得一层护盾，数值为 <span class="hg">0.8% 生命上限 × 屏幕上的敌人数量</span>（每层上限为 <span class="hg">15% 生命上限</span>），最多叠加 2 层。护盾完全耗尽后重置，从头开始积攒。还会一次性提供 <span class="hg">30% 生命上限</span> 的屏障，外加 <span class="hg">90% 减伤，持续 1 秒</span>，在 All for One 护盾破裂的瞬间生效。</span><span class="det-short">每 1.5 秒获得一层随屏幕上敌人数量提升的护盾，最多 2 层（约 30% 生命上限）。AFO 护盾破裂时还会提供 30% 生命上限的屏障 + 90% 减伤，持续 1 秒。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>All for One</b>——铁躯护盾，直至达成击杀指标（10–20）。双翼收拢。免疫控制。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>兽群首领</b>——<span class="det-full">所有敌人获得 <span class="hr">嫉妒</span>：减伤 +15%、受到的治疗 +15%、每秒恢复 +0.75% 生命上限。每 2.5 秒重新施加以覆盖利维坦之后生成的敌人。</span><span class="det-short">利维坦存活期间，为所有敌人提供 +15% 减伤、+15% 受到的治疗与每秒 +0.75% 生命上限恢复。</span></li>
+<li><span style="color:var(--gold);font-size:10px">普通攻击</span> 每 0.75 秒向最近的目标发射 3 颗子弹。子弹生命 = 利维坦生命上限的 2%。</li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>坚毅</b>——<span class="det-full">红色预警 + 完整的 360° 横扫激光。AFO 护盾破裂时发射。玩家：<span class="hr">1 条命</span>。哨兵：<span class="hr">5% × AFO 护盾承受次数</span> 生命上限/跳，上限 <span class="hr">50% 生命上限</span>（最多计 10 次护盾命中）。</span><span class="det-short">AFO 破裂时发射 360° 横扫激光。玩家：1 条命。哨兵：最多 50% 生命上限。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> 在生命为 1 时 <b>临终圣礼</b>——<span class="det-full">9 片翼板锁定目标，同时开火。玩家：<span class="hr">1 条命</span> 仅在被射击本身命中时（开火后的最初 150ms，整轮齐射仅计算一次）；之后触碰光束 <span class="hr">减速 30%</span>，<span class="hr">ATK 降低 20%</span>与 <span class="hi">沉默</span> <span class="hg">1秒</span>，停留在光束上时会刷新，永不叠加。哨兵：<span class="hr">3% ×（AFO 护盾承受次数 ÷ 2）</span> 生命上限/束激光，上限 <span class="hr">55% 生命上限</span>（最多计 37 次护盾命中）。激光在死亡后仍然存在。</span><span class="det-short">生命为 1 时发射 9 束同时存在的激光，死亡后仍然存在。玩家：若被射击本身命中则失去 1 条命，否则触碰光束会获得 30% 减速、ATK 降低 20% 与 1 秒沉默（不叠加）。哨兵：最多 55% 生命上限。</span></li>
+</ul></div>
+<div class="card" style="border-color:rgba(245,158,11,0.3)">
+<h2 class="dsname" style="color:#f59e0b">歌利亚 <span class="dsclass" style="font-size:9px;color:#eab308">数字化</span></h2>
+<div style="display:flex;gap:6px;margin-bottom:8px;">
+  <button onclick="showGoliathTab(1)" id="gTabBtn1" style="flex:1;padding:5px;font-family:'Rajdhani', 'Be Vietnam Pro', sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;background:rgba(245,158,11,0.25);border:1.5px solid #f59e0b;border-radius:6px;color:#f59e0b;">① 阿尔法</button>
+  <button onclick="showGoliathTab(2)" id="gTabBtn2" style="flex:1;padding:5px;font-family:'Rajdhani', 'Be Vietnam Pro', sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;background:rgba(80,50,0,0.2);border:1.5px solid rgba(245,158,11,0.4);border-radius:6px;color:#c9891f;">② 真身</button>
+</div>
+<div id="gGoliathPane1">
+<div class="ab" style="height:190px"><canvas id="cvGoliathAlpha" style="width:100%;height:100%"></canvas></div>
+<div class="sub" style="margin-top:6px">生命 1 · 闪避 0% · 无法锁定 · 无敌</div>
+<ul>
+<li><span style="color:#ffd700;font-size:10px">阶段</span> <b>阿尔法</b>——<span class="det-full">在屏幕顶部附近生成，生命为 <span class="hg">1 点生命</span>，绝对无敌且无法锁定——此阶段没有任何例外。<span class="hi">电路链接</span> 将它与当前所有敌人连接：每命中一次最多 <span class="hg">该敌人自身生命上限的 80%</span> 会被转移至歌利亚的伤害牵引账本，而非直接将其击杀。<span class="hi">腐化创生</span>——当一名已链接的异常及以上品阶敌人死亡时，一颗彩色宝珠会飞入它的 3 个插槽之一；用不同宝珠填满全部 3 个插槽后开始蜕变。</span><span class="det-short">无敌宝珠，与波次链接，将敌人自身生命上限的最多 80% 转移至伤害牵引账本。从已链接的死亡中吸收 3 颗宝珠以完成变身。</span></li>
+<li><span style="color:#ffd700;font-size:10px">被动</span> <b>猎食场</b>——歌利亚生成的瞬间，<span class="hr">ceil(1/3)</span> 的当前波次敌人会被直接吞噬，每名幸存者获得 <span class="hg">+15% 生命上限</span>。</li>
+<li><span style="color:#ffd700;font-size:10px">阶段</span> <b>蜕变</b>——<span class="det-full">填满全部 3 个插槽后开始约 4 秒、共 4 阶段的变身序列：陨石汇聚并融合成一团熔融物质（召唤），物质膨胀起泡（融合），冷却结晶为真身躯体，同时 3 颗宝珠依次点燃（结晶），随后双臂伸展落定并伴随最后一道冲击波（落定）。全程仍然无敌且无法锁定。</span><span class="det-short">填满全部 3 个宝珠插槽后，经过 4 阶段、约 4 秒变身为真身。全程仍然无敌。</span></li>
+</ul>
+</div>
+<div id="gGoliathPane2" style="display:none">
+<div class="ab" style="height:190px"><canvas id="cvGoliathTrue" style="width:100%;height:100%"></canvas></div>
+<div class="sub" style="margin-top:6px">生命 130,000+（随伤害牵引提升）· 闪避 40%→33%（每个生命里程碑 +10%）· 上限 1 · 速度约 90 px/s（正弦波漂移，非固定速度）</div>
+<p style="color:var(--dim);font-size:11px;margin:2px 0 8px">以下所有治疗/护盾数值均按 <b>Hentry</b>（即它完成真身变身瞬间的生命上限，而非当前或临时提升的生命上限）计算，并从两个共用的滚动预算中支出，预算每 10 秒补满：治疗预算（12% Hentry）与护盾预算（15% Hentry），另有普通护盾总上限 30% Hentry。一次性里程碑/复活奖励（阈值庇护、坚定意志）可跳过滚动预算，但仍须遵守 30% 上限。这取代了以往无上限、无条件的恢复/护盾来源。伤害方面，所有真正削减其生命的来源（包括护掌与 Back to Motherland）都会经过同一个共用的 <b>生命损失上限</b>：在任意滚动 4 秒内最多损失 <b>13% Hentry</b> 的生命，无论多少来源同时命中。</p>
+<ul>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>命中注定</b>——<span class="det-full"><span class="hr">4 秒绝对铁躯</span>，在成功变身为真身后立即获得（没有任何例外，即使是穿透/真实伤害），<span class="dmg">70% 基础减伤</span>，永久免疫控制，<span class="hg">0.75% Hentry/秒</span> 恢复（治疗预算）。一次命中超过 <span class="hg">8% 生命上限</span> 会开启一个 2 秒窗口，将后续伤害上限设为 <span class="hr">2.5% 生命上限</span> 每次命中（之后冷却 0.5 秒）。只有 <span class="hi">穿透</span>，<span class="hi">真实伤害</span>，且 <span class="hi">DoT</span> 命中才能对歌利亚造成全额伤害——其他所有命中（常规按生命上限百分比计算的伤害，包括基础自动射击）会被硬性上限限制为 <span class="hr">1.21% 生命上限</span> 每次命中，<span class="hg">每层减益 +0.25%</span>（歌利亚当前携带的任意减益：易伤、噬魂、生效中的减速、剧毒/狮子座灼烧层数、犹格-索托斯标记、次元裂隙、特斯拉线圈光环），上限为 <span class="hr">2.6% 生命上限</span>，仍受减伤影响。<span class="hi">穿透、真实伤害与持续伤害</span> 命中可跳过该上限，但会受到另一个更高的上限限制：<span class="hr">3% 生命上限</span> 每次命中，<span class="hg">每层减益 +0.25%</span>，上限为 <span class="hr">5% 生命上限</span>（热修复：这些来源以往仅受基础减伤限制、完全无上限，导致以真实伤害为主的配装可在不到一分钟内击败真身）。<b>护盾爆发：</b> 追踪滚动 1 秒窗口内实际损失的生命+护盾（而非原始来袭伤害）——超过 <span class="hr">12% Hentry</span> 可获得一层新的 <span class="hg">护盾</span>，数值为该窗口实际损失的 20%，上限 8% Hentry（护盾预算），并另外消耗最多 <span class="hg">10% Hentry</span> 的当前护盾，以恢复所消耗量的 50%（治疗预算）。每次触发之间有 3 秒冷却。<b>生命损失上限：</b> 所有真正削减歌利亚生命的来源（包括护掌与 Back to Motherland）共用一个上限：<span class="hr">13% Hentry</span> 的生命损失（每滚动 4 秒），无论多少来源同时命中。</span><span class="det-short">进入真身时获得 4 秒铁躯。减伤 70%，永久免疫控制，每秒恢复 0.75% Hentry（治疗预算）。大额命中（&gt;8% 生命上限）会触发 2 秒 2.5% 上限窗口。普通命中上限为每次 1.21% 生命上限（每层减益 +0.25%，最多 2.6%）；穿透/真实/持续伤害则有各自更高的上限（3%，每层 +0.25%，最多 5%）。护盾爆发：1 秒内实际损失 &gt;12% Hentry 时，可获得相当于该损失 20% 的护盾（上限 8% Hentry），另消耗最多 10% Hentry 的护盾以恢复其中 50%（冷却 3 秒）。生命损失上限：所有来源合计，每滚动 4 秒最多损失 13% Hentry 的生命。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>碎裂步</b>——<span class="det-full">当威胁靠近至 <span class="hi">100px</span> 内时传送（或每 2 秒传送一次，传送本身有 2 秒冷却），每次获得 <span class="hg">4 次铁躯</span> 层。传送是一个缓慢的两阶段魔法阵传送门（在旧位置用 400ms 关闭，在新位置用 400ms 重新打开），而非瞬间闪现。抵达后 1 秒内，获得 <span class="hg">造成伤害 +30%</span>，<span class="hg">飞行速度 +10%</span>，且 <span class="hg">治疗/护盾效果 +10%</span>（可与泰利斯自身的 +20% 叠加，总和上限 +40%）。</span><span class="det-short">传送远离威胁或每 2 秒传送一次（冷却 2 秒），获得一层 4 次铁躯。缓慢的两阶段传送门。传送后 1 秒内：伤害 +30%、速度 +10%、治疗/护盾效果 +10%（与其他来源加法叠加上限 +40%）。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>坚定意志</b>——<span class="det-full">每名歌利亚恰好触发 <span class="hi">一次</span>：本应将其击杀的第一次命中会被完全抵消。随后进入完全无敌状态，持续 <span class="hr">4秒</span>（与变身后窗口的绝对铁躯规则相同），恢复至 <span class="hg">满额 100% 生命上限</span>（以往只是恢复 35% Hentry 的“第二阶段”，如今是真正的满血第二战），并立即获得 <span class="hg">护盾</span>，数值为 <span class="hg">15% Hentry</span>（跳过滚动预算，仍遵守 30% Hentry 总上限）。从此刻起，直至战斗结束，歌利亚还会永久保留 <span class="hg">减伤 +12%</span>，<span class="hg">+550 点固定减伤</span>，且 <span class="hg">闪避 +10%</span>（在命中注定的 70% 基础减伤与阈值庇护自身闪避曲线之上，且独立于下方的临时窗口）——战斗的后半段理应比前半段明显更难。4 秒无敌结束的瞬间，歌利亚会释放一道 <span class="hi">橙色冲击波</span>，其机制与 Maou Haki 完全相同（相同速度/半径，清除屏幕上的所有玩家子弹），造成 <span class="hr">每名哨兵自身生命上限 50% 的真实伤害</span>，作用于它触及的每名哨兵（不受先锋范围伤害衰减影响），但不会让玩家失去生命，释放前会有一道短暂的施法闪光作为预警。从那时起，它进入第二阶段：火焰光环、绯红符文环与升腾的余烬环绕身体，光环变为炽红色。与此同时，一个独立的增益窗口也会开启，持续 <span class="hi">6秒</span>（在无敌结束后开始，不重叠）：<span class="hg">治疗/护盾效果 +15%</span>（可与其他所有效果叠加，总和上限 +40%），<span class="hg">+12% Hentry 生命上限</span>（真实可用生命，窗口结束时自动恢复），以及 <span class="hg">飞行速度 +15%</span>——持续期间身体明显闪烁并散发出脉动的橙色光环。</span><span class="det-short">每名歌利亚一次：致命命中会被抵消——恢复至满额 100% 生命上限，完全无敌 4 秒 + 15% Hentry 护盾（跳过预算，遵守 30% 上限），外加永久 +12% 减伤、+550 点固定减伤与 +10% 闪避，直至战斗结束。无敌结束的瞬间：一道类似 Maou Haki 的橙色冲击波（清除子弹，对每名哨兵造成其生命上限 50% 的真实伤害，不消耗生命）发射，同时开启一个独立的 6 秒窗口（不与无敌重叠）：治疗/护盾效果 +15%、Hentry 生命上限 +12%、速度 +15%，身体闪烁并散发光环。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>护掌</b>——<span class="det-full">来自技能 F 的来袭攻击、技能 D 中心牵引 + 接触造成的终结（银河战舰与技能 D 的标记与歼灭光束不受此规则约束——这两者造成普通伤害），或 Phōtokrystos 的终极激光有 <span class="hg">35% 概率</span> 被部分偏转，仅承受 <span class="hg">生命上限的 10%</span>；其余 65% 的情况下，本源之力会压倒护掌，命中造成全额 <span class="hr">生命上限的 22%</span>——每次命中皆是如此，无终身次数上限。技能 D 对歌利亚的接触伤害还会被限速为 <span class="hi">每秒 1 跳</span>（间隔 1000ms，而其他免疫控制目标通常为 400ms），因此在接触期间该判定不会更频繁地触发。此规则（如同歌利亚的所有自有规则）会覆盖任何本可穿透它的印记。通过护掌以技能 F 命中歌利亚时，还会返还 <span class="hg">1.5秒</span> 技能 F 自身的冷却，无论是否被偏转。另外，Phōtokrystos 自身的所有伤害（追踪子弹 + 回旋镖）都会降低 <span class="hg">40%</span>——在减伤/命中注定上限之前应用，同时影响有上限的普通命中与无上限的真实伤害回旋镖。这些命中削减的生命仍须经过生命损失上限（每滚动 4 秒 13% Hentry），因此一次 22% 的命中最多只能造成上限剩余的伤害。</span><span class="det-short">35% 概率将技能 F / 技能 D 的接触击杀（不包括其战舰与光束）/ Phōtokrystos 激光命中偏转至 10% 生命上限；否则为 22% 生命上限，每次命中皆是如此。任意技能 F 命中还会返还 1.5 秒自身冷却。技能 D 对歌利亚的接触跳动上限为每秒 1 次。Phōtokrystos 的其他所有伤害（子弹/回旋镖）-40%。损失的生命仍受生命损失上限约束。</span></li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>阈值庇护</b>——<span class="det-full">真身开始时闪避为 <span class="hg">40% 闪避</span>，线性衰减至 <span class="hg">33%</span>，持续 <span class="hi">15秒</span>，随后在战斗剩余时间内保持不变（适用于除技能 F/D/Phōtokrystos 终幕激光之外的一切，后者可通过护掌绕过）。每次向下越过 75/50/25% 生命里程碑时，会同时触发两件事：一层 <span class="hi">一次性</span> <span class="hg">+15% Hentry</span> 普通护盾（跳过滚动预算，仍遵守 30% Hentry 总上限；不再有以往持续恢复生命的行为），以及 <span class="hg">+10% 闪避提升，持续 3.5 秒</span>——与护盾不同，它可以重复触发任意次（生命恢复至里程碑之上后再次跌破时会重新触发），但无论同时越过多少里程碑，都不会叠加超过一层 +10%。</span><span class="det-short">进入真身时闪避 40%，15 秒内衰减至 33%（不适用于技能 F/D/Phōtokrystos 激光）。每个 75/50/25% 生命里程碑：一次性 +15% Hentry 护盾（跳过预算，遵守 30% 上限），外加可重复（不叠加）的 +10% 闪避，持续 3.5 秒。</span></li><li><span style="color:#a855f7;font-size:10px">被动</span> <b>淬炼决心</b>——<span class="det-full">引导任意技能时（自身或小丑复制品的技能），歌利亚会 <span class="hr">减速 35%</span>，无法使用碎裂步，获得 <span class="hg">+12% 减伤与 600 点固定减伤</span>，持续期间有效，并在施放结束后恢复 <span class="hg">4% Hentry</span>（治疗预算，所有施放共用 4 秒冷却，并非每次施放都无条件触发）。</span><span class="det-short">施放任意技能时：减速 35%、无法使用碎裂步、+12% 减伤与 600 点固定减伤，施放结束时恢复 4% Hentry（治疗预算，共用 4 秒冷却）。</span></li><li><span style="color:#a855f7;font-size:10px">被动</span> <b>统一战线</b>——<span class="det-full">每 1 秒，根据地图上当前存活的玩家方单位数量（玩家 + 哨兵 + 追忆之灵；勇者小队不计入，因为他们的每次攻击都是按生命上限百分比计算的命中，已经适用下方的同一固定减伤档位）重新计算 3 项防御属性：<span class="hg">每单位治疗/护盾效果 +2%</span>（上限 <span class="hg">+20%</span>），<span class="hg">固定减伤 200 + 340 ×（1 + 每单位 5%，最多 12 单位）</span>，对普通命中与按生命上限百分比计算的命中同样适用（以往是两个不同且更严苛的公式，对百分比命中惩罚更重），以及 <span class="hg">每单位 0.25% Hentry 的护盾补充（最多 8 单位）</span>，每秒加入同一护盾池（护盾预算；不会逐跳复利，仅按当前数量计算）。</span><span class="det-short">每 1 秒，根据当前存活盟友数量（玩家+哨兵+灵体；勇者小队除外）调整治疗/护盾效果（每盟友 +2%，上限 +20%）、固定减伤（200+340×（1+每盟友 5%，最多 12），两种命中类型现为同一公式）与护盾补充（每盟友 0.25% Hentry，最多 8，护盾预算）。</span></li><li><span style="color:#a855f7;font-size:10px">被动</span> <b>命中削弱</b>——<span class="det-full">歌利亚实际命中玩家的任意伤害——身体攻击、绝对裁决、腐化陨石、任意小丑复制品——都会使玩家的 ATK 降低 <span class="hr">30%</span>，持续 <span class="hg">1.5秒</span>。在效果持续期间再次受击只会刷新持续时间，永不加深叠加或延长。</span><span class="det-short">歌利亚的任意命中都会使玩家 ATK 降低 30%，持续 1.5 秒。再次受击只会刷新持续时间，而非叠加。</span></li><li><span style="color:#a855f7;font-size:10px">被动</span> <b>威势渐衰：</b> <span class="det-full">每在真身状态下停留 <span class="hi">60秒</span>，歌利亚会在 3 项属性上同时永久衰弱：自身伤害输出、自身治疗/护盾效果，以及命中注定的 70% 基础减伤部分（坚定意志后的永久 +12% 减伤不受威势渐衰影响）。前 2 层按固定的每层比率衰减（伤害 ×<span class="hg">0.85</span>，减伤 ×<span class="hg">0.90</span>，治疗 ×<span class="hg">0.80</span>）；从第 3 层起，同一比率会被平方，因此一场持续到 <span class="hi">~180 秒</span> 真身状态（第 3 层）的战斗会迅速崩溃，而非以相同速度继续消耗。乘法叠加，无上限（可无限接近 0，但永不为负）。各层伤害：<span class="hg">100% → 85% → 72% → 52% → 38% → 27%</span>（0–5 层）。减伤：<span class="hg">100% → 90% → 81% → 66% → 53% → 43%</span>。治疗/护盾：<span class="hg">100% → 80% → 64% → 41% → 26% → 17%</span>。</span><span class="det-short">每在真身状态下停留 60 秒：自身伤害、自身治疗/护盾效果与命中注定的 70% 减伤都会进一步衰减（坚定意志后的永久 +12% 减伤不受影响）。第 1–2 层按固定比率衰减；第 3 层起比率被平方，持久战会迅速崩溃。无上限。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>绝对裁决</b>——<span class="det-full">引导 2.6 秒（双臂在眼部合拢），追踪玩家位置，直至 <span class="hi">发射前 0.5 秒</span>，随后锁定。发射一颗穿透宝珠：<span class="hr">35% 生命上限真实伤害</span> 对哨兵，或 <span class="hr">-5 条命</span> 对玩家。命中玩家还会 <span class="hi">沉默</span> <span class="hr">1.25秒</span>——无法使用技能、无法自动射击，无法使用 Charge Shot/Overload Laser。</span><span class="det-short">引导 2.6 秒，追踪玩家直至发射前 0.5 秒，随后锁定。宝珠：对哨兵造成 35% 生命上限真实伤害，或使玩家 -5 条命。命中玩家还会使其沉默 1.25 秒。</span></li>
+<li><span style="color:var(--cyan);font-size:10px">技能</span> <b>腐化陨石</b>——<span class="det-full">冷却 <span class="hi">4秒</span>。抬起一只手，将最多 <span class="hi">3</span> 名随机存活使徒同时（若数量不足则按实际数量）吸入压缩陨石核心，历时 <span class="hi">0.8秒</span>，将每名使徒作为燃料消耗，随后投出的陨石比消耗的使徒更多：<span class="hi">1 名使徒 → 3 颗陨石，2 名 → 4 颗，3 名 → 5 颗</span>（上限），全部呈扇形散布——超出实际消耗使徒数量的陨石都是空的（没有燃料）。若没有可用的使徒，它仍会恰好投出 <span class="hi">1</span> 颗空陨石。命中玩家会使玩家失去 <span class="hr">1 条命</span>与 <span class="hi">沉默</span> <span class="hr">0.75秒</span>；命中哨兵会爆炸，对附近哨兵造成 <span class="hr">该哨兵自身生命上限的 25%</span> 的溅射伤害。</span><span class="det-short">冷却 4 秒。最多吸入 3 名使徒；消耗 1/2/3 名使徒时投出 3/4/5 颗陨石（多余的为空），若无使徒可用则投出 1 颗空陨石。玩家：每颗陨石 -1 条命 + 沉默 0.75 秒。哨兵：25% 生命上限溅射伤害。</span></li>
+<li><span style="background:linear-gradient(90deg,#2dd4bf,#818cf8,#d946ef);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:10px;font-weight:700;letter-spacing:0.5px">UNIQUE SKILL</span> <b>无尽回响</b>：<span class="det-full">冷却 <span class="hi">11秒</span> 每次施放后，第一次在 <span class="hi">8秒</span> 进入真身后。歌利亚每 100ms 记录一次玩家的飞行轨迹，并保留最近的 <span class="hi">1.5秒</span>。Kanade 在屏幕边缘、远离歌利亚的一侧打开她的现实之门（施放开始时放置一次，永不跟随他），抬起施法手臂，在掌中凝聚光芒，持续 <span class="hi">1.4秒</span>，同时玩家飞船的两道幽影逐渐成形。在她施法期间，歌利亚仍以全速飞行，仍可使用碎裂步，但只在自己那半边屏幕内活动，绝不会落在她的传送门上。淬炼决心仍然生效。释放时，两道幽影从她掌中飞向记录轨迹的起点。幽影 1 立即重演轨迹，幽影 2 在原地等待 <span class="hi">1.2秒</span>。每道幽影以 <span class="hg">0.6x</span> 的速度重演，恰好存活 <span class="hg">2.5秒</span>，记录轨迹中的传送会被重演为一次跳跃。触碰幽影会使 <span class="hr">1 条命</span>与 <span class="hi">沉默</span> 玩家失去 <span class="hr">0.75秒</span>（命中半径 26px；幽影不会伤害哨兵）。记录的轨迹会画成带箭头的紫色轨迹，每道正在运行的幽影带有一个红色致命环，等待中的幽影带有一个逐渐填满的环，直到轮到它。随后 Kanade 放下手臂、渐渐消失，传送门关闭。若歌利亚死亡，幽影会消失。</span><span class="det-short">冷却 11 秒。记录玩家最近 1.5 秒的飞行轨迹。Kanade 的传送门在屏幕边缘、远离歌利亚的一侧打开，两道幽影在她掌中成形（1.4 秒，歌利亚继续移动）。它们以 0.6 倍速度重演轨迹，相隔 1.2 秒，每道存活 2.5 秒。触碰会使玩家失去 1 条命并沉默 0.75 秒。紫色轨迹、红色致命环与逐渐填满的环会指示躲避位置。</span>技能 F、它发射的回旋镖与刃弧，以及大圣的偷取宝珠攻击，都能斩断飞行中、等待中或运行中的幽影，无击杀奖励。乌列的 Protection 屏障可阻挡斩击，一旦一次施放的两道幽影都被斩断，轨迹便会消散。即使里奥将歌利亚石化，无尽回响与小丑仍会继续运行。</li>
+<li><span style="background:linear-gradient(90deg,#2dd4bf,#818cf8,#d946ef);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:10px;font-weight:700;letter-spacing:0.5px">UNIQUE SKILL</span> <b>小丑</b>——<span class="det-full">真身会获得与其吸收宝珠完全对应的 <span class="hi">3 个技能</span> 的可用复制品（7 种可能中）：
+<br>• <b>维尔舒德</b>——幻影（3 秒，+99% 减伤），随后锁定 3 个点（玩家 + 2 名哨兵，若缺少哨兵则以屏幕上随机位置补足），并以闪电打击每个点（命中玩家，哨兵受到 5% 生命上限真实伤害）。
+<br>• <b>泰利斯</b>——+10–25% 减伤，随歌利亚损失生命而降低（下限 10%），所有自身治疗/护盾效果 +20%（可与一切叠加，总和上限 +40%），且每损失 5% 生命上限可恢复 0.75% Hentry（治疗预算，终身上限 15% Hentry）并获得 0.5% Hentry 护盾（护盾预算，终身上限 10% Hentry）。
+<br>• <b>拉斐尔</b>——每 4 秒，标记 3 条锁定直线（玩家 + 2 名哨兵，若缺少哨兵则以随机位置补足），并沿每条直线发射激光（命中哨兵造成 25% 生命上限真实伤害）。
+<br>• <b>玛可西亚斯</b>——剑与屏障的完整移植：一个独立的 <span class="hi">8000 HP</span>屏障（60% 减伤、每次命中上限为当前生命的 35%、10% 闪避、穿透部分穿透、真实伤害可绕过），受击时触发剑击（25%/10% 概率，每周期最多 10 次——达到 10 次时屏障自爆）。每次触发同时投出 3 把剑，指向玩家及另外 2 个锁定点（哨兵，若缺少哨兵则以随机位置补足）。剑会穿透：命中玩家每次失去 1 条命，命中哨兵按命中顺序造成 27%/23%/21% 生命上限伤害。屏障每次受击可修复实际损失的 3%（上限 160/滚动 1 秒），并窃取该损失的 5% 作为歌利亚本体治疗（限速 0.5% Hentry/秒，治疗预算；过量治疗 → 25% 护盾，护盾预算）。屏障破碎时获得铁躯、破碎期间 +10% 减伤、恢复 5% Hentry（治疗预算）与 5% Hentry 护盾（护盾预算）。全方向（无朝向弧），因为歌利亚没有可供判定的位置命中数据。
+<br>• <b>埃格雷戈</b>——虚空斩（而非心灵风暴）：准备 3 秒，随后一次 180° 横扫使玩家减速 50%，持续 1.5 秒，并对哨兵造成真实伤害（按命中次数为 30/35/40% 生命上限），外加一个次元破裂区域。渲染为橙色等离子触手臂，而非埃格雷戈自身的黑暗触手。
+<br>• <b>达格鲁尔</b>——每 8 秒，一道冲击波清除玩家子弹并使玩家减速 30%。
+<br>• <b>利维坦</b>——360° 横扫激光；被扫中的哨兵始终承受公式的 50% 生命上限上限（固定相当于 150 层）。
+<br>以上任何小丑复制品实际命中玩家时，还会 <span class="hi">沉默</span> <span class="hr">0.75秒</span>——无法使用技能、无法自动射击，无法使用 Charge Shot/Overload Laser——与下方的绝对裁决与腐化陨石规则相同。
+</span><span class="det-short">精确复制与其吸收宝珠对应的 3 个技能，每个技能都针对其真实来源技能重新平衡/重新预警。每个命中玩家的复制品还会使其沉默 0.75 秒。</span></li>
+</ul>
+</div>
+</div>
+<div class="card" style="border-color:rgba(255,34,68,0.3);position:relative;overflow:hidden;">
+<h2 class="dsname" style="color:#ff2244">无尽之夜的 KANADE <span class="dsclass" style="font-size:9px;color:#ff2244">管理员</span></h2>
+<div class="sub" style="color:#ff2244aa">— 未定义 —</div>
+<div class="ul-hero kanade-hero" oncontextmenu="return false"><img src="assets/images/site/kanade-genesis.png" draggable="false" alt="Kanade of the Endless Nights"><canvas id="cvKanadeFx" class="kanade-hero-fx"></canvas></div>
+<ul>
+<li>管理员存在于现实之外，以 <span class="hr">系统</span> 的形式治理现实——而非生活于其中。</li>
+<li>创造了 <span class="hg">Endless Nights Protocol</span>：无限复制宇宙，阻止一切终结。</li>
+<li>对因果的绝对掌控——可以复制、覆盖并定义现实。</li>
+<li>一位被对不可逆终结的恐惧所驱动的遥远监督者。受到 <span class="hi">Irregulars</span>（异数者）的威胁，它们超出她的权限范围。</li>
+<li>在每个首领波次开始时停止时间，并施放一个 <span class="hg">时间线扭曲</span>，绝不会连续两次相同：<span class="hg">Stack Overflow</span>（解除所有叠加上限），<span style="color:#38e8ff">时空流动</span>（你的冷却加快 35%，敌方子弹与歌利亚加快 25%），<span style="color:#f5c451">管理员的眷顾</span>（为你提供护盾与 +10% ATK，为敌人提供祝福与再生），以及 <span style="color:#3ddc97">自适应反击</span>（重复使用一个技能，歌利亚会抵抗它；切换技能则伤害提高 20%）。</li>
+</ul></div>`,
+      basics: `
+<div class="card">
+<h2 style="color:var(--cyan)">你的战机</h2>
+<div class="sub">双鱼座级截击机</div>
+<div class="ab" style="height:170px"><canvas id="cvShip" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayShip" onclick="playWidget('ship', this)"><i class="ico ico-play"></i>播放</button></div>
+<p>你的战机每 135 毫秒自动发射 <span class="hp">5 枚紫色子弹</span>，呈 45° 扇形散布。小小的 <span class="hi">青色圆点</span> 才是你真正的判定点——只有碰到这个圆点才会失去一条命。</p>
+<p style="margin-top:8px">本指南中所有友方伤害数值（哨兵、技能、印记）都按你的 <span class="hi">ATK</span> 属性换算，而非固定数值。ATK 初始为 <span class="hg">1000</span>，每波次提升 <span class="hg">+3%</span>，到第 18 波时达到上限 <span class="hg">+50%</span>（<span class="hg">1500</span>），此后整场保持不变。每件已装备的印记还会额外提供固定 ATK 加成，从 4% 到 20% 不等，印记选择界面会在每张卡上标明数值。本身就能增伤或防御出色的套装加得少，需要依赖基础 ATK 的套装加得多，而双鱼座加得最多，因为它没有任何攻击手段。</p>
+</div>
+<div class="card">
+<h2 style="color:var(--cyan)">操作</h2>
+<p><b>决战：</b> 按 A 释放所选圣遗物的技能。按 F 蓄力湮灭横扫。按住 Shift 开启时间领域。A 与 F 相互独立，按住 Shift 时无法启动。A 不提供无敌。空格、S、D、G 在决战中禁用。决战只能在电脑上游玩，在标题画面选择“移动端”标签页会显示 Soon 并锁定该模式。</p>
+<table class="controls-table"><tr><th>圣遗物技能（A）</th><th>冷却时间</th></tr><tr><td>月轮庇护</td><td>13秒</td></tr><tr><td>虚空长枪</td><td>15秒</td></tr><tr><td>蚀月斩</td><td>15秒</td></tr><tr><td>幻影利刃</td><td>14秒</td></tr><tr><td>泰坦破灭者</td><td>16秒</td></tr></table>
+<table class="controls-table">
+<tr><th>按键</th><th>操作</th></tr>
+<tr><td><span class="key">ESC</span></td><td>暂停 / 继续游戏</td></tr>
+<tr><td><span class="key">← →</span></td><td>左右移动</td></tr>
+<tr><td><span class="key">Space</span> 点按并按住</td><td>蓄力射击（最高 10 倍伤害）——松开开火</td></tr>
+<tr><td><span class="key">Space</span> 按住 3 秒</td><td>超载激光——持续 12 秒的光束</td></tr>
+<tr><td><span class="key">Shift</span></td><td>犹格-索托斯领域（时间减速 + 铁躯）</td></tr>
+<tr><td><span class="key">A</span></td><td>雷霆宝珠——20 枚追踪能量宝珠</td></tr>
+<tr><td><span class="key">S</span></td><td>追忆之灵——召唤灵体盟友</td></tr>
+<tr><td><span class="key">D</span></td><td>死星——牵引、标记并歼灭，召唤战舰</td></tr>
+<tr><td><span class="key">F</span></td><td>湮灭横扫——全屏光束</td></tr>
+<tr><td><span class="key">G</span></td><td>生命领域 / 特斯拉矩阵</td></tr>
+</table></div>
+<div class="card"><h2 style="color:var(--cyan)">远航</h2><div class="sub">游戏模式 · 在“启动超空间跳跃”上方的栏位中选择</div><ul>
+<li><b>无尽远航：</b> 标准模式。在无尽的波次中求生，选择印记，冲击高分。</li>
+<li><b>决战远航</b> <span class="hr">高难度</span>：与宇宙实体的一对一首领对决，使用五件圣遗物之一。只能在电脑上游玩：在标题画面选择“移动端”标签页会显示 Soon 并锁定该模式。</li>
+<li><b>教程：</b> 与 Kanade 一起上的短暂引导课程，教你移动、全部技能以及如何读懂攻击预警。</li>
+<li><b>自定义远航：</b> 供开发使用的调试沙盒，只有一片空旷场地和控制台。</li></ul></div>
+<div class="card"><h2 style="color:var(--gold)">生命与得分</h2><ul>
+<li>开局拥有 <span class="hg">10 条命</span>，最多不超过 <span class="hg">12</span>。每获得 <span class="hgr">+1 条命</span>，每 <span class="dmg">500,000 分</span>。</li>
+<li>得分 = 敌人生命上限 × 4（第 1 波），到第 10 波逐渐降至 × 3。歌利亚最多值 500,000 分。</li><li>切换标签页时游戏自动暂停。</li></ul></div>
+<div class="card">
+<h2 style="color:var(--gold)">关于</h2>
+<div class="sub">双鱼座背后的故事</div>
+<p>在虚空一片行将熄灭的星域深处，一艘 <span class="hi">双鱼座级截击机</span> 孤身漂流，对抗无尽的浪潮。前方的星辰已经沉寂——被不属于任何星座、不讲任何秩序、毫不留情的虚空造物吞没。十二枚古老的 <span class="hg">星座印记</span> 散落在被遗忘舰队的残骸之间，是孤身飞行员最后能求助的防线。每挺过一波，就是从黑暗手中夺回一次心跳。</p>
+<div style="height:1px;background:rgba(0,229,255,0.15);margin:16px 0;"></div>
+<p><b>Pisces: Space Journey</b> 是一款独立的非商业项目，由一名大学生利用业余时间开发与维护。</p>
+<ul>
+<li>这是一个个人学习项目——<span class="hi">不出售、不盈利，也不隶属于任何工作室或发行商。</span></li>
+<li>对现有音乐、游戏或媒体的任何风格借鉴（使用处均已注明出处，见音乐档案）都严格只出于 <span class="hg">教育与启发之目的</span>——绝非声称拥有其所有权。</li>
+<li><span class="hg">同人制作，无任何关联：</span> 本游戏是一个兴趣项目。它与任何游戏工作室、发行商、唱片公司、艺人，或任何它可能涉及的系列、角色、品牌的所有者均无关联，也未获得其认可或赞助。此处提及或呼应的所有商标、名称与作品均属于其各自的所有者。</li>
+<li><span class="hg">图片与创意来自众多来源：</span> 视觉元素（战机、敌人、特效、图标）以及首领、技能与机制背后的创意，均参考并改编自游戏、动漫、电影、神话等多种来源，再为本项目重新加工。没有任何一部作品被原样复制，与现有素材的相似之处只是灵感来源，而非所有权主张。</li>
+<li><span class="hg">隐私：</span> 本游戏没有账号，也不展示广告。你的设置只保存在浏览器中。本站仅通过 Google Analytics 统计匿名访问量，且其 Cookie 默认关闭。</li>
+<li>我们全力承诺尊重原创者的权利。如果此处有任何内容无意中越界，请联系我们，我们会立即修正或删除。</li>
+</ul>
+<p style="margin-top:10px;">由 AanSensei 使用原生 JavaScript、HTML5 Canvas 与 WebGL（通过 PixiJS）开发。部署于 GitHub Pages，可安装为离线 Web 应用（PWA）。</p>
+<p style="margin-top:10px;">有问题、想报告 bug，或者只是想打个招呼？<span class="key">GitHub: @aansensei</span></p>
+</div>`,
+      passives: `
+<div class="card">
+<h2 style="color:var(--cyan)">哨兵</h2>
+<div class="sub">被动 —— 每击杀 3 名敌人生成 • 最多 12 名</div>
+<div class="ab" style="height:160px"><canvas id="cvSentinels" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlaySentinel" onclick="playWidget('sentinel', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul>
+<li>每 <span class="hi">击杀 3 名敌人</span>生成。36% 概率获得 <b>坚固</b>（生命上限 +50%）。</li>
+<li>每 <span class="hi">2.5秒</span>，每名哨兵投掷一支 <span class="hg">金色长矛</span>：自动追踪，可穿透最多 3 名敌人，每次命中恢复 2% 生命上限。对歌利亚仅造成 <span class="hi">25%</span> 伤害。</li>
+<li><span style="color:#00FFFF">青色 1–4：</span> 生命 +30%，弹速 +10%。</li>
+<li><span style="color:#FF00FF">品红 5–11：</span> 射速 +20%，伤害 +10%，减伤 +10%。<b>先锋网络</b>。</li>
+<li><span style="color:#FFD700">金色 ×12：</span> 减伤 +12%，长矛穿透 4 名敌人并恢复 3%。每 <span class="hi">12秒</span>，十二名哨兵同时向最强的敌人投掷长矛。</li>
+<li><b>8% 基础减伤</b>（常驻）。</li>
+<li><b>哨兵格挡</b>（正义荣耀激活时）：20% 概率抵消 → <span class="hg">精准格挡</span>，持续 4 秒 + <span class="hg">减伤 +10%</span>，持续 4 秒。</li>
+<li><span style="color:#a855f7;font-size:10px">被动</span> <b>盖亚庇护</b>——<span class="det-full">生命上限随波次成长：<span class="hg">+5%（第 2 波）· +10%（第 6 波）· +15%（第 10 波）</span>；之后 <span class="hg">每波 +3%</span>，直到 <span class="hg">总上限 +60%</span>。正义荣耀激活期间：每 <span class="hi">8秒</span>（<span class="hi">5秒</span>第 10 波后）每名哨兵生成一层 <span class="hg">盖亚屏障</span> = <span class="hg">已损失生命的 20% + 生命上限的 12%</span>（不可叠加，会取代上一层。激活时立即触发。屏障按自身剩余量吸收受到的伤害（无论剩余多少，都没有固定比例的伤害能穿透）。<b>真实伤害完全无视盖亚屏障</b>——根本不会消耗屏障量。<b>不计入生命上限。</b> 在哨兵上方显示为绿色月牙。</span><span class="det-short">生命上限随波次里程碑成长（上限 +60%）。正义荣耀期间：盖亚屏障每 8 秒触发一次（第 10 波后为 5 秒）= 已损失生命的 20% + 生命上限的 12%。按自身量吸收伤害，真实伤害完全无视，不计入生命上限。</span></li>
+<li>死亡时：<span class="dmg">10 枚散射弹</span>。</li></ul></div>
+<div class="card"><h2 style="color:var(--red)">易伤</h2><div class="sub">减益 —— 可叠加 ×4 • 持续 3 秒</div>
+<div class="ab"><canvas id="cvVuln" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayVuln" onclick="playWidget('vuln', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li>自动射击 <span class="dmg">28%</span> 概率，其他来源 <span class="dmg">15%</span>。每层：<span class="hr">承受伤害 +12%</span>，撕碎 <span class="dmg">20% 护盾</span>。</li>
+<li>叠满 4 层后，接下来 2.5 秒内：命中仍正常消耗护盾，但会额外附加真实伤害，并随时间线性衰减 <span class="hr">+30% → +15%</span>。持续时间结束时：造成 <span class="hr">57.5% ATK 的真实伤害</span>，层数重置为 0。</li></ul></div>
+<div class="card"><h2 style="color:var(--green)">正义荣耀</h2><div class="sub">触发：敌人 4+ / ABNORMAL+ / 技能 G / PHŌTOKRYSTOS</div>
+<div class="ab"><canvas id="cvGlory" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayGlory" onclick="playWidget('glory', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul><li>全部友方伤害 <span class="hgr">×1.55</span>，射速 <span class="hgr">×1.2</span>。</li>
+<li><span class="det-full"><b>连锁闪电</b>（冷却 150ms）：传导至 <b>8</b> 名敌人，造成 <b>50%</b> 伤害。<b>60%</b> → <span class="hr">噬魂</span>，持续 <b>2秒</b>（−<b>40%</b> 治疗/护盾，持续伤害每 <b>0.35秒</b>：<b>6.9% ATK</b> 真实伤害）。</span><span class="det-short"><b>连锁闪电</b>：传导至 8 名敌人。60% 概率施加噬魂，持续 2 秒（降低治疗与持续伤害）。</span></li>
+<li>哨兵：<b>+25% DR</b>，格挡激活。</li></ul></div>
+<div class="card"><h2 style="color:var(--gold)">最终防线与最后一搏</h2><div class="sub">自动安全网</div>
+<div class="ab" style="height:140px"><canvas id="cvFinal" style="width:100%;height:100%"></canvas><button class="play-btn" id="btnPlayFinal" onclick="playWidget('final', this)"><i class="ico ico-play"></i>播放</button></div>
+<ul>
+<li><b>玩家护盾：</b> 吸收 1 次命中 <span class="cd">，25 秒后恢复</span>。<b>边界护盾：</b> 吸收 1 名越界敌人 <span class="cd">25秒</span>。</li>
+<li><b>最后一搏：</b> 最后一条命受到致命伤害时 → 存活并获得 <span class="hg">绝对护盾</span>（自身 + 哨兵）。<span class="hg">仅可触发一次。</span></li>
+<li>优先级：<span class="hp">领域</span> → <span class="hi">宝珠献祭</span> → 玩家护盾 → 最后一搏 → 失去生命。</li></ul></div>
+<div class="card"><h2 style="color:#ffaaaa"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 4l13 13M20 4L7 17M14.5 19.5l5-5M9.5 19.5l-5-5"/></svg> YUUKI —— 战斗意志</h2><div class="sub">被动 • 第 8 波起 • 每 2 波 • 叠加至 +300%</div>
+<ul>
+<li>从 <span class="hi">第 8 波</span>开始，每 <span class="hi">2 波</span>（第 8、10、12 波……）：所有友方单位造成 <span class="hg">+20% 伤害</span>。</li>
+<li>按加法叠加，直到总加成达到 <span class="hg">+300%</span>（第 36 波起达到上限），之后保持不变。</li>
+<li>适用于所有友方伤害来源：自动射击、技能、灵体、哨兵、连锁闪电、特斯拉持续伤害。</li>
+<li>在 HUD 中显示为 <span class="hg"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 4l13 13M20 4L7 17M14.5 19.5l5-5M9.5 19.5l-5-5"/></svg> Yuuki +X%</span>（激活后）。</li>
+</ul></div>
+<div class="card"><h2 style="color:#c86464"><img src="assets/images/game/icons/walpurgis-icon.png" alt="Walpurgis" style="height:0.9em;vertical-align:-0.1em;margin-right:5px;">WALPURGIS —— 血夜</h2><div class="sub">全局诅咒 • 每 5 波 • 无上限</div>
+<ul>
+<li>每 <span class="hi">5 波</span>，所有敌人永久获得 1 层：<span class="hg">生命上限 +20%</span>，<span class="hg">闪避 +5%</span>（上限 <span class="hg">+40%</span>，仅计瓦尔普吉斯部分，即 8 层），<span class="hg">固定减伤 +25</span>（在百分比减伤之后扣除，见“固定减伤”卡片），<span class="hg">治疗/护盾效果 +5%</span>。</li>
+<li>生命上限、固定减伤与治疗/护盾效果永久叠加，无上限。生命上限被刻意推得最狠：本游戏真正的死亡倒计时是因接触而失去的生命，而非承受的原始伤害，所以延长击杀时间比让敌人打得更痛重要得多。</li>
+<li>在 HUD 中显示为 <img src="assets/images/game/icons/walpurgis-icon.png" alt="Walpurgis" style="height:1em;vertical-align:-0.15em;"> <span class="hg">Walpurgis xN</span>（至少有 1 层时显示）。</li>
+</ul></div>`,
+    };
+
     // Music archive — list must match assets/audio/bgm/ filenames on disk.
     // Rendered in this order, unsorted. Anata is pinned to the top on purpose;
     // everything after it stays alphabetical.
@@ -3156,6 +3754,16 @@
 <div class="sub">Nơi hàng vạn dòng chảy thanh âm hội tụ, thời gian giao thoa thành giai điệu, và các vì sao ngân lên khúc khải hoàn.</div>
 <img src="assets/images/site/music-archive-egregor-phase3.png" alt="Tranh pixel art chiến hạm của người chơi trong khiên cầu đối đầu Egregor dạng thứ ba, Chung Yên Hư Ngôn, giữa những viên đạn vàng" oncontextmenu="return false" style="width:100%;border-radius:10px;margin-top:12px;display:block;border:1px solid rgba(0,229,255,0.18);user-select:none;-webkit-user-drag:none">
 <p style="opacity:0.75; font-size:12px; margin-top:6px;">Nhạc nền menu "Pisces" chỉ phát ở màn hình tiêu đề. Mọi bản nhạc khác được chọn ngẫu nhiên sau khi bạn xác nhận sigil đầu tiên mỗi lượt chơi. "Ruler of the Violet Domain" là nhạc trận đấu với Egregor, chỉ phát trong Quyết Chiến.</p>
+<div id="music-list" style="display:flex; flex-direction:column; gap:10px; margin-top:14px;"></div>
+</div>`;
+      }
+      if (lang === 'zh') {
+        return `
+<div class="card">
+<h2 style="color:var(--cyan)">音乐档案</h2>
+<div class="sub">音流汇聚之处，时间本身在旋律中绽放，群星之间的寂静开始歌唱。</div>
+<img src="assets/images/site/music-archive-egregor-phase3.png" alt="像素画：玩家星舰身处球形护盾内，迎战第三形态的埃格雷戈——终焉之虚言，身处金色弹幕之中" oncontextmenu="return false" style="width:100%;border-radius:10px;margin-top:12px;display:block;border:1px solid rgba(0,229,255,0.18);user-select:none;-webkit-user-drag:none">
+<p style="opacity:0.75; font-size:12px; margin-top:6px;">菜单主题曲“Pisces”仅在标题画面播放。其他曲目会在每局确认第一个印记后随机播放。“Ruler of the Violet Domain”是埃格雷戈的战斗主题，仅在决战中播放。</p>
 <div id="music-list" style="display:flex; flex-direction:column; gap:10px; margin-top:14px;"></div>
 </div>`;
       }
@@ -3289,11 +3897,23 @@
       });
     }
 
+    // Tab-bar + header labels per language. The tab CONTENT comes from
+    // TABS_EN/TABS_VI/TABS_ZH; the bar and header are static HTML, so they
+    // need their own map. Vietnamese keeps the original English labels, as
+    // the shipped VI version does.
+    const TAB_LABELS = {
+        en: { basics: 'Basics', passives: 'Passives', skills: 'Skills', sigils: 'Sigils', enemies: 'Enemies', rules: 'Combat', updatelog: 'Update Log', music: 'Music Archive', detail: 'Detailed', shortened: 'Shortened', title: 'GENERAL GUIDE', subtitle: 'PISCES: SPACE JOURNEY — COMBAT MANUAL' },
+        vi: { basics: 'Basics', passives: 'Passives', skills: 'Skills', sigils: 'Sigils', enemies: 'Enemies', rules: 'Combat', updatelog: 'Update Log', music: 'Music Archive', detail: 'Detailed', shortened: 'Shortened', title: 'GENERAL GUIDE', subtitle: 'PISCES: SPACE JOURNEY — COMBAT MANUAL' },
+        zh: { basics: '基础', passives: '被动', skills: '技能', sigils: '印记', enemies: '敌人', rules: '战斗', updatelog: '更新日志', music: '音乐档案', detail: '详细', shortened: '简略', title: '综合指南', subtitle: 'PISCES: SPACE JOURNEY — 战斗手册' }
+    };
+
     // Render tab content
     function _tabHtml(name) {
       const lang = (window.parent && window.parent._lang) || 'en';
       document.body.classList.toggle('lang-vi', lang === 'vi');
+      document.body.classList.toggle('lang-zh', lang === 'zh');
       if (lang === 'vi' && TABS_VI[name]) return TABS_VI[name];
+      if (lang === 'zh' && TABS_ZH[name]) return TABS_ZH[name];
       return TABS_EN[name];
     }
 
@@ -3302,6 +3922,14 @@
       if (typeof _stopPreview === 'function') _stopPreview(true);
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
       document.body.classList.toggle('lang-vi', ((window.parent && window.parent._lang) || 'en') === 'vi');
+      document.body.classList.toggle('lang-zh', ((window.parent && window.parent._lang) || 'en') === 'zh');
+      // Tab-bar + header labels follow the parent frame's language too.
+      const _gl = TAB_LABELS[((window.parent && window.parent._lang) || 'en')] || TAB_LABELS.en;
+      document.querySelectorAll('.tab-btn').forEach(b => { const _l = _gl[b.dataset.tab]; if (_l) b.textContent = _l; });
+      const _tog = document.getElementById('togDetail');
+      if (_tog) _tog.textContent = (document.getElementById('guideBody') && document.getElementById('guideBody').classList.contains('shortened')) ? _gl.shortened : _gl.detail;
+      const _h1 = document.querySelector('.guide-header h1'); if (_h1) _h1.textContent = _gl.title;
+      const _sub = document.querySelector('.guide-header .sub'); if (_sub) _sub.textContent = _gl.subtitle;
       const html = (name === 'music') ? _renderMusicArchive() : _tabHtml(name);
       G.innerHTML = '<div class="tab-content active">' + html + '</div>';
       requestAnimationFrame(() => {
@@ -3391,7 +4019,8 @@
         break;
       }
       const isShort = G.classList.toggle('shortened');
-      _togBtn.textContent = isShort ? 'Shortened' : 'Detailed';
+      const _gl2 = TAB_LABELS[((window.parent && window.parent._lang) || 'en')] || TAB_LABELS.en;
+      _togBtn.textContent = isShort ? _gl2.shortened : _gl2.detail;
       _togBtn.classList.toggle('shortened', isShort);
       if (anchor) {
         const h = anchor.getBoundingClientRect().height;
@@ -4847,13 +5476,17 @@ c.textAlign = 'left';
         if (sEg) {
           const { c, w, h } = sEg;
           const vi = document.body.classList.contains('lang-vi');
+          const zh = document.body.classList.contains('lang-zh');
           // Scene on the left, notes on the right (notes are skipped on a narrow card, the list below carries them).
           const showNotes = w >= 560;
           const sceneW = showNotes ? Math.round(w * 0.58) : w, noteX = sceneW + 10, noteW = w - noteX - 12;
           const world = { left: 100, top: 0, width: 1000, height: 800 };
           const scale = Math.min((sceneW - 12) / world.width, (h - 34) / world.height);
           const sceneX = (sceneW - world.width * scale) / 2, sceneY = 28;
-          const notes = vi ? [
+          const notes = zh ? [
+            ['集体意识', ['10 条触手，每条 80% 生命上限', '偏转：存活触手 / 10 × 60%', '触手受击：35% × 75%，随后随狂怒降低', '本体命中上限：max(25%, 90% 减去每条失去触手 10%)']],
+            ['心灵链接 · 狂怒', ['每层：移动 +18%，生命上限 +15%', '本体恢复 12% 新生命上限，存活触手恢复 10%', '风暴 1200ms，冷却 4000ms，狂怒乘以 0.85', '最多 5 层，每层 8 秒']]
+          ] : vi ? [
             ['TÂM TRÍ TẬP THỂ', ['10 xúc tu, mỗi cái 80% MaxHP', 'Bật đòn: xúc tu sống / 10 × 60%', 'Xúc tu nhận: 35% × 75%, rồi giảm theo rage', 'CAP đòn vào thân: max(25%, 90% trừ 10% mỗi xúc tu mất)']],
             ['LIÊN KẾT TÂM TRÍ · CUỒNG NỘ', ['Mỗi tầng: +18% di chuyển, +15% MaxHP', 'Hồi thân 12% MaxHP mới, xúc tu sống hồi 10%', 'Tempest 1200ms, hồi 4000ms, có rage nhân 0.85', 'Tối đa 5 tầng, mỗi tầng 8s']]
           ] : [
@@ -4915,7 +5548,7 @@ c.textAlign = 'left';
           function idle() {
             if (!egPlaying) {
               enemies = [idleEnemy]; sentinels = []; player.x = 600; player.y = 530;
-              renderFrame(idleEnemy, true, vi ? 'EGREGOR: TÂM TRÍ TẬP THỂ' : 'EGREGOR: COLLECTIVE MIND');
+              renderFrame(idleEnemy, true, zh ? '埃格雷戈：集体意识' : vi ? 'EGREGOR: TÂM TRÍ TẬP THỂ' : 'EGREGOR: COLLECTIVE MIND');
             }
             activeAnimations.push(requestAnimationFrame(idle));
           }
@@ -5006,17 +5639,17 @@ c.textAlign = 'left';
               window._dimBreakZones = window._dimBreakZones.filter(zone => nowT < zone.fxEnd);
               window._egregorDeathBursts = window._egregorDeathBursts.filter(burst => nowT - burst.spawnAt < burst.duration);
               _tickParticlesAndExplosions(dt);
-              const title = deathDone ? (vi ? 'SỤP ĐỔ TẬP THỂ VÀ TIẾNG VỌNG TEMPEST' : 'COLLECTIVE COLLAPSE AND TEMPEST ECHOES')
-                : enemy._tempestPhase !== 'ready' ? (vi ? 'TEMPEST: CẮM XÚC TU, MỞ CỔNG, ĐÂM LÊN' : 'TEMPEST: PLANT, OPEN, ERUPT')
-                : enemy._nullSlashPhase !== 'ready' || window._dimBreakZones.length ? (vi ? 'HƯ KHÔNG TRẢM VÀ VẾT NỨT VŨ TRỤ' : 'NULL SLASH AND COSMIC RIFT')
-                : (vi ? 'EGREGOR: CUỒNG NỘ' : 'EGREGOR: RAGE');
+              const title = deathDone ? (zh ? '集体崩塌与风暴回响' : vi ? 'SỤP ĐỔ TẬP THỂ VÀ TIẾNG VỌNG TEMPEST' : 'COLLECTIVE COLLAPSE AND TEMPEST ECHOES')
+                : enemy._tempestPhase !== 'ready' ? (zh ? '风暴：扎根、开门、爆发' : vi ? 'TEMPEST: CẮM XÚC TU, MỞ CỔNG, ĐÂM LÊN' : 'TEMPEST: PLANT, OPEN, ERUPT')
+                : enemy._nullSlashPhase !== 'ready' || window._dimBreakZones.length ? (zh ? '虚空斩与宇宙裂缝' : vi ? 'HƯ KHÔNG TRẢM VÀ VẾT NỨT VŨ TRỤ' : 'NULL SLASH AND COSMIC RIFT')
+                : (zh ? '埃格雷戈：狂怒' : vi ? 'EGREGOR: CUỒNG NỘ' : 'EGREGOR: RAGE');
               renderFrame(enemy, !deathDone, title);
               if (elapsed < 9600) activeAnimations.push(requestAnimationFrame(tick));
               else {
                 window._egregorDeathBursts = []; window._dimBreakZones = []; _egregorTempestEchoes.fill(null); _egregorTempestScars.fill(0);
                 particles.length = 0; explosions.length = 0; enemies = []; egSent = []; sentinels = []; egPlaying = false;
                 btn.dataset.running = 'false'; btn.dataset.paused = 'false'; delete btn.dataset._pauseAnchorAt; _setBtnIcon(btn, 'play', 'Play');
-                renderFrame(idleEnemy, true, vi ? 'EGREGOR: TÂM TRÍ TẬP THỂ' : 'EGREGOR: COLLECTIVE MIND');
+                renderFrame(idleEnemy, true, zh ? '埃格雷戈：集体意识' : vi ? 'EGREGOR: TÂM TRÍ TẬP THỂ' : 'EGREGOR: COLLECTIVE MIND');
               }
             }
             tick();
@@ -5037,12 +5670,17 @@ c.textAlign = 'left';
         if (sAm) {
           const { c, w, h } = sAm;
           const vi = document.body.classList.contains('lang-vi');
+          const zh = document.body.classList.contains('lang-zh');
           const showNotes = w >= 560;
           const sceneW = showNotes ? Math.round(w * 0.58) : w, noteX = sceneW + 10, noteW = w - noteX - 12;
           const world = { left: 100, top: 0, width: 1000, height: 800 };
           const scale = Math.min((sceneW - 12) / world.width, (h - 34) / world.height);
           const sceneX = (sceneW - world.width * scale) / 2, sceneY = 28;
-          const notes = vi ? [
+          const notes = zh ? [
+            ['心脏 · 裹尸布 · 羽毛', ['最多 5 颗 ib 心脏（10 秒），5 层时双眼炽亮', '3 层裹尸布，每层吸收 8% 生命上限，6 秒后重新缠绕', '4 秒内损失 12% 生命上限：羽毛掉落，暴露 3 秒']],
+            ['阿米特之颚 · 心脏称量', ['颚：预警 1.3 秒（r=110），留下 3 秒沙坑', '心脏称量：两个秤盘（r=170），位于 25% 与 75% 宽度处', '重盘砸下；双方相等则眩晕 2 秒']],
+            ['狮爪 · 河马践踏', ['爪：飞船横向距离 340px 内时红色扇形越过飞船，冷却 5 秒', '践踏：冲击波扫下，仅 260px 间隙安全', '颚孵化 3 只沙圣甲虫，飞船子弹可击碎']]
+          ] : vi ? [
             ['TÍCH TIM · VẢI LIỆM · LÔNG VŨ', ['Tối đa 5 Trái Tim ib (10s), đủ 5 mắt rực sáng', '3 lớp Vải Liệm, mỗi lớp hút 8% máu tối đa, quấn lại sau 6s', 'Mất 12% máu trong 4s: rơi lông vũ, Lộ Diện 3s']],
             ['HÀM AMMIT · CÂN TRÁI TIM', ['Hàm Ammit: báo 1.3s (r=110), để lại Hố Cát 3s', 'Cân Trái Tim: 2 đĩa (r=170) ở 25% và 75% ngang', 'Đĩa nặng đập xuống; cân bằng thì Ammit choáng 2s']],
             ['VUỐT SƯ TỬ · GIẬM HÀ MÃ', ['Vuốt: quạt đỏ vươn xuống quá tàu khi tàu lệch ngang dưới 340px, hồi 5s', 'Giậm: sóng quét xuống, chỉ khoảng 260px an toàn', 'Hàm Ammit nở 3 bọ hung, đạn tàu bắn vỡ']]
@@ -5114,7 +5752,7 @@ c.textAlign = 'left';
           function idleAm() {
             if (!amPlaying) {
               enemies = [idleAmmit]; sentinels = []; player.x = 600; player.y = 540;
-              renderAmFrame(idleAmmit, true, vi ? 'AMMIT: KẺ NUỐT TRÁI TIM' : 'AMMIT: DEVOURER OF HEARTS');
+              renderAmFrame(idleAmmit, true, zh ? '阿米特：吞心者' : vi ? 'AMMIT: KẺ NUỐT TRÁI TIM' : 'AMMIT: DEVOURER OF HEARTS');
             }
             activeAnimations.push(requestAnimationFrame(idleAm));
           }
@@ -5167,11 +5805,11 @@ c.textAlign = 'left';
               }
               if (elapsed >= 18800 && step < 4) { step = 4; _spawnAmmitDeathBurst(enemy.x, enemy.y, enemy.size, clock, 5); }
               _tickParticlesAndExplosions(dt);
-              const title = elapsed < 3000 ? (vi ? 'KHE NỨT DUAT VÀ CỔNG KIM TỰ THÁP' : 'DUAT RIFT AND PYRAMID GATEWAY')
-                : elapsed < 6100 ? (vi ? 'HÀM AMMIT VÀ HỐ CÁT' : 'JAWS AND SAND PIT')
-                : elapsed < 13900 ? (vi ? 'CÂN TRÁI TIM: HAI PHÁN QUYẾT' : 'WEIGHING: BOTH VERDICTS')
-                : elapsed < 16400 ? (vi ? 'LỘ DIỆN, NỔI ĐIÊN VÀ VUỐT SƯ TỬ' : 'EXPOSED, ENRAGE AND LION CLAW')
-                : elapsed < 18800 ? (vi ? 'GIẬM HÀ MÃ' : 'HIPPO STOMP') : (vi ? 'TAN THÀNH CÁT' : 'DISSOLVING INTO SAND');
+              const title = elapsed < 3000 ? (zh ? 'DUAT 裂缝与金字塔之门' : vi ? 'KHE NỨT DUAT VÀ CỔNG KIM TỰ THÁP' : 'DUAT RIFT AND PYRAMID GATEWAY')
+                : elapsed < 6100 ? (zh ? '阿米特之颚与沙坑' : vi ? 'HÀM AMMIT VÀ HỐ CÁT' : 'JAWS AND SAND PIT')
+                : elapsed < 13900 ? (zh ? '心脏称量：两次裁决' : vi ? 'CÂN TRÁI TIM: HAI PHÁN QUYẾT' : 'WEIGHING: BOTH VERDICTS')
+                : elapsed < 16400 ? (zh ? '暴露、狂怒与狮爪' : vi ? 'LỘ DIỆN, NỔI ĐIÊN VÀ VUỐT SƯ TỬ' : 'EXPOSED, ENRAGE AND LION CLAW')
+                : elapsed < 18800 ? (zh ? '河马践踏' : vi ? 'GIẬM HÀ MÃ' : 'HIPPO STOMP') : (zh ? '化为沙尘' : vi ? 'TAN THÀNH CÁT' : 'DISSOLVING INTO SAND');
               renderAmFrame(enemy, elapsed < 18800, title);
               if (elapsed < 20000) activeAnimations.push(requestAnimationFrame(tickAm));
               else {
@@ -5179,7 +5817,7 @@ c.textAlign = 'left';
                 if (window._ammitDeathBursts) for (let i = 0; i < window._ammitDeathBursts.length; i++) window._ammitDeathBursts[i].spawnAt = -999999;
                 particles.length = 0; explosions.length = 0; enemies = []; sentinels = []; amPlaying = false;
                 btn.dataset.running = 'false'; btn.dataset.paused = 'false'; delete btn.dataset._pauseAnchorAt; _setBtnIcon(btn, 'play', 'Play');
-                renderAmFrame(idleAmmit, true, vi ? 'AMMIT: KẺ NUỐT TRÁI TIM' : 'AMMIT: DEVOURER OF HEARTS');
+                renderAmFrame(idleAmmit, true, zh ? '阿米特：吞心者' : vi ? 'AMMIT: KẺ NUỐT TRÁI TIM' : 'AMMIT: DEVOURER OF HEARTS');
               }
             }
             tickAm();

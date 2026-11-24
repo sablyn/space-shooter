@@ -17,3 +17,8 @@ SIGIL_I18N_VI.aquarius = { name: 'Bảo Bình', element: 'Phong', buffs: {
         set_day_chuyen: { name: 'Liên Hoàn Lôi', desc: 'Sát thương Tesla có thể lan sang kẻ địch gần đó, Skill G nạp nhanh hơn 35%. Cầu hết hạn chưa ghép cho thêm sát thương cộng dồn và thêm cầu Skill A.' },
         dien_tu_truong: { name: 'Điện Từ Trường', desc: 'Khi Skill G kích hoạt hoặc nạp đầy, kẻ địch trong 300px bị chậm 30% và chịu 65% ATK sát thương mỗi giây.' },
 }};
+
+SIGIL_I18N_ZH.aquarius = { name: '水瓶座', element: '风', buffs: {
+        set_day_chuyen: { name: '连锁闪电', desc: '特斯拉持续伤害可传导至附近敌人，技能G充能速度+35%。过期未配对的法球可叠加友军伤害，并额外提供技能A法球。' },
+        dien_tu_truong: { name: '磁场', desc: '技能G激活或充满时，300px内的敌人减速30%，每秒受到65% ATK伤害。' },
+}};

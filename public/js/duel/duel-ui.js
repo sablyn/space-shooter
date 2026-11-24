@@ -193,6 +193,7 @@
             'duel.spellCard.survival': 'Survival',
             'duel.spellCard.defeated': 'Defeated',
             'duel.spellCard.bonus': 'Bonus',
+            'duel.spellCard.label': 'SPELL',
 
             'duel.hud.boss': 'The Slumbering Elder',
             'duel.hud.attack': 'Attack',
@@ -349,6 +350,7 @@
             'duel.spellCard.survival': 'Sống Sót',
             'duel.spellCard.defeated': 'Đã Hạ',
             'duel.spellCard.bonus': 'Thưởng',
+            'duel.spellCard.label': 'SPELL',
 
             'duel.hud.boss': 'Thâm Miên Cổ Thần',
             'duel.hud.attack': 'Chiêu',
@@ -418,19 +420,171 @@
             'duel.result.status.cleared': 'Đã Hạ',
             'duel.result.status.survived': 'Hết Giờ',
             'duel.result.status.unreached': 'Chưa Tới'
+        },
+        zh: {
+            'duel.opponentSelect.title': '选择对手',
+            'duel.opponentSelect.subtitle': '与宇宙实体展开巅峰决战。',
+            'duel.opponentSelect.diff': '难度',
+            'duel.opponentSelect.standard': '标准',
+            'duel.opponentSelect.hard': '困难',
+            'duel.opponentSelect.continue': '出战',
+            'duel.opponentSelect.back': '返回',
+            'duel.opponentSelect.practice': '练习',
+            "duel.opponent.egregor.card.classification": '灾厄级。信息生命体。',
+            "duel.opponent.egregor.card.size": '体型',
+            "duel.opponent.egregor.card.traits": '特性',
+            "duel.opponent.egregor.card.evolution": '进化',
+            "duel.opponent.egregor.card.record": '记录',
+            "duel.opponent.egregor.card.height": '高度：640 米（穹顶）',
+            "duel.opponent.egregor.card.span": '触手跨度：2.8 公里',
+            "duel.opponent.egregor.card.mass": '质量：约 470 万吨凝聚意念',
+            "duel.opponent.egregor.card.minds": '心智：10 个，同一意志',
+            "duel.opponent.egregor.card.trait1": '集体心智：十心如一',
+            "duel.opponent.egregor.card.trait2": '心灵风暴：在你脚下撕裂空间',
+            "duel.opponent.egregor.card.trait3": '次元裂缝：可开启于任何位置的传送门',
+            "duel.opponent.egregor.card.trait4": '三重进化：战斗中两次变换形态',
+            "duel.opponent.egregor.card.weak": '弱点：攻破招式即可暴露',
+            'duel.opponent.egregor.name': '埃格雷戈·统御心智',
+            'duel.opponent.egregor.title': '十心集体实体',
+            'duel.opponent.egregor.theme': '主题：心灵风暴与次元裂缝',
+            'duel.opponent.locked.title': '机密实体',
+            'duel.opponent.locked.desc': '本区域未探测到信号。',
+            'duel.opponent.locked.tag': '即将推出',
+            'duel.weaponSelect.title': '神圣遗物',
+            'duel.weaponSelect.subtitle': '为远航选择你的天界武装。',
+            'duel.weaponSelect.confirm': '出战',
+            'duel.weaponSelect.back': '返回',
+            'duel.stat.width': '覆盖',
+            'duel.stat.precision': '精准',
+            'duel.stat.burst': '爆发',
+            'duel.weapon.sword.name': '天穹之刃',
+            'duel.weapon.sword.desc': '五路扇形新月利刃，覆盖可靠，利于擦弹。',
+            'duel.weapon.sword.role': '战术定位：均衡覆盖，推荐首次通关使用。',
+            'duel.weapon.spear.name': '虚空穿刺者',
+            'duel.weapon.spear.desc': '双发高速直刺，极致集中的单体穿透。',
+            'duel.weapon.spear.role': '战术定位：集中精准，适合激进打法。',
+            'duel.weapon.halberd.name': '蚀月利刃',
+            'duel.weapon.halberd.desc': '三柄横扫镰刃，弹幕密集时强力清场。',
+            'duel.weapon.halberd.role': '战术定位：横扫劈砍，弹幕密集时掌控空间。',
+            'duel.weapon.dagger_array.name': '幻影刃阵',
+            'duel.weapon.dagger_array.desc': '四刃平行排布，形成宽幅屏障，边界处安全输出。',
+            'duel.weapon.dagger_array.role': '战术定位：平行弹流，贴墙闪避时依然稳定输出。',
+            'duel.weapon.heavy_lance.name': '泰坦巨枪',
+            'duel.weapon.heavy_lance.desc': '七次穿刺动能突进，随后是一记毁灭性的重型冲击枪。',
+            'duel.weapon.heavy_lance.role': '战术定位：重型动能爆发，节奏性毁灭打击。',
+            'duel.opening.range': '射程',
+            'duel.opening.mass': '质量',
+            'duel.fx.system': '飞行系统已上线',
+            'duel.fx.shield': '护盾已同步',
+            'duel.fx.armament': '武装已链接',
+            'duel.fx.range': '射程',
+            'duel.fx.mass': '质量',
+            'duel.fx.sequence': '招式',
+            'duel.fx.reforming': '下一招式正在成形',
+            'duel.fx.final': '最终汇聚',
+            'duel.fx.evolved': '护盾已恢复。检测到新形态',
+            'duel.opening.calamity': '灾厄级',
+            'duel.opening.engage': '开战',
+            'duel.opening.warning': '警告',
+            'duel.opening.warningSub': '未知地外实体正在接近',
+            'duel.opening.title': '沉眠古神',
+            'duel.opening.titleSub': '第一阶段',
+            'duel.opening.slowed': '减速中',
+            'duel.phase.1': '第一阶段：沉眠古神',
+            'duel.phase.2': '第二阶段：十念降世',
+            'duel.phase.3': '第三阶段：终末虚言',
+            'duel.phase.1.title': '沉眠古神',
+            'duel.phase.2.title': '十念降世',
+            'duel.phase.3.title': '终末虚言',
+            'duel.spellCard.survival': '存活',
+            'duel.spellCard.defeated': '已击败',
+            'duel.spellCard.bonus': '奖励',
+            'duel.spellCard.label': '符卡',
+            'duel.hud.boss': '沉眠古神',
+            'duel.hud.attack': '招式',
+            'duel.hud.time': '时间',
+            'duel.hud.shiftReady': '领域：就绪',
+            'duel.hud.shiftCooling': '领域冷却',
+            'duel.audio.ambience': '决战氛围音',
+            'duel.hud.shield': '护盾',
+            'duel.hud.shieldAbsorbed': '护盾吸收',
+            'duel.hud.skillF': '横扫 [F]',
+            'duel.hud.lives': '生命',
+            'duel.report.tag.warning': '警告',
+            'duel.report.tag.critical': '严重警告',
+            'duel.report.tag.report': '报告',
+            'duel.report.tag.failure': '严重故障',
+            'duel.report.phase2': '检测到该实体聚变结构发生重大变化，能量输出正在上升。',
+            'duel.report.phase3': '聚变结构正在坍缩为新形态，输出已超出所有可测数值。准备承受冲击。',
+            'duel.report.setclear': '招式已解析，对策已确认。',
+            'duel.report.lowhp5': '屏障完整性告急，舰体出现故障。',
+            'duel.report.lowhp3': '核心系统已失效，舰体即将崩溃。',
+            'duel.report.failed': '舰体完整性丧失，任务失败。',
+            'duel.tip.shift': '按住 SHIFT 减缓时间。按住时点按左或右方向键可横向闪现。',
+            'duel.tip.f': '按 F 蓄力横扫，清除扫过的所有子弹，7 秒后可再次使用。',
+            'duel.skill.thoughtSphere': '念力之球',
+            'duel.attack.1': '触手探查',
+            'duel.attack.2': '锁定意念',
+            'duel.attack.3': '眼线',
+            'duel.attack.4': '次元涟漪',
+            'duel.attack.5': '低语之雨',
+            'duel.attack.6': '镜心',
+            'duel.attack.7': '十声同鸣',
+            'duel.attack.8': '集体心智',
+            'duel.attack.9': '虚无前奏',
+            'duel.attack.10': '虚无斩击',
+            'duel.attack.11': '心灵链接脉冲',
+            'duel.attack.12': '福祸相依',
+            'duel.attack.13': '次元破裂',
+            'duel.attack.14': '统御心智合唱',
+            'duel.attack.15': '心灵风暴漩涡',
+            'duel.attack.16': '十念回响',
+            'duel.attack.17': '集体之怒',
+            'duel.attack.18': '十心一言',
+            'duel.practice.title': '符卡练习',
+            'duel.practice.subtitle': '选择一招单独练习，逐一掌握。',
+            'duel.practice.close': '关闭',
+            'duel.practice.phase1': '第一阶段：觉醒（招式 1 至 6）',
+            'duel.practice.phase2': '第二阶段：多重心智（招式 7 至 13）',
+            'duel.practice.phase3': '第三阶段：一言（招式 14 至 18）',
+            'duel.practice.cleared': '练习通过',
+            'duel.practice.failed': '练习失败',
+            'duel.practice.retry': '重试',
+            'duel.practice.pickAnother': '选择其他招式',
+            'duel.result.victory': '远航征服',
+            'duel.result.defeat': '远航败北',
+            'duel.result.defeatedAt': '败于',
+            'duel.result.time': '用时',
+            'duel.result.damage': '造成伤害',
+            'duel.result.graze': '擦弹次数',
+            'duel.result.shifts': '领域使用次数',
+            'duel.result.attacksCleared': '已攻克招式',
+            'duel.result.shieldAbsorptions': '护盾抵挡次数',
+            'duel.result.rank': '决战评级',
+            'duel.result.playAgain': '再战一次',
+            'duel.result.mainMenu': '主菜单',
+            'duel.result.status.cleared': '已攻克',
+            'duel.result.status.survived': '已存活',
+            'duel.result.status.unreached': '未到达'
         }
     };
 
     Object.assign(I18N_STRINGS.en, {"duel.tip.a":"Press A to unleash the skill of your sacred relic.","duel.relic.category":"SACRED RELIC","duel.relic.sword.name":"Moonwheel Aegis","duel.relic.sword.desc":"Three crescents ward the ship, then strike the boss twice each.","duel.relic.sword.label":"Moonwheel","duel.relic.spear.name":"Void Lance","duel.relic.spear.desc":"Charge, then pierce a column with six hits.","duel.relic.spear.label":"Void Lance","duel.relic.halberd.name":"Eclipse Reave","duel.relic.halberd.desc":"Five sweeping strikes across the forward arc.","duel.relic.halberd.label":"Eclipse","duel.relic.dagger_array.name":"Phantom Blades","duel.relic.dagger_array.desc":"Two phantoms fire at 40% power for 5 seconds.","duel.relic.dagger_array.label":"Phantoms","duel.relic.heavy_lance.name":"Titan Breaker","duel.relic.heavy_lance.desc":"Heavy lance, impact wave, early heavy shot.","duel.relic.heavy_lance.label":"Titan Break"});
     Object.assign(I18N_STRINGS.vi, {"duel.tip.a":"Bấm A để kích hoạt kỹ năng của thánh di vật.","duel.relic.category":"THÁNH DI VẬT","duel.relic.sword.name":"Nguyệt Luân Hộ Thân","duel.relic.sword.desc":"Ba lưỡi trăng hộ thân rồi lao tới chém Egregor hai lượt.","duel.relic.sword.label":"Nguyệt Luân","duel.relic.spear.name":"Xuyên Hư Thương","duel.relic.spear.desc":"Nạp rồi xuyên một cột với sáu hit.","duel.relic.spear.label":"Xuyên Hư","duel.relic.halberd.name":"Nhật Thực Trảm","duel.relic.halberd.desc":"Năm nhát quét vùng phía trước tàu.","duel.relic.halberd.label":"Nhật Thực","duel.relic.dagger_array.name":"Ảnh Phi Đao","duel.relic.dagger_array.desc":"Hai bóng bắn với 40% sức mạnh trong 5 giây.","duel.relic.dagger_array.label":"Ảnh Đao","duel.relic.heavy_lance.name":"Cự Thần Phá","duel.relic.heavy_lance.desc":"Thương nặng, sóng chấn, sớm có viên nặng.","duel.relic.heavy_lance.label":"Cự Thần Phá"});
+    Object.assign(I18N_STRINGS.zh, {"duel.tip.a":"按 A 释放圣遗物的技能。","duel.relic.category":"圣遗物","duel.relic.sword.name":"月轮圣盾","duel.relic.sword.desc":"三轮新月守护舰船，随后各两次重击首领。","duel.relic.sword.label":"月轮","duel.relic.spear.name":"虚空之枪","duel.relic.spear.desc":"蓄力后以六次打击贯穿一列。","duel.relic.spear.label":"虚空之枪","duel.relic.halberd.name":"蚀月斩","duel.relic.halberd.desc":"向前方弧线挥出五次横扫。","duel.relic.halberd.label":"蚀月","duel.relic.dagger_array.name":"幻影利刃","duel.relic.dagger_array.desc":"两道幻影以 40% 威力开火，持续 5 秒。","duel.relic.dagger_array.label":"幻影","duel.relic.heavy_lance.name":"泰坦碎击","duel.relic.heavy_lance.desc":"重枪、冲击波、提前释放的重击。","duel.relic.heavy_lance.label":"泰坦碎击"});
 
     function t(key) {
         if (!key) return '';
+        const lang = (typeof window !== 'undefined' && window._lang === 'zh') ? 'zh' : ((typeof window !== 'undefined' && window._lang === 'vi') ? 'vi' : 'en');
+        if (lang === 'zh') {
+            const dict = I18N_STRINGS.zh || {};
+            if (key in dict) return dict[key];
+            return I18N_STRINGS.en[key] || key;
+        }
         if (typeof window !== 'undefined' && typeof window._t === 'function') {
             const res = window._t(key);
             if (res && res !== key) return res;
         }
-        const lang = (typeof window !== 'undefined' && window._lang === 'vi') ? 'vi' : 'en';
         const dict = I18N_STRINGS[lang] || I18N_STRINGS.en;
         return dict[key] || I18N_STRINGS.en[key] || key;
     }
@@ -966,8 +1120,9 @@
             const key = ctx.font + ':' + maxWidth + ':' + text;
             if (this._cardTextCache.has(key)) return this._cardTextCache.get(key);
             const lines = []; let line = '';
-            for (const word of String(text).split(' ')) {
-                const next = line ? line + ' ' + word : word;
+            for (const word of (window._splitWrapWords ? window._splitWrapWords(text) : String(text).split(' '))) {
+                if (!line && /^\s+$/.test(word)) continue;
+                const next = line + word;
                 if (line && ctx.measureText(next).width > maxWidth) { lines.push(line); line = word; }
                 else line = next;
             }
@@ -1181,7 +1336,7 @@
                     // Spell index: Segoe UI uppercase with letter spacing
                     ctx.font = Theme.getBodyFont(10, 700);
                     ctx.fillStyle = isHovered ? T.electric : T.silverDim;
-                    ctx.fillText('SPELL ' + attId, colX + 10, itemY + 6);
+                    ctx.fillText(t('duel.spellCard.label') + ' ' + attId, colX + 10, itemY + 6);
 
                     // Spell name: Segoe UI
                     ctx.font = Theme.getBodyFont(12, 600);
@@ -1198,15 +1353,17 @@
 
         _renderWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
             if (!text) return;
-            const words = text.split(' ');
+            const words = window._splitWrapWords ? window._splitWrapWords(text) : text.split(' ');
             let line = '';
             let curY = y;
             for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
+                if (!line && /^\s+$/.test(words[n])) continue;
+                if (!line && /^\s+$/.test(words[n])) continue;
+                const testLine = line + words[n];
                 const metrics = ctx.measureText(testLine);
                 if (metrics.width > maxWidth && n > 0) {
                     ctx.fillText(line.trim(), x, curY);
-                    line = words[n] + ' ';
+                    line = words[n];
                     curY += lineHeight;
                 } else {
                     line = testLine;
@@ -1817,15 +1974,15 @@
 
         _renderWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
             if (!text) return;
-            const words = text.split(' ');
+            const words = window._splitWrapWords ? window._splitWrapWords(text) : text.split(' ');
             let line = '';
             let curY = y;
             for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
+                const testLine = line + words[n];
                 const metrics = ctx.measureText(testLine);
                 if (metrics.width > maxWidth && n > 0) {
                     ctx.fillText(line.trim(), x, curY);
-                    line = words[n] + ' ';
+                    line = words[n];
                     curY += lineHeight;
                 } else {
                     line = testLine;
@@ -2022,11 +2179,12 @@
             ctx.textAlign = 'left';
             ctx.font = Theme.getBodyFont(12.5, 400);
             ctx.fillStyle = '#e6d3a1';
-            const maxW = w - capW - 40, words = tips[i].text.split(' ');
+            const maxW = w - capW - 40, words = window._splitWrapWords ? window._splitWrapWords(tips[i].text) : tips[i].text.split(' ');
             const lines = [];
             let line = '';
             for (const word of words) {
-                const next = line ? line + ' ' + word : word;
+                if (!line && /^\s+$/.test(word)) continue;
+                const next = line + word;
                 if (line && ctx.measureText(next).width > maxW) { lines.push(line); line = word; } else line = next;
             }
             if (line) lines.push(line);
@@ -2117,7 +2275,7 @@
         ctx.font = 'bold 11px Arial';
         ctx.fillStyle = hudShieldActive ? '#e8c46a' : '#d9825b';
         const shieldCd = state.playerShieldCooldownRemaining || 0;
-        const shieldText = hudShieldActive ? (window._lang === 'vi' ? 'KHIÊN SẴN SÀNG' : 'SHIELD READY') : ((window._lang === 'vi' ? 'HỒI KHIÊN ' : 'SHIELD ') + Math.ceil(shieldCd) + 's');
+        const shieldText = hudShieldActive ? window._L3('SHIELD READY', 'KHIÊN SẴN SÀNG', '护盾就绪') : (window._L3('SHIELD ', 'HỒI KHIÊN ', '护盾恢复 ') + Math.ceil(shieldCd) + 's');
         ctx.fillText(shieldText, _hX + _hW - _hPad, _ry + 12);
 
         // 5. Bottom left corner HUD: Shift domain, Player Shield, Skill F
@@ -2223,7 +2381,7 @@
             const attNum = stats.currentAttackId || 1;
             ctx.font = Theme.getBodyFont(14, 700);
             ctx.fillStyle = T.electric;
-            ctx.fillText(('SPELL ' + attNum + ': ' + t('duel.attack.' + attNum)).toUpperCase(), width * 0.5, height * 0.19);
+            ctx.fillText((t('duel.spellCard.label') + ' ' + attNum + ': ' + t('duel.attack.' + attNum)).toUpperCase(), width * 0.5, height * 0.19);
 
             const panelW = Math.min(480, width * 0.78);
             const panelH = 210;

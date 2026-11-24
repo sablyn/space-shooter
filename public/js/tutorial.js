@@ -30,47 +30,47 @@
     const SKIP_AFTER = 75000;
     const TOAST_MS = 7000;
 
-    // [english, vietnamese]
+    // [english, vietnamese, chinese]
     const TXT = {
-        intro1: ['I am Kanade. This is a calibration run for your ship.', 'Tôi là Kanade. Đây là lượt hiệu chuẩn cho con tàu của bạn.'],
-        intro2: ['Nothing here can truly harm you. Watch first, then act.', 'Ở đây không gì có thể gây hại thật cho bạn. Hãy quan sát trước, rồi hành động.'],
-        sigils: ['Choose one Sigil. Read its blessings before confirming.', 'Chọn một Sigil. Đọc phước lành của nó trước khi xác nhận.'],
-        move: ['Move with the left and right arrow keys.', 'Di chuyển bằng phím mũi tên trái và phải.'],
-        moveM: ['Drag the joystick to move your ship.', 'Kéo cần điều khiển để di chuyển con tàu.'],
-        moveDone: ['Good. Your ship also fires on its own, without pause.', 'Tốt. Con tàu còn tự động bắn liên tục, không ngừng.'],
-        charge: ['Hold SPACE to charge a shot. Release to fire it.', 'Giữ SPACE để Bắn Sạc. Thả ra để bắn.'],
-        chargeM: ['Hold the CHARGE button to charge a shot. Release to fire it.', 'Giữ nút CHARGE để Bắn Sạc. Thả ra để bắn.'],
-        chargeMore: ['Hold it for three seconds and it becomes the Overload Laser.', 'Giữ trong ba giây, nó trở thành Laser Quá Tải.'],
-        skills: ['Now your skills. Each one has its own cooldown.', 'Giờ là các kỹ năng. Mỗi kỹ năng có thời gian hồi chiêu riêng.'],
-        skillA: ['A: Thunder Orbs. Energy orbs that hunt enemies on their own.', 'A: Cầu Sấm Sét. Những cầu năng lượng tự tìm kẻ địch.'],
-        skillS: ['S: Remembrance Spirit. It summons an ally that fights beside you.', 'S: Tinh Linh Hoài Niệm. Triệu hồi một đồng minh chiến đấu cùng bạn.'],
-        skillD: ['D: Death Star. It pulls enemies in and destroys what it touches.', 'D: Tử Long Tinh. Hút kẻ địch vào và tiêu diệt thứ nó chạm tới.'],
-        skillF: ['F: Annihilation Sweep. A beam that crosses the whole screen.', 'F: Càn Quét Hủy Diệt. Một chùm tia quét qua toàn màn hình.'],
-        skillG: ['G: Tesla Matrix. A field of lightning that guards your ship.', 'G: Ma Trận Tesla. Một trường sét bảo vệ con tàu.'],
-        monsters: ['Hostiles detected. Destroy them. Use every skill you have.', 'Phát hiện kẻ địch. Hãy tiêu diệt chúng. Dùng mọi kỹ năng bạn có.'],
-        afterMonsters: ['Acceptable. Now the part that decides survival: avoiding attacks.', 'Đạt yêu cầu. Giờ là phần quyết định sự sống còn: né đòn.'],
-        dodgeIntro: ['A red zone marks where an attack will land. Leave it before it fires.', 'Vùng đỏ đánh dấu nơi đòn tấn công sẽ giáng xuống. Hãy rời khỏi đó trước khi nó phát động.'],
-        patBullets: ['First, shots aimed at you. Step aside.', 'Trước hết là đạn nhắm vào bạn. Hãy tránh sang bên.'],
-        patStrip: ['A beam follows its red lane. Get out of the lane.', 'Một tia sáng chạy dọc làn đỏ. Hãy rời khỏi làn đó.'],
-        patCircle: ['A burst lands on a red circle. Move out of it.', 'Một vụ nổ rơi xuống vòng tròn đỏ. Hãy rời khỏi vòng.'],
-        patSector: ['A sweep covers a wide fan. Go behind it or past its edge.', 'Một đòn quét phủ cả một cung rộng. Hãy vòng ra sau nó hoặc vượt qua rìa cung.'],
-        patShift: ['Some attacks cannot be outrun. Hold SHIFT to enter the Yog Sothoth Domain.', 'Có những đòn không thể chạy thoát. Giữ SHIFT để vào Lãnh Địa Yog-Sothoth.'],
-        patShiftM: ['Some attacks cannot be outrun. Hold the Yog Sothoth button to enter its Domain.', 'Có những đòn không thể chạy thoát. Giữ nút Yog-Sothoth để vào Lãnh Địa của nó.'],
-        good: ['Well dodged.', 'Né tốt.'],
-        again: ['You were hit. Again.', 'Bạn bị trúng. Làm lại.'],
-        hintBullets: ['Move after the circles aim. Keep moving.', 'Di chuyển sau khi pháp trận ngắm. Đừng dừng lại.'],
-        hintStrip: ['Leave the lane. Its light still burns.', 'Ra khỏi làn. Ánh sáng của nó vẫn thiêu đốt.'],
-        hintCircle: ['Watch the centre. Cross the rim before impact.', 'Nhìn vào tâm vòng. Vượt qua rìa trước khi nổ.'],
-        hintSector: ['The bright edge advances. Leave the fan.', 'Mép sáng đang tiến tới. Ra khỏi cung.'],
-        hintShift: ['Hold the Domain through the blast. Timing matters.', 'Giữ Lãnh Địa qua lúc nổ. Canh đúng thời điểm.'],
-        hintWait: ['Take your time. I am waiting.', 'Cứ thong thả. Tôi đang chờ.'],
-        outro1: ['Calibration complete. I will not repeat myself.', 'Hiệu chuẩn hoàn tất. Tôi sẽ không lặp lại.'],
-        outro2: ['The Endless Voyage is waiting. Do not disappoint the system.', 'Hành Trình Vô Tận đang chờ. Đừng làm hệ thống thất vọng.'],
-        capHud: ['The skill panel: a skill pulses when it is ready.', 'Bảng kỹ năng: kỹ năng nhấp nháy khi đã sẵn sàng.'],
-        capStrip: ['Red lane: a beam is about to cross it.', 'Làn đỏ: một tia sắp quét qua.'],
-        capCircle: ['Red circle: a burst is about to land.', 'Vòng đỏ: một vụ nổ sắp rơi xuống.'],
-        capSector: ['Red fan: a sweep is about to cover it.', 'Cung đỏ: một đòn quét sắp phủ qua.'],
-        capYog: ['The Domain stops every attack while you hold it.', 'Lãnh Địa chặn mọi đòn tấn công khi bạn còn giữ nó.']
+        intro1: ['I am Kanade. This is a calibration run for your ship.', 'Tôi là Kanade. Đây là lượt hiệu chuẩn cho con tàu của bạn.', '我是 Kanade。 这是你飞船的校准演练。'],
+        intro2: ['Nothing here can truly harm you. Watch first, then act.', 'Ở đây không gì có thể gây hại thật cho bạn. Hãy quan sát trước, rồi hành động.', '这里没有任何东西能真正伤到你。 先看，再行动。'],
+        sigils: ['Choose one Sigil. Read its blessings before confirming.', 'Chọn một Sigil. Đọc phước lành của nó trước khi xác nhận.', '选择一枚印记。 确认前先读清它的祝福。'],
+        move: ['Move with the left and right arrow keys.', 'Di chuyển bằng phím mũi tên trái và phải.', '用左右方向键移动飞船。'],
+        moveM: ['Drag the joystick to move your ship.', 'Kéo cần điều khiển để di chuyển con tàu.', '拖动摇杆移动飞船。'],
+        moveDone: ['Good. Your ship also fires on its own, without pause.', 'Tốt. Con tàu còn tự động bắn liên tục, không ngừng.', '很好。 你的飞船还会自己不停开火。'],
+        charge: ['Hold SPACE to charge a shot. Release to fire it.', 'Giữ SPACE để Bắn Sạc. Thả ra để bắn.', '按住空格键蓄力射击， 松开即可开火。'],
+        chargeM: ['Hold the CHARGE button to charge a shot. Release to fire it.', 'Giữ nút CHARGE để Bắn Sạc. Thả ra để bắn.', '按住 CHARGE 按钮蓄力射击， 松开即可开火。'],
+        chargeMore: ['Hold it for three seconds and it becomes the Overload Laser.', 'Giữ trong ba giây, nó trở thành Laser Quá Tải.', '蓄力三秒， 就会变成超载激光。'],
+        skills: ['Now your skills. Each one has its own cooldown.', 'Giờ là các kỹ năng. Mỗi kỹ năng có thời gian hồi chiêu riêng.', '现在是技能。 每个技能都有自己的冷却时间。'],
+        skillA: ['A: Thunder Orbs. Energy orbs that hunt enemies on their own.', 'A: Cầu Sấm Sét. Những cầu năng lượng tự tìm kẻ địch.', 'A：雷霆宝珠。 会自动追踪敌人的能量宝珠。'],
+        skillS: ['S: Remembrance Spirit. It summons an ally that fights beside you.', 'S: Tinh Linh Hoài Niệm. Triệu hồi một đồng minh chiến đấu cùng bạn.', 'S：追忆之灵。 召唤一位与你并肩作战的盟友。'],
+        skillD: ['D: Death Star. It pulls enemies in and destroys what it touches.', 'D: Tử Long Tinh. Hút kẻ địch vào và tiêu diệt thứ nó chạm tới.', 'D：死星。 把敌人吸进来， 触碰到的东西都会被摧毁。'],
+        skillF: ['F: Annihilation Sweep. A beam that crosses the whole screen.', 'F: Càn Quét Hủy Diệt. Một chùm tia quét qua toàn màn hình.', 'F：湮灭横扫。 一道横贯整个屏幕的光束。'],
+        skillG: ['G: Tesla Matrix. A field of lightning that guards your ship.', 'G: Ma Trận Tesla. Một trường sét bảo vệ con tàu.', 'G：特斯拉矩阵。 守护飞船的闪电场。'],
+        monsters: ['Hostiles detected. Destroy them. Use every skill you have.', 'Phát hiện kẻ địch. Hãy tiêu diệt chúng. Dùng mọi kỹ năng bạn có.', '发现敌对目标。 消灭它们， 用上你所有的技能。'],
+        afterMonsters: ['Acceptable. Now the part that decides survival: avoiding attacks.', 'Đạt yêu cầu. Giờ là phần quyết định sự sống còn: né đòn.', '还算合格。 接下来是决定生死的部分： 躲避攻击。'],
+        dodgeIntro: ['A red zone marks where an attack will land. Leave it before it fires.', 'Vùng đỏ đánh dấu nơi đòn tấn công sẽ giáng xuống. Hãy rời khỏi đó trước khi nó phát động.', '红色区域标示攻击落点。 在它发动之前离开那里。'],
+        patBullets: ['First, shots aimed at you. Step aside.', 'Trước hết là đạn nhắm vào bạn. Hãy tránh sang bên.', '首先是瞄准你的子弹。 闪开。'],
+        patStrip: ['A beam follows its red lane. Get out of the lane.', 'Một tia sáng chạy dọc làn đỏ. Hãy rời khỏi làn đó.', '光束沿着红色通道追踪。 离开这条通道。'],
+        patCircle: ['A burst lands on a red circle. Move out of it.', 'Một vụ nổ rơi xuống vòng tròn đỏ. Hãy rời khỏi vòng.', '爆炸会落在红色圆圈里。 移出圆圈。'],
+        patSector: ['A sweep covers a wide fan. Go behind it or past its edge.', 'Một đòn quét phủ cả một cung rộng. Hãy vòng ra sau nó hoặc vượt qua rìa cung.', '横扫覆盖一大片扇形区域。 绕到它身后， 或越过它的边缘。'],
+        patShift: ['Some attacks cannot be outrun. Hold SHIFT to enter the Yog Sothoth Domain.', 'Có những đòn không thể chạy thoát. Giữ SHIFT để vào Lãnh Địa Yog-Sothoth.', '有些攻击是躲不开的。 按住 SHIFT 进入犹格-索托斯领域。'],
+        patShiftM: ['Some attacks cannot be outrun. Hold the Yog Sothoth button to enter its Domain.', 'Có những đòn không thể chạy thoát. Giữ nút Yog-Sothoth để vào Lãnh Địa của nó.', '有些攻击是躲不开的。 按住犹格-索托斯按钮进入它的领域。'],
+        good: ['Well dodged.', 'Né tốt.', '躲得漂亮。'],
+        again: ['You were hit. Again.', 'Bạn bị trúng. Làm lại.', '你被击中了。 再来一次。'],
+        hintBullets: ['Move after the circles aim. Keep moving.', 'Di chuyển sau khi pháp trận ngắm. Đừng dừng lại.', '等法阵瞄准后再移动， 别停下。'],
+        hintStrip: ['Leave the lane. Its light still burns.', 'Ra khỏi làn. Ánh sáng của nó vẫn thiêu đốt.', '离开通道， 它的光还在灼烧。'],
+        hintCircle: ['Watch the centre. Cross the rim before impact.', 'Nhìn vào tâm vòng. Vượt qua rìa trước khi nổ.', '盯住圆心， 在爆炸前越过圆环边缘。'],
+        hintSector: ['The bright edge advances. Leave the fan.', 'Mép sáng đang tiến tới. Ra khỏi cung.', '明亮的边缘正在推进， 离开扇形区域。'],
+        hintShift: ['Hold the Domain through the blast. Timing matters.', 'Giữ Lãnh Địa qua lúc nổ. Canh đúng thời điểm.', '在爆炸期间一直维持领域， 时机很关键。'],
+        hintWait: ['Take your time. I am waiting.', 'Cứ thong thả. Tôi đang chờ.', '慢慢来， 我等着你。'],
+        outro1: ['Calibration complete. I will not repeat myself.', 'Hiệu chuẩn hoàn tất. Tôi sẽ không lặp lại.', '校准完成。 我不会再重复一遍。'],
+        outro2: ['The Endless Voyage is waiting. Do not disappoint the system.', 'Hành Trình Vô Tận đang chờ. Đừng làm hệ thống thất vọng.', '无尽远航正在等你。 别让系统失望。'],
+        capHud: ['The skill panel: a skill pulses when it is ready.', 'Bảng kỹ năng: kỹ năng nhấp nháy khi đã sẵn sàng.', '技能面板： 技能就绪时会闪烁。'],
+        capStrip: ['Red lane: a beam is about to cross it.', 'Làn đỏ: một tia sắp quét qua.', '红色通道： 光束即将横扫而过。'],
+        capCircle: ['Red circle: a burst is about to land.', 'Vòng đỏ: một vụ nổ sắp rơi xuống.', '红色圆圈： 爆炸即将落下。'],
+        capSector: ['Red fan: a sweep is about to cover it.', 'Cung đỏ: một đòn quét sắp phủ qua.', '红色扇形： 横扫即将覆盖这里。'],
+        capYog: ['The Domain stops every attack while you hold it.', 'Lãnh Địa chặn mọi đòn tấn công khi bạn còn giữ nó.', '只要你按住， 领域就能挡下所有攻击。']
     };
     const TOASTS = {
         hud: { img: 'assets/images/game/tutorial/tut-hud.png', cap: 'capHud' },
@@ -83,7 +83,7 @@
     const mobile = () => window._platform === 'mobile';
     const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
     const ease = (v) => (v < 0.5 ? 2 * v * v : 1 - Math.pow(-2 * v + 2, 2) / 2);
-    const lang = () => (window._lang === 'vi' ? 1 : 0);
+    const lang = () => (window._lang === 'zh' ? 2 : window._lang === 'vi' ? 1 : 0);
     const tx = (k) => (TXT[k] ? TXT[k][lang()] : k);
     const stage = () => window._kanadeStage || null;
     const nowMs = () => (typeof _frozenNow === 'number' && _frozenNow > 0 ? _frozenNow : performance.now());
@@ -870,8 +870,8 @@
     }
     function wrapLines(text, maxW, font) {
         if (_lineCache.text === text && _lineCache.width === maxW && _lineCache.font === font) return _lineCache.lines;
-        ctx.font = font; const words = text.split(' '), lines = []; let cur = '';
-        for (let i = 0; i < words.length; i++) { const t = cur ? cur + ' ' + words[i] : words[i]; if (cur && ctx.measureText(t).width > maxW) { lines.push(cur); cur = words[i]; } else cur = t; }
+        ctx.font = font; const words = window._splitWrapWords ? window._splitWrapWords(text) : text.split(' '), lines = []; let cur = '';
+        for (let i = 0; i < words.length; i++) { if (!cur && /^\s+$/.test(words[i])) continue; const t = cur + words[i]; if (cur && ctx.measureText(t).width > maxW) { lines.push(cur); cur = words[i]; } else cur = t; }
         if (cur) lines.push(cur); _lineCache.text = text; _lineCache.width = maxW; _lineCache.font = font; _lineCache.lines = lines; _lineCache.segments = new Array(lines.length); _lineCache.typed = -1; return lines;
     }
     function cutPath(x, y, w, h, c) { ctx.beginPath(); ctx.moveTo(x + c, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + h - c); ctx.lineTo(x + w - c, y + h); ctx.lineTo(x, y + h); ctx.lineTo(x, y + c); ctx.closePath(); }

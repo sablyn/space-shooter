@@ -1336,11 +1336,13 @@
         const shown = full.slice(0, Math.min(full.length, Math.floor(age * 38)));
         const size = Math.max(13, Math.min(16, h * .021));
         ctx.save(); ctx.font = root.DuelTheme.getBodyFont(size, 600);
-        const words = shown.split(' '), lines = [];
+        const words = window._splitWrapWords ? window._splitWrapWords(shown) : shown.split(' '), lines = [];
         let line = '';
-        for (const word of words) { const next = line ? line + ' ' + word : word; if (line && ctx.measureText(next).width > width - pad * 2 - 6) { lines.push(line); line = word; } else line = next; }
+        for (const word of words) { if (!line && /^\s+$/.test(word)) continue; const next = line + word; if (line && ctx.measureText(next).width > width - pad * 2 - 6) { lines.push(line); line = word; } else line = next; }
         if (line) lines.push(line);
-        const fullLines = Math.max(1, Math.ceil(full.length * size * .52 / (width - pad * 2 - 6)));
+        // CJK glyphs are ~full-width, Latin ~0.52em: size the box for the real line count.
+        const _cjkN = (full.match(/[\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef]/g) || []).length;
+        const fullLines = Math.max(1, Math.ceil(((full.length - _cjkN) * size * .52 + _cjkN * size) / (width - pad * 2 - 6)));
         const height = pad * 2 + 22 + Math.max(lines.length, fullLines) * (size + 5);
         const flicker = opts.motion && age < .6 ? .55 + .45 * Math.abs(Math.sin(age * 38)) : 1;
         ctx.globalAlpha = alpha * flicker;

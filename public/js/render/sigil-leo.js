@@ -202,18 +202,17 @@ function _drawLeoFateReadyPrompt() {
     if (Number.isFinite(window._leoHudTop) && Math.abs(player.x - x) < 179) {
         y = Math.max(28, Math.min(y, window._leoHudTop - (sagePrompt ? 76 : 28)));
     }
-    const vi = window._lang === 'vi';
     _beginScreenHud(x, canvas.height / 2);
     ctx.save(); ctx.fillStyle = 'rgba(24,12,8,0.75)';
     _leoRoundRect(ctx, x - 124, y - 20, 248, 40, 8); ctx.fill();
     ctx.strokeStyle = '#ef9f27'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffd27a';
-    ctx.font = 'bold 13px "Courier New", monospace';
-    ctx.fillText(vi ? 'THẦN MỆNH SẴN SÀNG' : 'DIVINE FATE READY', x, y - 8);
-    ctx.font = '11px "Courier New", monospace';
+    ctx.font = window._lang === 'zh' ? 'bold 13px ' + window._FONT_ZH_UI : 'bold 13px "Courier New", monospace';
+    ctx.fillText(window._L3('DIVINE FATE READY', 'THẦN MỆNH SẴN SÀNG', '神命就绪'), x, y - 8);
+    ctx.font = window._lang === 'zh' ? '11px ' + window._FONT_ZH_UI : '11px "Courier New", monospace';
     // Phones have no Space key; the CHARGE button releases it there.
     const key = window._platform === 'mobile' ? 'CHARGE' : 'Space';
-    ctx.fillText(key + (vi ? ': hóa đá mọi kẻ địch' : ': petrify all enemies'), x, y + 10);
+    ctx.fillText(key + window._L3(': petrify all enemies', ': hóa đá mọi kẻ địch', '：石化所有敌人'), x, y + 10);
     ctx.restore();
     _endScreenHud();
 }

@@ -139,17 +139,25 @@
         })
     });
 
-    // Helper to get title font family: Cinzel for English, Playfair Display for Vietnamese
+    // Helper to get title font family: Cinzel for English, Playfair Display for Vietnamese, Noto Serif SC for Chinese
     function getTitleFont(size, weight = 700) {
         const isVi = typeof window !== 'undefined' && ((window._getLocale && window._getLocale() === 'vi') || window._lang === 'vi');
+        const isZh = typeof window !== 'undefined' && ((window._getLocale && window._getLocale() === 'zh') || window._lang === 'zh');
+        if (isZh) {
+            return weight + ' ' + size + 'px ' + (window._FONT_ZH_TITLE || "'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif");
+        }
         if (isVi) {
             return weight + ' ' + size + "px 'Playfair Display', Cambria, 'Times New Roman', serif";
         }
         return weight + ' ' + size + "px 'Cinzel', 'Playfair Display', Georgia, serif";
     }
 
-    // Helper to get body font family: Segoe UI with system fallbacks matching game --gm-font
+    // Helper to get body font family: Segoe UI with system fallbacks matching game --gm-font; Noto Sans SC stack for Chinese
     function getBodyFont(size, weight = 400) {
+        const isZh = typeof window !== 'undefined' && ((window._getLocale && window._getLocale() === 'zh') || window._lang === 'zh');
+        if (isZh) {
+            return weight + ' ' + size + 'px ' + (window._FONT_ZH_UI || "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif");
+        }
         return weight + ' ' + size + 'px "Segoe UI", system-ui, -apple-system, sans-serif';
     }
 
@@ -854,7 +862,8 @@
     }
 
     // Sleek non-darkening Phase Form Card shown at the end of evolution (boss remains bright and unobstructed)
-    function drawPhaseFormCard(ctx, w, h, phaseNum, phaseTitleVi, phaseTitleEn, progress) {
+    // phaseTitleZh is optional: callers that pass it get the Chinese title when the language is zh.
+    function drawPhaseFormCard(ctx, w, h, phaseNum, phaseTitleVi, phaseTitleEn, progress, phaseTitleZh) {
         ctx.save();
         const p = Math.max(0, Math.min(1, progress));
         let slideY = 0;
@@ -882,8 +891,9 @@
         drawFantasyPanel(ctx, cx, cy, cardW, cardH, 16, true, 4);
 
         const isVi = typeof window !== 'undefined' && ((window._getLocale && window._getLocale() === 'vi') || window._lang === 'vi');
-        const mainTitle = isVi ? (phaseTitleVi || '') : (phaseTitleEn || phaseTitleVi || '');
-        const phaseSub = isVi ? (isP3 ? 'GIAI ĐOẠN III' : 'GIAI ĐOẠN II') : (isP3 ? 'PHASE III' : 'PHASE II');
+        const isZh = typeof window !== 'undefined' && ((window._getLocale && window._getLocale() === 'zh') || window._lang === 'zh');
+        const mainTitle = isZh ? (phaseTitleZh || phaseTitleEn || phaseTitleVi || '') : isVi ? (phaseTitleVi || '') : (phaseTitleEn || phaseTitleVi || '');
+        const phaseSub = isZh ? (isP3 ? '第三阶段' : '第二阶段') : isVi ? (isP3 ? 'GIAI ĐOẠN III' : 'GIAI ĐOẠN II') : (isP3 ? 'PHASE III' : 'PHASE II');
 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
@@ -955,7 +965,7 @@
         }
 
         // Label below gauge
-        const text = labelText || 'SHIELD';
+        const text = labelText || ((typeof window !== 'undefined' && window._L3) ? window._L3('SHIELD', 'SHIELD', '护盾') : 'SHIELD');
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.font = getBodyFont(9, 700);
@@ -1028,7 +1038,7 @@
         }
 
         // Label below
-        const text = labelText || 'SWEEP [F]';
+        const text = labelText || ((typeof window !== 'undefined' && window._L3) ? window._L3('SWEEP [F]', 'SWEEP [F]', '横扫 [F]') : 'SWEEP [F]');
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.font = getBodyFont(9, 700);
@@ -1380,6 +1390,8 @@
             document.fonts.load('700 20px Cinzel').catch(function () {});
             document.fonts.load('700 20px "Playfair Display"').catch(function () {});
             document.fonts.load('400 14px "Segoe UI"').catch(function () {});
+            document.fonts.load('700 20px "Noto Serif SC"').catch(function () {});
+            document.fonts.load('400 14px "Noto Sans SC"').catch(function () {});
         }
     }
 

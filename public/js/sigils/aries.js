@@ -17,3 +17,8 @@ SIGIL_I18N_VI.aries = { name: 'Bạch Dương', element: 'Hỏa', buffs: {
         cong_babylon: { name: 'Cổng Babylon', desc: 'Đòn trúng của phe ta có thể mở cổng phóng 14 lưỡi kiếm xuyên hình quạt, mỗi kẻ địch trúng chịu 7.5% ATK sát thương chuẩn (hồi 1.5s).' },
         enuma_elish: { name: 'Enuma Elish', desc: 'Mỗi 30 đòn trúng, 1 bản thể ma ảnh phóng thương xuyên theo hướng kẻ địch mạnh nhất: mỗi kẻ trúng chịu 18 lần ATK + 5% Max HP sát thương chuẩn.' },
 }};
+
+SIGIL_I18N_ZH.aries = { name: '白羊座', element: '火', buffs: {
+        cong_babylon: { name: '巴比伦之门', desc: '友军命中可开启宝库之门，扇形发射14把穿透利刃，命中每个敌人造成7.5% ATK真实伤害（冷却1.5秒）。' },
+        enuma_elish: { name: 'Enuma Elish', desc: '每30次友军命中，幻影向最强敌人的方向掷出长枪：命中每个敌人造成18倍ATK + 5%最大生命值真实伤害。' },
+}};

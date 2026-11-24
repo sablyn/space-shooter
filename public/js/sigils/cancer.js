@@ -17,3 +17,8 @@ SIGIL_I18N_VI.cancer = { name: 'Cự Giải', element: 'Thủy', buffs: {
         giap_nguyet: { name: 'Nguyệt Giáp', desc: 'Gaia Protection chạy không cần Glory for Justice, Gaia Barrier hấp thụ thêm 30%, Vệ Binh +15% né. Cá voi sát thủ kết liễu mọi kẻ địch còn 8% HP trở xuống.' },
         trieu_hoi: { name: 'Triều Lưu', desc: 'Vệ Binh tự hồi máu, hồi máu tốt hơn 30%, có 1 lớp Iron Body và được gọi lại nếu chết hết. Đòn bị chặn nạp thanh triều; khi đầy, Space hoặc CHARGE tạo xoáy nước hút kẻ địch (Áp Chế) rồi nổ tung.' },
 }};
+
+SIGIL_I18N_ZH.cancer = { name: '巨蟹座', element: '水', buffs: {
+        giap_nguyet: { name: '月之庇护', desc: '盖亚庇护无需GFJ即可生效，盖亚屏障吸收量+30%，哨兵闪避+15%。虎鲸会处决生命值8%及以下的敌人。' },
+        trieu_hoi: { name: '潮汐涌流', desc: '哨兵持续回复生命，治疗效果+30%，获得一层铁躯，全部阵亡后可复活。格挡命中积攒潮汐值；积满后，按空格或蓄力可召唤漩涡，将敌人拖入（压制）并爆裂。' },
+}};

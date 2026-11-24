@@ -428,7 +428,7 @@ function drawSkillF() {
                 if (p > 0.6) {
                     ctx.fillStyle = `rgba(0,255,220,${Math.min((p - 0.6) * 5, 1) * (0.7 + 0.3 * pulse0)})`;
                     ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-                    ctx.fillText('TARGET', enemy.x, enemy.y - er - 6);
+                    ctx.fillText(window._L3('TARGET', 'TARGET', '目标'), enemy.x, enemy.y - er - 6);
                 }
                 ctx.restore();
                 return;
@@ -542,7 +542,7 @@ function drawSkillF() {
                 const labelA = Math.min((settle - 0.7) / 0.3, 1);
                 ctx.fillStyle = `rgba(253,224,71,${labelA * (0.7 + 0.3 * pulse)})`;
                 ctx.font = 'italic bold 9px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-                ctx.fillText('BOUND', enemy.x, enemy.y - ringR - 6);
+                ctx.fillText(window._L3('BOUND', 'BOUND', '束缚'), enemy.x, enemy.y - ringR - 6);
             }
             ctx.restore();
         });
@@ -573,7 +573,7 @@ function drawSkillF() {
                 ctx.font = 'italic 13px monospace';
                 ctx.fillStyle = _greatSage ? '#ffe9a8' : '#aaffff';
                 if (!_mobPerf) ctx.shadowBlur = 8;
-                ctx.fillText(_greatSage ? ': Đấu Chiến Thắng Phật :' : ': Thiên Ý Trảm :', player.x, player.y - 96);
+                ctx.fillText(window._lang === 'zh' ? (_greatSage ? ': 斗战胜佛 :' : ': 天意斩 :') : (_greatSage ? ': Đấu Chiến Thắng Phật :' : ': Thiên Ý Trảm :'), player.x, player.y - 96);
                 ctx.restore();
             }
         }
@@ -594,7 +594,7 @@ function drawSkillF() {
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.font = `600 ${11 * hs}px Arial`;
         ctx.fillStyle = '#dce8ed';
-        ctx.fillText('Slash', canvas.width / 2, pillMid + 0.5 * hs);
+        ctx.fillText(window._L3('Slash', 'Slash', '斩击'), canvas.width / 2, pillMid + 0.5 * hs);
         for (const side of [-1, 1]) {
             const on = skillFDirection === side;
             const ax = canvas.width / 2 + side * 46 * hs;
@@ -1470,12 +1470,12 @@ function _drawGreatSageReleasePrompt() {
         && Number.isFinite(window._leoHudTop) && Math.abs(player.x - cx) < 179) {
         cy = Math.max(28, Math.min(cy, window._leoHudTop - 28));
     }
-    const label = ready72 ? '72 TRANSFORMATIONS READY' : 'STOLEN GEM READY';
-    const sub = ready72 ? 'F: unleash all 3 at once' : `F: release (${gems.length}/3 banked)`;
+    const label = window._lang === 'zh' ? (ready72 ? '七十二变就绪' : '宝石就绪') : ready72 ? '72 TRANSFORMATIONS READY' : 'STOLEN GEM READY';
+    const sub = window._lang === 'zh' ? (ready72 ? 'F：一次性释放全部 3 颗' : `F：释放（已存 ${gems.length}/3）`) : ready72 ? 'F: unleash all 3 at once' : `F: release (${gems.length}/3 banked)`;
 
     _beginScreenHud(cx, canvas.height / 2);
     ctx.save();
-    ctx.font = 'bold 13px "Courier New", Consolas, monospace';
+    ctx.font = window._lang === 'zh' ? 'bold 13px ' + window._FONT_ZH_UI : 'bold 13px "Courier New", Consolas, monospace';
     const labelW = ctx.measureText(label).width;
     const boxW = Math.max(labelW, 160) + 40, boxH = 40;
 
@@ -1494,7 +1494,7 @@ function _drawGreatSageReleasePrompt() {
     ctx.fillStyle = `rgba(253,224,71,${0.75 + 0.25 * pulse})`;
     ctx.fillText(label, cx, cy - 8);
 
-    ctx.font = '10px "Courier New", Consolas, monospace';
+    ctx.font = window._lang === 'zh' ? '10px ' + window._FONT_ZH_UI : '10px "Courier New", Consolas, monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText(sub, cx, cy + 10);
     ctx.restore();

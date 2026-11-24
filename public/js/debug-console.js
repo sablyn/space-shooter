@@ -371,7 +371,7 @@ function _debugSampleRecapData() {
     }
     return {
         score: 1284650, wave: 14, timeMs: 842000, livesStart: 12, livesLost: 12, cause: 'Leviathan',
-        sigils: [['capricorn', 0], ['leo', 5], ['pisces', 10]].map(([id, w]) => ({ id, name: SIGIL_DEFS[id].name, vi: (SIGIL_I18N_VI[id] || {}).name || SIGIL_DEFS[id].name, color: SIGIL_DEFS[id].color, atWave: w })),
+        sigils: [['capricorn', 0], ['leo', 5], ['pisces', 10]].map(([id, w]) => ({ id, name: SIGIL_DEFS[id].name, vi: (SIGIL_I18N_VI[id] || {}).name || SIGIL_DEFS[id].name, zh: (typeof SIGIL_I18N_ZH !== 'undefined' && SIGIL_I18N_ZH[id] || {}).name || SIGIL_DEFS[id].name, color: SIGIL_DEFS[id].color, atWave: w })),
         kills: { total: 1873, byType: { Apostle: 1320, Thaelis: 96, Marchosias: 88, Veilshroud: 77, Egregor: 71, Raphael: 61, Uriel: 58, Leviathan: 44, Dargruel: 42, Embryo: 15, Goliath: 1 } },
         matchStats: {
             allyDamage: { 'Player Auto-Fire': 2840000, 'Sentinel Auto-Fire': 1910000, 'Mountainfall': 1420000, 'Skill D: Death Star': 1180000, 'Divine Fate: Shatter': 960000, 'Skill G: Tesla Coil': 720000, 'Chain Lightning': 510000, 'Skill S: Remembrance Spirit': 480000, 'Solar Flare': 350000, 'Player Charged Shot': 260000, 'Pisces: Flow Fish': 140000, 'Other': 60000 },

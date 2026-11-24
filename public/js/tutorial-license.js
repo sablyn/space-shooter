@@ -3,33 +3,33 @@
     'use strict';
     const SLOTS = ['SH', 'A', 'S', 'D', 'F', 'G', 'SPC'];
     const WORDS = {
-        title: ['Voyage Pilot Licence', 'Giấy Phép Phi Công Hành Trình'],
-        class: ['Endless Voyage, Class I', 'Hành Trình Vô Tận, Hạng I'],
-        holder: ['LICENCE HOLDER', 'CHỦ GIẤY PHÉP'],
-        number: ['LICENCE NUMBER', 'SỐ GIẤY PHÉP'],
-        issued: ['ISSUED', 'NGÀY CẤP'],
-        reissued: ['REISSUED', 'CẤP LẠI'],
-        issuer: ['ISSUING OFFICER', 'NGƯỜI CẤP PHÉP'],
-        calibration: ['FLIGHT CALIBRATION', 'HIỆU CHUẨN BAY'],
-        stamp: ['CALIBRATED', 'ĐÃ HIỆU CHUẨN'],
-        begin: ['Begin Endless Voyage', 'Bắt Đầu Hành Trình Vô Tận'],
-        menu: ['Main menu', 'Menu chính'],
-        close: ['Close', 'Đóng'],
-        save: ['Save image', 'Lưu ảnh'],
-        name: ['Pilot name', 'Tên phi công'],
-        saving: ['Preparing image', 'Đang tạo ảnh'],
-        saved: ['Image ready', 'Ảnh đã sẵn sàng'],
-        error: ['Image unavailable. Try again.', 'Chưa tạo được ảnh. Hãy thử lại.']
+        title: ['Voyage Pilot Licence', 'Giấy Phép Phi Công Hành Trình', '远航飞行员执照'],
+        class: ['Endless Voyage, Class I', 'Hành Trình Vô Tận, Hạng I', '无尽远航，一级'],
+        holder: ['LICENCE HOLDER', 'CHỦ GIẤY PHÉP', '执照持有人'],
+        number: ['LICENCE NUMBER', 'SỐ GIẤY PHÉP', '执照编号'],
+        issued: ['ISSUED', 'NGÀY CẤP', '签发日期'],
+        reissued: ['REISSUED', 'CẤP LẠI', '补发'],
+        issuer: ['ISSUING OFFICER', 'NGƯỜI CẤP PHÉP', '签发人'],
+        calibration: ['FLIGHT CALIBRATION', 'HIỆU CHUẨN BAY', '飞行校准'],
+        stamp: ['CALIBRATED', 'ĐÃ HIỆU CHUẨN', '已校准'],
+        begin: ['Begin Endless Voyage', 'Bắt Đầu Hành Trình Vô Tận', '开始无尽远航'],
+        menu: ['Main menu', 'Menu chính', '主菜单'],
+        close: ['Close', 'Đóng', '关闭'],
+        save: ['Save image', 'Lưu ảnh', '保存图片'],
+        name: ['Pilot name', 'Tên phi công', '飞行员姓名'],
+        saving: ['Preparing image', 'Đang tạo ảnh', '正在生成图片'],
+        saved: ['Image ready', 'Ảnh đã sẵn sàng', '图片已就绪'],
+        error: ['Image unavailable. Try again.', 'Chưa tạo được ảnh. Hãy thử lại.', '图片生成失败，请重试。']
     };
     const STOP = ['stopAmbient', 'stopEngine', 'stopLaser', 'stopCharging', 'stopSkillDCharge', 'stopSkillFCharge', 'stopSkillFFire', 'stopDeathStar', 'stopMaouHaki', 'stopLowHp', 'stopNullSlashWindup', 'stopEgregorCrawl', 'stopPhotokrystosIdle', 'stopSkillGLoop', 'stopGoliathIdle', 'stopGoliathVerdictCharge', 'stopLeviathanIdle', 'stopAmmitIdle', 'stopAmmitCues', 'stopUrielIdle', 'stopUrielSwordHover', 'stopRaphaelIdle', 'stopCancerWhirlpool', 'stopCutsceneAmbience', 'exitGoliathTransformDuck', 'exitGoliathSpawnDuck', 'exitTimeDomain', 'stopBgm', 'stopTutorialSfx'];
     let overlay = null, card = null, view = null, base = null, stamp = null, seal = null, input = null, status = null;
-    let data = null, record = null, name = '', vi = false, portrait = false, opened = 0, raf = 0, active = false, elapsed = 0, cue = 0, reduced = false, focusReturn = null, generation = 0;
+    let data = null, record = null, name = '', vi = false, zh = false, portrait = false, opened = 0, raf = 0, active = false, elapsed = 0, cue = 0, reduced = false, focusReturn = null, generation = 0;
     let W = 1000, H = 650, scale = 1, stampX = 0, stampY = 0, sealX = 0, sealY = 0;
     const nameRect = { x: 0, y: 0, w: 0, h: 44 };
     const printRows = new Float32Array(7), printH = new Float32Array(7);
     const fonts = { title: '', ui: '', script: '' };
     const fontLoads = {};
-    function word(key) { return WORDS[key][vi ? 1 : 0]; }
+    function word(key) { return window._L3(WORDS[key][0], WORDS[key][1], WORDS[key][2]); }
     function clean(raw) { return Array.from(String(raw || '').normalize('NFC').replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f]/g, '').replace(/\s+/g, ' ').trim()).slice(0, 16).join(''); }
     function get(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
     function put(key, value) { try { localStorage.setItem(key, value); } catch (_) {} }
@@ -58,15 +58,15 @@
         return { number, issued, reissued: false };
     }
     function loadFonts() {
-        const v = vi, key = vi ? 'vi' : 'en';
+        const v = vi, z = zh, key = zh ? 'zh' : vi ? 'vi' : 'en';
         if (fontLoads[key]) return;
         fontLoads[key] = true;
         const link = document.createElement('link'); link.rel = 'stylesheet';
-        link.href = 'https://fonts.googleapis.com/css2?' + (vi ? 'family=Playfair+Display:wght@700&family=Be+Vietnam+Pro:wght@400;600;700&family=Cormorant+Garamond:ital,wght@1,600' : 'family=Cinzel:wght@700&family=Orbitron:wght@400;600;700&family=Cormorant+Garamond:ital,wght@1,600&family=Be+Vietnam+Pro:wght@600') + '&display=swap';
+        link.href = 'https://fonts.googleapis.com/css2?' + (zh ? 'family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@700;900&family=Cormorant+Garamond:ital,wght@1,600' : vi ? 'family=Playfair+Display:wght@700&family=Be+Vietnam+Pro:wght@400;600;700&family=Cormorant+Garamond:ital,wght@1,600' : 'family=Cinzel:wght@700&family=Orbitron:wght@400;600;700&family=Cormorant+Garamond:ital,wght@1,600&family=Be+Vietnam+Pro:wght@600') + '&display=swap';
         link.onload = function () {
             if (!document.fonts) return;
             // canvas text never requests a font by itself, so each face and its Vietnamese subset is loaded explicitly before the card is baked again
-            const probes = v ? [['700 38px "Playfair Display"', 'Giấy Phép Phi Công Hành Trình HẠNG ẤẠỆỔ'], ['400 22px "Be Vietnam Pro"', 'CHỦ GIẤY PHÉP HIỆU CHUẨN Ạ'], ['600 22px "Be Vietnam Pro"', 'Né ngay lần đầu Ạ'], ['italic 600 48px "Cormorant Garamond"', 'Kanade']] : [['700 38px Cinzel', 'Voyage Pilot Licence GRADE'], ['400 22px Orbitron', 'LICENCE HOLDER 0123456789'], ['600 22px Orbitron', 'Attempts'], ['italic 600 48px "Cormorant Garamond"', 'Kanade']];
+            const probes = v ? [['700 38px "Playfair Display"', 'Giấy Phép Phi Công Hành Trình HẠNG ẤẠỆỔ'], ['400 22px "Be Vietnam Pro"', 'CHỦ GIẤY PHÉP HIỆU CHUẨN Ạ'], ['600 22px "Be Vietnam Pro"', 'Né ngay lần đầu Ạ'], ['italic 600 48px "Cormorant Garamond"', 'Kanade']] : z ? [['700 38px "Noto Serif SC"', '远航飞行员执照等级'], ['400 22px "Noto Sans SC"', '执照持有人飞行校准'], ['600 22px "Noto Sans SC"', '首次即过'], ['italic 600 48px "Cormorant Garamond"', 'Kanade']] : [['700 38px Cinzel', 'Voyage Pilot Licence GRADE'], ['400 22px Orbitron', 'LICENCE HOLDER 0123456789'], ['600 22px Orbitron', 'Attempts'], ['italic 600 48px "Cormorant Garamond"', 'Kanade']];
             Promise.all(probes.map(function (p) { return document.fonts.load(p[0], p[1]); })).catch(function () {}).then(function () { if (active) { bake(); render(elapsed); } });
         };
         document.head.appendChild(link);
@@ -93,8 +93,8 @@
     function bake(resolution = 1) {
         portrait = innerHeight > innerWidth;
         W = portrait ? 720 : 1000; H = portrait ? 1000 : 650;
-        fonts.title = vi ? '"Playfair Display",Georgia,serif' : 'Cinzel,Georgia,serif';
-        fonts.ui = vi ? '"Be Vietnam Pro","Segoe UI",sans-serif' : 'Orbitron,"Segoe UI",sans-serif';
+        fonts.title = zh ? window._FONT_ZH_TITLE : vi ? '"Playfair Display",Georgia,serif' : 'Cinzel,Georgia,serif';
+        fonts.ui = zh ? window._FONT_ZH_UI : vi ? '"Be Vietnam Pro","Segoe UI",sans-serif' : 'Orbitron,"Segoe UI",sans-serif';
         fonts.script = '"Cormorant Garamond",Georgia,serif';
         if (!base) { base = document.createElement('canvas'); stamp = document.createElement('canvas'); seal = document.createElement('canvas'); }
         base.width = W * resolution; base.height = H * resolution;
@@ -133,7 +133,7 @@
         nameRect.x = rx; nameRect.y = 238; nameRect.w = rw;
         text(g, word('holder'), rx, 220, 22, fonts.ui, '#c3add8', rw);
         g.strokeStyle = '#8e7569'; g.lineWidth = 1; g.beginPath(); g.moveTo(rx, 288); g.lineTo(W - 49, 288); g.stroke();
-        const date = new Date(record.issued).toLocaleDateString(vi ? 'vi-VN' : 'en-GB');
+        const date = new Date(record.issued).toLocaleDateString(zh ? 'zh-CN' : vi ? 'vi-VN' : 'en-GB');
         field(g, word('number'), record.number, rx, 324, rw);
         field(g, word('issued'), date + (record.reissued ? ' (' + word('reissued').toLowerCase() + ')' : ''), rx, 405, rw);
         const cy = portrait ? 500 : 487;
@@ -145,9 +145,9 @@
             text(g, SLOTS[i] === 'SH' ? 'SH' : SLOTS[i] === 'SPC' ? 'SPC' : SLOTS[i], x + 8, y + 30, 22, fonts.ui, taught ? '#f4dca3' : '#776a87', cell - 12);
         }
         const metricsY = portrait ? 635 : 585;
-        const first = vi ? 'Né ngay lần đầu: ' + data.first + '/5' : 'First try: ' + data.first + '/5';
-        const tries = vi ? 'Tổng lần thử: ' + data.total : 'Attempts: ' + data.total;
-        const time = (vi ? 'Thời gian: ' : 'Time: ') + Math.floor(data.time / 60) + ':' + String(data.time % 60).padStart(2, '0');
+        const first = window._L3('First try: ' + data.first + '/5', 'Né ngay lần đầu: ' + data.first + '/5', '首次即过：' + data.first + '/5');
+        const tries = window._L3('Attempts: ' + data.total, 'Tổng lần thử: ' + data.total, '总尝试次数：' + data.total);
+        const time = (window._L3('Time: ', 'Thời gian: ', '用时：')) + Math.floor(data.time / 60) + ':' + String(data.time % 60).padStart(2, '0');
         text(g, first, 48, metricsY, 22, fonts.ui, '#eadcc7', portrait ? 340 : 330);
         text(g, tries, portrait ? 48 : 395, portrait ? metricsY + 42 : metricsY, 22, fonts.ui, '#c1b3d5', 280);
         text(g, time, portrait ? 400 : 690, metricsY, 22, fonts.ui, '#c1b3d5', portrait ? 270 : 261);
@@ -159,7 +159,7 @@
         // the grade sits in its own framed badge
         const bx = portrait ? 48 : 751, by = portrait ? 715 : 302, bw = 200, bh = portrait ? 70 : 62;
         cut(g, bx, by, bw, bh, 12); g.fillStyle = '#1a1428'; g.fill(); g.strokeStyle = '#d9bb7a'; g.lineWidth = 1.5; g.stroke(); g.lineWidth = 1;
-        text(g, vi ? 'HẠNG' : 'GRADE', bx + 18, by + bh / 2 + 7, 22, fonts.ui, '#c3add8', 100);
+        text(g, window._L3('GRADE', 'HẠNG', '等级'), bx + 18, by + bh / 2 + 7, 22, fonts.ui, '#c3add8', 100);
         text(g, data.rank, bx + bw - 62, by + bh / 2 + 17, 52, fonts.title, '#f1d795', 60);
         stampX = portrait ? 490 : 800; stampY = portrait ? 765 : 420;
         sealX = portrait ? 603 : 690; sealY = portrait ? 880 : 335;
@@ -185,7 +185,7 @@
     function render(ms, target) {
         const g = target || view.getContext('2d'), c = g.canvas;
         g.setTransform(c.width / W, 0, 0, c.height / H, 0, 0); g.clearRect(0, 0, W, H); g.drawImage(base, 0, 0, W, H);
-        text(g, name || (vi ? 'PHI CÔNG' : 'PILOT'), nameRect.x, 274, portrait ? 30 : 36, /[^\x20-\x7e]/.test(name) ? '"Be Vietnam Pro","Segoe UI",sans-serif' : fonts.ui, '#fff0cd', nameRect.w);
+        text(g, name || window._L3('PILOT', 'PHI CÔNG', '飞行员'), nameRect.x, 274, portrait ? 30 : 36, /[^\x20-\x7e]/.test(name) ? (zh ? window._FONT_ZH_UI : '"Be Vietnam Pro","Segoe UI",sans-serif') : fonts.ui, '#fff0cd', nameRect.w);
         const mrz = 'PSC<<' + (name || 'PILOT').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/Đ/g, 'D').replace(/[^A-Z0-9]/g, '<') + '<<' + record.number.replace(/-/g, '<') + '<<<<I';
         text(g, mrz, 48, H - 29, 22, 'monospace', '#a5a0b4', W - 95);
         if (ms < 1800) {
@@ -267,7 +267,7 @@
     function download(blob) { const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = record.number + '.png'; a.click(); setTimeout(function () { URL.revokeObjectURL(url); }, 10000); }
     function open(raw, reprint = false) {
         if (active) close();
-        vi = window._lang === 'vi'; data = stats(raw); name = clean(get('pisces_pilot_name')); record = identity(reprint);
+        vi = window._lang === 'vi'; zh = window._lang === 'zh'; data = stats(raw); name = clean(get('pisces_pilot_name')); record = identity(reprint);
         if (!reprint) put('pisces_license', JSON.stringify(record));
         reduced = !!window._fxOpts?.reducedMotion || matchMedia('(prefers-reduced-motion: reduce)').matches; active = true; generation++; elapsed = 0; cue = 0; focusReturn = document.activeElement;
         if (!document.getElementById('licenseStyle')) {
@@ -277,7 +277,7 @@
         }
         overlay = document.createElement('section'); overlay.id = 'licenseOverlay'; overlay.setAttribute('role', 'dialog'); overlay.setAttribute('aria-modal', 'true'); overlay.setAttribute('aria-label', word('title'));
         card = document.createElement('div'); card.className = 'license-card'; view = document.createElement('canvas'); view.setAttribute('role', 'img'); view.setAttribute('aria-label', word('title') + ', ' + record.number + ', ' + data.rank); card.appendChild(view);
-        input = document.createElement('input'); input.value = name; input.maxLength = 40; input.placeholder = vi ? 'PHI CÔNG' : 'PILOT'; input.autocomplete = 'nickname'; input.setAttribute('aria-label', word('name')); card.appendChild(input);
+        input = document.createElement('input'); input.value = name; input.maxLength = 40; input.placeholder = window._L3('PILOT', 'PHI CÔNG', '飞行员'); input.autocomplete = 'nickname'; input.setAttribute('aria-label', word('name')); card.appendChild(input);
         input.addEventListener('input', function () { name = clean(input.value); put('pisces_pilot_name', name); sfx('tut-license-name'); skip(); });
         input.addEventListener('blur', function () { input.value = name; }); input.addEventListener('pointerdown', function (e) { e.stopPropagation(); skip(); });
         card.addEventListener('pointerdown', skip); overlay.appendChild(card);

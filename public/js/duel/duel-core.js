@@ -2827,7 +2827,7 @@
                 if (this.transitionElapsed >= (nextP === 3 ? 4.0 : 3.2)) hudPhase = nextP;
             }
             UI.renderHUD(ctx, canvasW, canvasH, {
-                bossName: (function () { const isVi = typeof window !== 'undefined' && window._lang === 'vi'; if (hudPhase === 3) return isVi ? 'Chung Yên Hư Ngôn' : 'Voidword of the Final End'; if (hudPhase === 2) return isVi ? 'Thập Niệm Giáng Thế' : 'Descent of Ten Thoughts'; return isVi ? 'Thâm Miên Cổ Thần' : 'The Slumbering Elder'; })(),
+                bossName: (function () { const L3 = (typeof window !== 'undefined' && window._L3) || function (en) { return en; }; if (hudPhase === 3) return L3('Voidword of the Final End', 'Chung Yên Hư Ngôn', '终末虚言'); if (hudPhase === 2) return L3('Descent of Ten Thoughts', 'Thập Niệm Giáng Thế', '十念降世'); return L3('The Slumbering Elder', 'Thâm Miên Cổ Thần', '沉眠古神'); })(),
                 attackKey: def ? def.key : 'duel.attack.1',
                 attackId: opening ? 1 : this.attacks.currentAttackId,
                 attackSerial: opening ? (this.attackSerial || 0) + 1 : this.attackSerial,

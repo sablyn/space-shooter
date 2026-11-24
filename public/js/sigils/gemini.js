@@ -17,3 +17,8 @@ SIGIL_I18N_VI.gemini = { name: 'Song Tử', element: 'Phong', buffs: {
         bong_doi: { name: 'Ảnh Song', desc: 'Mỗi đòn trúng thứ 10 gọi 1 tàu bóng ma bắn 3 đợt cầu plasma xuyên khắp màn hình, gây Trọng Thương và Đoạt Hồn.' },
         guong_laze: { name: 'Gương Quang Tuyến', desc: 'Overload Laser có thêm 2 tia gương và +20% sát thương. Skill và đạn bắn còn có tỉ lệ nhỏ, tăng dần, bắn ra 1 cột laser xuyên trong 3s.' },
 }};
+
+SIGIL_I18N_ZH.gemini = { name: '双子座', element: '风', buffs: {
+        bong_doi: { name: '影之双子', desc: '每第10次友军命中召唤幻影双子战机，向全屏发射3波穿透等离子弹，附加易伤与夺魂。' },
+        guong_laze: { name: '镜面激光', desc: '超载激光获得2道镜像光束，伤害+20%。技能与射击还有小概率（随时间提升）发射一道穿透激光柱，持续3秒。' },
+}};

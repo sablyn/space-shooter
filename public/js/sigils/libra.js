@@ -17,3 +17,8 @@ SIGIL_I18N_VI.libra = { name: 'Thiên Bình', element: 'Huyết Quỷ Thuật', 
         mui_ten_apollo: { name: 'Huyết Tiễn', desc: 'Hồi chiêu Skill A -2s. Mỗi lần ấn tích 1 loạt 5 mũi tên xuyên; ấn khi có mục tiêu để bắn hết. Mũi tên phát nổ và gây Trọng Thương.' },
         xuyen_pha: { name: 'Tinh Xuyên', desc: 'Cầu Skill A xuyên qua mục tiêu tới mép màn hình, trúng mọi kẻ địch trên đường bay. Kích thước cầu +30%, sát thương +20%.' },
 }};
+
+SIGIL_I18N_ZH.libra = { name: '天秤座', element: '血魔法', buffs: {
+        mui_ten_apollo: { name: '血箭', desc: '技能A冷却-2秒。每次按下积攒一轮5支穿透箭；视野内有目标时按下可射出全部积攒的箭。箭矢爆炸并附加易伤。' },
+        xuyen_pha: { name: '星界穿刺', desc: '技能A法球穿透目标直达屏幕边缘，命中沿途所有敌人。法球体积+30%，伤害+20%。' },
+}};
